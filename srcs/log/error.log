@@ -1,0 +1,8 @@
+2024/03/20 05:46:46 [emerg] 7#7: unknown directive "worker_process" in /etc/nginx/nginx.conf:2
+2024/03/20 06:41:12 [emerg] 7#7: unknown directive "tcp_nocash" in /etc/nginx/nginx.conf:11
+2024/03/20 06:41:27 [emerg] 7#7: unknown directive "tcp_nocash" in /etc/nginx/nginx.conf:11
+2024/03/20 06:43:36 [emerg] 7#7: unknown directive "default" in /etc/nginx/nginx.conf:14
+2024/03/20 06:43:59 [emerg] 7#7: invalid number of arguments in "ssl_certificate" directive in /etc/nginx/nginx.conf:15
+2024/03/20 06:45:02 [emerg] 7#7: invalid number of arguments in "gzip" directive in /etc/nginx/nginx.conf:18
+2024/03/20 06:45:28 [emerg] 7#7: host not found in "ssl" of the "listen" directive in /etc/nginx/sites-enabled/nginx-app.conf:6
+2024/03/20 06:48:43 [emerg] 7#7: invalid number of arguments in "charset" directive in /etc/nginx/sites-enabled/nginx-app.conf:10

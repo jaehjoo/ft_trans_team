@@ -1,0 +1,63 @@
+version: "3"
+
+services:
+  nginx:
+    image: nginx
+    build:
+      context: ./requirements/nginx
+    container_name: nginx-alpha
+    ports:
+      - $NGINX_PORT:$NGINX_PORT
+    depends_on:
+      - django
+    volumes:
+      - was:/app/src/django
+    networks:
+      - intra
+    env_file:
+      - .env
+  django:
+    image: django
+    build:
+      context: ./requirements/django
+    container_name: django
+    networks:
+      - intra
+    restart: always
+    volumes:
+      - was:/app/src/django
+    depends_on:
+      - db
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_NAME=${DB_NAME}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_USER=${DB_USER}
+      - HOST_NAME = ${HOST_NAME}
+      - DB_PORT=${DB_PORT}
+  db:
+    image: postgres:15-alpine3.18
+    container_name: db
+    restart: always
+    networks:
+      - intra
+    volumes:
+      - db:/var/lib/postgresql/data
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_USER=${DB_USER}
+    ports:
+      - $DB_PORT:$DB_PORT
+
+
+volumes:
+  db:
+  was:
+
+networks:
+  intra:
+    driver: bridge
