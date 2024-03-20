@@ -9,12 +9,13 @@ RUN pip install -r requirements.txt
 
 RUN django-admin startproject config .
 RUN python3 manage.py startapp users
-RUN mkdir -p /app/src/django/templates/users /app/src/django/static/css /app/src/django/tools /app/src/django/media
+RUN mkdir -p /app/src/django/templates/users /app/src/django/.static /app/src/django/tools /app/src/django/.media
 
 
 COPY ./src/ /app/src/django/
 COPY ./tools/script.sh /app/src/django/tools/
 
+RUN pip install gunicorn
 RUN chmod +x /app/src/django/tools/script.sh
 
 EXPOSE $DJANGO_PORT

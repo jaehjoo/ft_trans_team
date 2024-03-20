@@ -1,4 +1,6 @@
 Django==5.0.1
 psycopg2-binary==2.9.9
 Pillow<10
-gunicorn==21.2.0
+channels==4.0.0
+requests==2.31.0
+django-cors-headers==4.1.0

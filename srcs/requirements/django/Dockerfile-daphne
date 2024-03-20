@@ -1,0 +1,20 @@
+FROM python:3.11.8-alpine3.18
+
+WORKDIR /app/src/django
+
+RUN apk add --no-cache gcc bash musl-dev jpeg-dev zlib-dev libffi-dev cairo-dev pango-dev gdk-pixbuf-dev
+
+RUN pip install daphne
+
+RUN pip install --upgrade pip
+
+RUN mkdir -p /app/src/django/config
+
+COPY ./src/config/ /app/src/django/config/
+COPY ./requirements.txt .
+
+RUN pip install -r requirements.txt
+
+EXPOSE $ASGI_PORT
+
+ENTRYPOINT [ "daphne", "-b", "0.0.0.0", "-p", "8001", "config.asgi:application" ]

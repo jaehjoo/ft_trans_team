@@ -9,18 +9,20 @@ services:
     ports:
       - $NGINX_PORT:$NGINX_PORT
     depends_on:
-      - django
+      - django-wsgi
+      - django-asgi
     volumes:
       - was:/app/src/django
     networks:
       - intra
     env_file:
       - .env
-  django:
-    image: django
+  django-wsgi:
+    image: django-wsgi
     build:
       context: ./requirements/django
-    container_name: django
+      dockerfile: Dockerfile
+    container_name: django-wsgi
     networks:
       - intra
     restart: always
@@ -28,6 +30,28 @@ services:
       - was:/app/src/django
     depends_on:
       - db
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_NAME=${DB_NAME}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_USER=${DB_USER}
+      - HOST_NAME = ${HOST_NAME}
+      - DB_PORT=${DB_PORT}
+  django-asgi:
+    image: django-asgi
+    build:
+      context: ./requirements/django
+      dockerfile: Dockerfile-daphne
+    container_name: django-asgi
+    restart: always
+    networks:
+      - intra
+    depends_on:
+      - db
+      - django-wsgi
+    volumes:
+      - was:/app/src/django
     env_file:
       - .env
     environment:
