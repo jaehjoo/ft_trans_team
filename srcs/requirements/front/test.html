@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Send JSON to Server</title>
+</head>
+<body>
+
+<h2>Send JSON to Server</h2>
+
+<textarea id="jsonData" rows="10" cols="50">{
+  "name": "John Doe",
+  "age": 30,
+  "email": "john@example.com"
+}</textarea>
+
+<button onclick="sendData()">Send JSON</button>
+
+<script>
+function sendData() {
+  var jsonData = document.getElementById('jsonData').value;
+  
+  try {
+    var parsedData = JSON.parse(jsonData);
+    
+    var xhr = new XMLHttpRequest();
+    var url = 'https://localhost/api/test'; // 서버의 엔드포인트 URL을 여기에 넣으세요
+
+    xhr.open('POST', url, true);
+    xhr.setRequestHeader('Authorization', '');
+
+    // CSRF 토큰 가져오기
+    var csrftoken = getCookie('csrftoken');
+    xhr.setRequestHeader('X-CSRFToken', csrftoken); // 요청 헤더에 CSRF 토큰 추가
+
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        console.log('Data sent successfully');
+      }
+    };
+    xhr.send(JSON.stringify(parsedData));
+  } catch (error) {
+    console.error('Error parsing JSON:', error);
+  }
+}
+
+// CSRF 토큰 가져오는 함수
+function getCookie(name) {
+  var cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+      var cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+</script>
+
+</body>
+</html>

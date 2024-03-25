@@ -12,7 +12,9 @@ services:
       - django-wsgi
       - django-asgi
     volumes:
-      - was:/app/src/django
+      - ./requirements/front:/var/www/html
+      - static:/var/www/html/static
+      - cert:/etc/nginx/ssl
     networks:
       - intra
     env_file:
@@ -27,7 +29,8 @@ services:
       - intra
     restart: always
     volumes:
-      - was:/app/src/django
+      - static:/app/src/django/.static
+      - cert:/etc/nginx/ssl
     depends_on:
       - db
     env_file:
@@ -38,6 +41,7 @@ services:
       - POSTGRES_USER=${DB_USER}
       - HOST_NAME = ${HOST_NAME}
       - DB_PORT=${DB_PORT}
+      - WSGI=1
   django-asgi:
     image: django-asgi
     build:
@@ -51,7 +55,8 @@ services:
       - db
       - django-wsgi
     volumes:
-      - was:/app/src/django
+      - static:/app/src/django/.static
+      - cert:/etc/nginx/ssl
     env_file:
       - .env
     environment:
@@ -60,6 +65,7 @@ services:
       - POSTGRES_USER=${DB_USER}
       - HOST_NAME = ${HOST_NAME}
       - DB_PORT=${DB_PORT}
+      - WSGI=0
   db:
     image: postgres:15-alpine3.18
     container_name: db
@@ -80,7 +86,8 @@ services:
 
 volumes:
   db:
-  was:
+  static:
+  cert:
 
 networks:
   intra:

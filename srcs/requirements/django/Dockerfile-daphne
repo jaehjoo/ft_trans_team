@@ -10,7 +10,7 @@ RUN pip install --upgrade pip
 
 RUN mkdir -p /app/src/django/config
 
-COPY ./src/config/ /app/src/django/config/
+COPY ./src/ /app/src/django/
 COPY ./requirements.txt .
 
 RUN pip install -r requirements.txt

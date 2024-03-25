@@ -9,7 +9,7 @@ RUN pip install -r requirements.txt
 
 RUN django-admin startproject config .
 RUN python3 manage.py startapp users
-RUN mkdir -p /app/src/django/templates/users /app/src/django/.static /app/src/django/tools /app/src/django/.media
+RUN mkdir -p /app/src/django/.static /app/src/django/tools /app/src/django/.media
 
 
 COPY ./src/ /app/src/django/

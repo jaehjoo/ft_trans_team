@@ -1,43 +1,114 @@
-from django.contrib.auth import authenticate, login, logout
-from django.shortcuts import render, redirect
-from users.forms import LoginForm, SignupForm
+import requests, base64, hashlib, json, os
+from django.core import serializers
+from django.http import JsonResponse
+from datetime import datetime
 from users.models import User
+from users import jwt
+from users import enroll42
 
-def login_view(request):
-	if request.user.is_authenticated:
-		return redirect("/posts/feeds")
-	if request.method == "POST":
-		form = LoginForm(data = request.POST)
-		if form.is_valid():
-			username = form.cleaned_data["username"]
-			password = form.cleaned_data["password"]
-			user = authenticate(username=username, password=password)
-			if user:
-				login(request, user)
-				return redirect("/posts/feeds/")
+def auth_access(request):
+	try:
+		token_json = json.loads(request.body)
+	except json.JSONDecodeError:
+		return None
+	token = token_json.get('access', None)
+	if token:
+		payload = jwt.decode_access(token)
+		date = payload.get('exp', None)
+		if date:
+			user = User.objects.get(username=payload.get('user', None))
+			if date > datetime.now():
+				user.connect = "Y"
+				user.save()
+				return payload
 			else:
-				form.add_error(None, "입력한 자격증명에 해당하는 사용자가 없습니다")
-		print("form.is_valid():", form.is_valid())
-		print("form.cleaned_data:", form.cleaned_data)
-		context = {"form": form}
-		return render(request, "users/login.html", context)
-	else:
-		form = LoginForm()
-		context = {"form": form}
-		return render(request, "users/login.html", context)
+				user.connect = "N"
+				user.save()
+	return None
 
-def logout_view(request):
-	logout(request)
-	return redirect("/users/login/")
+def auth_refresh(request):
+	try:
+		token_json = json.loads(request.body)
+	except json.JSONDecodeError:
+		return None
+	token = token_json.get('refresh', None)
+	if token:
+		payload = jwt.decode_refresh(token)
+		date = payload.get('exp', None)
+		if date:
+			if date > datetime.now():
+				return payload
+	return None
 
-def signup(request):
-	if request.method == "POST":
-		form = SignupForm(data=request.POST, files=request.FILES)
-		if form.is_valid():
-			user = form.save()
-			login(request, user)
-			return redirect("/posts/feeds/")
+# GET : 42 인증 요청
+# POST : invalid
+def auth_42(request):
+	if request.method == 'GET':
+		return enroll42.generate_42(request)
+	return None
+
+# def auth_2fa(request):
+
+
+def login(request):
+	if auth_access(request):
+		return JsonResponse(
+			{
+				'success' : 'Y',
+				'message' : 'success.login.already',
+				'redirect_uri' : 'index'
+			}
+		)
+	user = auth_42(request)
+	if user:
+		return JsonResponse(
+			{
+				'success' : 'Y',
+				'message' : 'success.auth.42',
+				'redirect_uri' : 'auth2fa',
+				'context' : {
+					'access' : jwt.generate_access(user),
+					'refresh' : jwt.generate_refresh(user)
+				}
+			}
+		)
+	return JsonResponse(
+		{
+			'success' : 'N',
+			'meesage' : 'fail.auth.42',
+			'redirect_uri' : 'login'
+		}
+	)
+
+def index(request):
+	access = auth_access(request)
+	refresh = auth_refresh(request)
+	if access:
+		return JsonResponse( 
+			{
+				"success" : "Y",
+				"messages" : "success.login",
+				"redirect_uri" : "profile"
+			}
+		)
+	elif refresh:
+		user_obj = User.objects.get(username=refresh.get('name'))
+		if user_obj:
+			return JsonResponse(
+				{
+					"success" : "N",
+					"message" : "fail.auth.access",
+					"redirect_uri" : "index",
+					"content" : {
+						'access' : jwt.generate_access(user_obj)
+					}
+				}
+			)
 	else:
-		form = SignupForm()
-	context = {"form": form}
-	return render(request, "users/signup.html", context)
+		return JsonResponse(
+			{
+				"success" : "N",
+				"message" : "fail.auth.all",
+				"redirect_uri" : "login"
+			} 
+		)

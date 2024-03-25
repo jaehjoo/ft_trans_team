@@ -15,5 +15,7 @@ RUN mkdir -p /etc/nginx/sites-enabled/ /etc/nginx/ssl/\
 
 RUN chmod +x /usr/local/bin/script.sh
 
+WORKDIR /var/www/html
+
 ENTRYPOINT [ "/usr/bin/dumb-init", "--", "sh", "/usr/local/bin/script.sh" ]
 CMD [ "nginx", "-g", "daemon off;" ]

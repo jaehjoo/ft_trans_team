@@ -1,4 +1,15 @@
-from django.shortcuts import render, redirect
+from django.http import JsonResponse
 
-def index(request):
-	pass
+def pong(request):
+	if request.method == "GET":
+		return JsonResponse(
+			{
+				"ping" : "pong"
+			}
+		)
+	else:
+		return JsonResponse(
+			{
+				"ping" : "fail"
+			}
+		)
