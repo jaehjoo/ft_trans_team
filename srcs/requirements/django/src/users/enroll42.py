@@ -3,13 +3,15 @@ from users.models import User
 def generate_42(request):
 	
 	code = request.GET.get('code')
+	uri = "transcendence.kgnj.kr"
+	uri = "https://" + uri + "/shallwe"
 	if code:
 		data = {
 			'grant_type' : 'authorization_code',
 			'client_id' : os.environ.get('42_CLIENT_ID'),
 			'client_secret' : os.environ.get('42_CLIENT_SECRET'),
 			'code' : code,
-			'redirect_uri' : 'https://transcendence.kgnj.kr/shallwe'
+			'redirect_uri' : uri
 		}
 		data_42 = requests.post('https://api.intra.42.fr/oauth/token', data=data)
 		access_token = data_42.json()["access_token"]

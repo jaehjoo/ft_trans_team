@@ -2,6 +2,7 @@ import Start from "./views/Start.js";
 import Posts from "./views/Posts.js";
 import Settings from "./views/Login.js";
 import GetCode from "./views/GetCode.js";
+import TwoFactor from "./views/2fa.js";
 
 const navigateTo = url => {
 	history.pushState(null, null, url);
@@ -13,7 +14,8 @@ const router = async () => {
 		{ path: "/", view: Start },
 		{ path: "/posts", view: Posts },
 		{ path: "/settings", view: Settings },
-		{ path: "/shallwe", view: GetCode }
+		{ path: "/shallwe", view: GetCode },
+		{ path: "/twofactor", view: TwoFactor}
 	];
 	
 	const potentialMatches = routes.map(route => {
@@ -35,6 +37,10 @@ const router = async () => {
 	const view = new match.route.view();
 
 	document.querySelector("#app").innerHTML = await view.getHtml();
+
+    if (match.route.path === "/twofactor") {
+        await view.executeScript();
+    }
 };
 
 window.addEventListener("popstate", router);

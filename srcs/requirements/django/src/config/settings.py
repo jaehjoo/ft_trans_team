@@ -29,7 +29,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'django-wsgi', 'django-asgi'
-    ]
+]
 
 
 # Application definition
@@ -43,7 +43,7 @@ if WSGI:
         'django.contrib.contenttypes',
         'django.contrib.sessions',
         'django.contrib.messages',
-        'django.contrib.staticfiles',
+        'django.contrib.staticfiles'
     ]
 else:
     INSTALLED_APPS = [
@@ -129,7 +129,6 @@ CORS_ALLOW_HEADERS = (
     'x-requested-with',
 )
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
@@ -176,6 +175,15 @@ USE_I18N = True
 
 USE_TZ = True
 
+# EMAIL
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.naver.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'wnwoduq@naver.com'
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_SECRET')
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/

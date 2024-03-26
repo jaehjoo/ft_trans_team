@@ -26,12 +26,12 @@ export default class TwoFactor extends AbstractView {
 		const OTPBtn = document.getElementById('OTPFaBtn');
 		EMAILBtn.addEventListener("click", async () => {
 			console.log("EMAIL button clicked!");
-			const data = await this.postData("https://transcendence.kgnj.kr/api/auth2fa", {'X-CSRFToken' : csrftoken}, { 'access' : access, 'email' : "Y"});
+			const data = await this.postData("https://transcendence.kgnj.kr/api/input2fa", {'X-CSRFToken' : csrftoken}, { 'access' : access, 'email' : "Y"});
 			console.log(data);
 		});
 		SMSBtn.addEventListener("click", async () => {
 			console.log("SMS button clicked!");
-			const data = await this.postData("https://transcendence.kgnj.kr/api/auth2fa", {'X-CSRFToken' : csrftoken }, { 'access' : access, 'SMS' : "Y"});
+			const data = await this.postData("https://transcendence.kgnj.kr/api/input2fa", {'X-CSRFToken' : csrftoken }, { 'access' : access, 'SMS' : "Y"});
 			console.log(data);
 		});
 		OTPBtn.addEventListener("click", async () => {

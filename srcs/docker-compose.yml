@@ -15,6 +15,7 @@ services:
       - ./requirements/front:/var/www/html
       - static:/var/www/html/static
       - cert:/etc/nginx/ssl
+      - media:/var/www/html/media
     networks:
       - intra
     env_file:
@@ -31,6 +32,7 @@ services:
     volumes:
       - static:/app/src/django/.static
       - cert:/etc/nginx/ssl
+      - media:/app/src/django/.media
     depends_on:
       - db
     env_file:
@@ -56,6 +58,7 @@ services:
       - django-wsgi
     volumes:
       - static:/app/src/django/.static
+      - media:/app/src/django/.media
       - cert:/etc/nginx/ssl
     env_file:
       - .env
@@ -88,6 +91,7 @@ volumes:
   db:
   static:
   cert:
+  media:
 
 networks:
   intra:

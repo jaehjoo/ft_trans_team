@@ -23,8 +23,9 @@ export default class AbstractView {
 	async getData(url = "", value = {}) {
 		try {
 			const response = await fetch(url, value);
-			if (response.ok)
+			if (response.ok) {
 				return response.json();
+			}
 		} catch (error) {
 			return null
 		}

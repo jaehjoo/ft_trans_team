@@ -1,5 +1,7 @@
 #!/bin/sh
 
+export HOST_IP=$(ping -c 1 host.docker.internal | grep "PING" | cut -d "(" -f 2 | cut -d ")" -f 1)
+
 echo "set nginx configure"
 sed -i "s/listen s ssl;/listen ${NGINX_PORT} ssl;/g" /etc/nginx/sites-available/nginx-app.conf
 sed -i "s/listen \[::\]: s ssl;/listen \[::\]:${NGINX_PORT} ssl;/g" /etc/nginx/sites-available/nginx-app.conf

@@ -1,12 +1,17 @@
-export function check_jwt_token() {
+export async function check_jwt_token() {
 	let access_token = localStorage.getItem('access');
 	let refresh_token = localStorage.getItem('refresh');
-	let data;
+	let url = "https://transcendence.kgnj.kr/api/main"
 	if (access_token) {
-		data = this.getData("https://transcendence.kgnj.kr/api/index", {"access" : access_token, "refresh" : refresh_token});
+		url = url + "?access=" + access_token + "&refresh=" + refresh_token
+		response = await fetch(url, {
+			method : 'GET'
+		});
 	}
 	else {
-		data = this.getData("https://transcendence.kgnj.kr/api/index", {});
+		url = url + "?access=null&refresh=null"
+		const response = await fetch(url, {
+			method : 'GET'
+		});
 	}
-	return data;
 }

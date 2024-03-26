@@ -2,8 +2,9 @@ from django.urls import path
 from users import views
 
 urlpatterns = [
-	path('index', views.index, name='index'),
+	path('main', views.main, name='main'),
 	path('login', views.login, name='login'),
-	path('auth42', views.login, name='auth42')
-	# path('auth2fa', views.auth_2fa, name='auth2fa')
+	path('auth42', views.login, name='auth42'),
+	path('auth2fa', views.TwoFactor, name='auth2fa'),
+	path('input2fa', views.inputTwoFactor, name='input2fa')
 ]

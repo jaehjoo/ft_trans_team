@@ -8,8 +8,7 @@ export default class Start extends AbstractView {
 	}
 
 	async getHtml() {
-		let data = check_jwt_token();
-		console.log(data);
+		check_jwt_token();
 		return `
 			<h1>Welcome back, Dom</h1>
 			<p>
