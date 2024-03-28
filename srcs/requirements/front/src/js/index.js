@@ -3,6 +3,7 @@ import Posts from "./views/Posts.js";
 import Settings from "./views/Login.js";
 import GetCode from "./views/GetCode.js";
 import TwoFactor from "./views/2fa.js";
+import input2fa from "./views/input2fa.js"
 
 const navigateTo = url => {
 	history.pushState(null, null, url);
@@ -15,7 +16,8 @@ const router = async () => {
 		{ path: "/posts", view: Posts },
 		{ path: "/settings", view: Settings },
 		{ path: "/shallwe", view: GetCode },
-		{ path: "/twofactor", view: TwoFactor}
+		{ path: "/twofactor", view: TwoFactor},
+		{ path: "/input2fa", view : input2fa }
 	];
 	
 	const potentialMatches = routes.map(route => {
@@ -38,7 +40,7 @@ const router = async () => {
 
 	document.querySelector("#app").innerHTML = await view.getHtml();
 
-    if (match.route.path === "/twofactor") {
+    if (match.route.path === "/twofactor" || match.route.path === "/input2fa") {
         await view.executeScript();
     }
 };

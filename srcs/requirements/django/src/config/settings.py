@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-o6t1oz+tk^e6!8y*ij*4j#n=sus^ap)m@-!=72f1=q4)v-1f0@
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'django-wsgi', 'django-asgi'
+    'localhost', 'transcendence.kgnj.kr'
 ]
 
 
@@ -49,6 +49,7 @@ else:
     INSTALLED_APPS = [
 	    "daphne",
         'corsheaders',
+        'channels',
         'django.contrib.admin',
         'django.contrib.auth',
         'django.contrib.contenttypes',
@@ -59,9 +60,9 @@ else:
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+	'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-	'corsheaders.middleware.CorsMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -188,7 +189,7 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = "/static/"
+STATIC_URL = "static/"
 
 STATICFIELS_DIRS = [
 	BASE_DIR / ".static",
@@ -196,7 +197,7 @@ STATICFIELS_DIRS = [
 
 STATIC_ROOT = BASE_DIR / ".static"
 
-MEDIA_URL = "/media/"
+MEDIA_URL = "media/"
 
 MEDIA_ROOT = BASE_DIR / ".media"
 

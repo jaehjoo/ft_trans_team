@@ -26,7 +26,10 @@ def auth_access(request):
 	if dict_access:
 			date = dict_access.get('exp', None)
 			if date:
-				user = User.objects.get(username=dict_access.get('user', None))
+				try:
+					user = User.objects.get(username=dict_access.get('user', None))
+				except User.DoesNotExist:
+					return None
 				if date > datetime.now():
 					user.connect = "Y"
 					user.save()
@@ -41,7 +44,7 @@ def auth_refresh(request):
 		try:
 			data = request.GET.get('refresh')
 			dict_access = jwt.decode_access(data)
-		except:
+		except json.JSONDecodeError:
 			return None
 	elif request.method == 'POST':
 		try:
@@ -54,7 +57,10 @@ def auth_refresh(request):
 	if dict_access:
 			date = dict_access.get('exp', None)
 			if date:
-				user = User.objects.get(username=dict_access.get('user', None))
+				try:
+					user = User.objects.get(username=dict_access.get('user', None))
+				except User.DoesNotExist:
+					return None
 				if date > datetime.now():
 					user.connect = "Y"
 					user.save()
@@ -71,14 +77,13 @@ def auth_42(request):
 		return enroll42.generate_42(request)
 	return None
 
-
 def login(request):
 	if request.method == 'POST':
 		return JsonResponse(
 			{
 				'success' : 'N',
 				'message' : 'fail.login.nopost',
-				'redirect_uri' : 'index'
+				'redirect_uri' : 'main'
 			}
 		)
 	csrftoken = get_token(request)
@@ -87,7 +92,7 @@ def login(request):
 			{
 				'success' : 'Y',
 				'message' : 'success.login.already',
-				'redirect_uri' : 'index',
+				'redirect_uri' : 'main',
 				'csrftoken' : csrftoken
 			}
 		)
@@ -98,7 +103,7 @@ def login(request):
 				'success' : 'Y',
 				'message' : 'success.auth.42',
 				'redirect_uri' : 'auth2fa',
-				'context' : {
+				'content' : {
 					'access' : jwt.generate_access(user),
 					'refresh' : jwt.generate_refresh(user),
 					'csrftoken' : csrftoken
@@ -122,7 +127,7 @@ def main(request):
 				{
 					"success" : "Y",
 					"messages" : "success.login",
-					"redirect_uri" : "profile",
+					"redirect_uri" : "main",
 				}
 			)
 		elif refresh:
@@ -145,16 +150,17 @@ def main(request):
 	)
 	
 def TwoFactor(request):
-	if request.GET.get('email'):
+	content = json.loads(request.body)
+	if content.get('email', None):
 		if enroll2fa.send_email(request):
 			return JsonResponse(
 				{
 					'success' : 'Y',
 					'meesage' : 'success.auth.2fa',
-					'redirect_uri' : 'index'
+					'redirect_uri' : 'main'
 				}
 			)
-	elif request.GET.get('OTP'):
+	elif content.get('OTP', None):
 		data = enroll2fa.send_otp(request)
 		if data:
 			return JsonResponse(

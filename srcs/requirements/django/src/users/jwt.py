@@ -47,6 +47,10 @@ def generate_access(user_obj):
 	return access
 
 def decode_access(access):
+	if access is None:
+		return {
+			'error': 'token dose not exist'
+		}
 	array = access.split('.')
 
 	decode_payload = json.loads(base64.urlsafe_b64decode(array[0].encode('utf-8')).decode('utf-8'))

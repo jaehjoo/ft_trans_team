@@ -1,7 +1,7 @@
 import AbstractView from "./AbstractView.js"
 import getCookie from "../utils/getCookie.js"
 
-export default class TwoFactor extends AbstractView {
+export default class input2fa extends AbstractView {
 	constructor() {
 		super();
 		this.setTitle("TwoFactor");
@@ -9,11 +9,13 @@ export default class TwoFactor extends AbstractView {
 
 	async getHtml() {
 		return `
-			<h1>Please select 2fa</h1>
+			<h1>Please input 2fa code</h1>
 			<div>
-				<button id="EMAILFaBtn">EMAIL</button>
-				<button id="SMSFaBtn">SMS</button>
-				<button id="OTPFaBtn">OTP</button>
+				<h4>코드 기입란입니다</h4>
+				<h4>OTP 사용 희망자는 google authenticator에 qr 코드 내용물로 등록해주세요</h4>
+				<img src=https://transcendence.kgnj.kr/media/qr.jpg>
+				<input type="text" placeholder="코드를 입력해주세요" id="code2fa">
+				<input type="button" value="보내기" id="input2faBtn">
 			</div>
 		`
 	}
@@ -21,22 +23,12 @@ export default class TwoFactor extends AbstractView {
 	async executeScript() {
 		const access = localStorage.getItem('access');
 		const csrftoken = getCookie('csrftoken');
-		const EMAILBtn = document.getElementById('EMAILFaBtn');
-		const SMSBtn = document.getElementById('SMSFaBtn');
-		const OTPBtn = document.getElementById('OTPFaBtn');
-		EMAILBtn.addEventListener("click", async () => {
-			console.log("EMAIL button clicked!");
-			const data = await this.postData("https://transcendence.kgnj.kr/api/input2fa", {'X-CSRFToken' : csrftoken}, { 'access' : access, 'email' : "Y"});
-			console.log(data);
-		});
-		SMSBtn.addEventListener("click", async () => {
-			console.log("SMS button clicked!");
-			const data = await this.postData("https://transcendence.kgnj.kr/api/input2fa", {'X-CSRFToken' : csrftoken }, { 'access' : access, 'SMS' : "Y"});
-			console.log(data);
-		});
-		OTPBtn.addEventListener("click", async () => {
-			console.log("OTP button clicked!");
-			const data = await this.postData("https://transcendence.kgnj.kr/api/auth2fa", {'X-CSRFToken' : csrftoken }, {'access' : access, 'OTP' : "Y"});
+		const input2faBtn = document.getElementById('input2faBtn');
+		input2faBtn.addEventListener("click", async () => {
+			console.log("2fa code send button clicked!");
+			const code = document.getElementById('code2fa').value;
+			console.log(access);
+			const data = await this.postData("https://transcendence.kgnj.kr/api/input2fa", {'X-CSRFToken' : csrftoken}, { 'access' : access, 'code' : code});
 			console.log(data);
 		});
 	}

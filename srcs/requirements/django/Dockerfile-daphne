@@ -9,12 +9,17 @@ RUN pip install daphne
 RUN pip install --upgrade pip
 
 RUN mkdir -p /app/src/django/config
+RUN mkdir -p /app/src/django/.static /app/src/django/tools /app/src/django/.media
 
 COPY ./src/ /app/src/django/
 COPY ./requirements.txt .
 
+COPY ./tools/script.sh /app/src/django/tools/
+
 RUN pip install -r requirements.txt
+RUN chmod +x /app/src/django/tools/script.sh
 
 EXPOSE $ASGI_PORT
 
-ENTRYPOINT [ "daphne", "-b", "0.0.0.0", "-p", "8001", "config.asgi:application" ]
+ENTRYPOINT ["sh", "/app/src/django/tools/script.sh"]
+CMD [ "daphne", "-b", "0.0.0.0", "-p", "8001", "config.asgi:application" ]

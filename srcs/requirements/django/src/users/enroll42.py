@@ -1,7 +1,7 @@
 import requests, json, os
-from users.models import User
+from users.models import User, UserKey, UserAvatar
+
 def generate_42(request):
-	
 	code = request.GET.get('code')
 	uri = "transcendence.kgnj.kr"
 	uri = "https://" + uri + "/shallwe"
@@ -25,10 +25,14 @@ def generate_42(request):
 			return user
 		except User.DoesNotExist:
 			is_user = User(
-				username=user_name, display_name=display_name, password=access_token,
-				auth42=True, has2fa=0, email=user_email_address, phone_number=user_phone_number,
-				verification_code=0, connect=False
+				username=user_name, display_name=display_name,
+				email=user_email_address, phone_number=user_phone_number,
+				connect=True
 				)
 			is_user.save()
+			is_key = UserKey(me=is_user, auth42=True, access_42=access_token)
+			is_key.save()
+			is_avatar = UserAvatar(me=is_user)
+			is_avatar.save()
 			return is_user
 	return None
