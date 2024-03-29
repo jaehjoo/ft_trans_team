@@ -22,13 +22,13 @@ export default class input2fa extends AbstractView {
 
 	async executeScript() {
 		const access = localStorage.getItem('access');
-		const csrftoken = getCookie('csrftoken');
 		const input2faBtn = document.getElementById('input2faBtn');
 		input2faBtn.addEventListener("click", async () => {
 			console.log("2fa code send button clicked!");
+			const csrftoken = getCookie('csrftoken')
 			const code = document.getElementById('code2fa').value;
 			console.log(access);
-			const data = await this.postData("https://transcendence.kgnj.kr/api/input2fa", {'X-CSRFToken' : csrftoken}, { 'access' : access, 'code' : code});
+			const data = await this.postData("https://transcendence.kgnj.kr/api/input2fa", { 'X-CSRFToken' : csrftoken },  { 'access' : access, 'code' : code});
 			console.log(data);
 		});
 	}

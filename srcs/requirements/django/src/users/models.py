@@ -18,7 +18,7 @@ class User(AbstractUser):
 
 # 사용자에게 필요한 인증키(42, 2fa)를 담아둔 모델
 class UserKey(models.Model):
-	me = models.ForeignKey(User, on_delete=models.CASCADE)
+	me = models.ForeignKey(User, related_name="key", on_delete=models.CASCADE)
 	# 42 인증 여부와 42 액세스 토큰
 	auth42 = models.BooleanField(default=False)
 	access_42 = models.CharField(max_length=80, default="")
@@ -29,7 +29,7 @@ class UserKey(models.Model):
 
 # 사용자의 아바타 기록
 class UserAvatar(models.Model):
-	me = models.ForeignKey(User, on_delete=models.CASCADE)
+	me = models.ForeignKey(User, related_name="avatar", on_delete=models.CASCADE)
 	# 각 종류 개수에 따라 maximum 추후 지정 예정
 	hair = models.IntegerField(default=0)
 	eye = models.IntegerField(default=0)
@@ -38,16 +38,16 @@ class UserAvatar(models.Model):
 	medal_color = models.IntegerField(default=0)
 
 # 사용자의 게임 기록
-# class UserRecordGame(models.model):
-# 	me = models.ForeignKey(User, on_delete=models.CASCADE)
-# 	win = models.IntegerField(default=0)
-# 	lose = models.IntegerField(default=0)
-# 	rating = models.IntegerField(defualt=0)
+class UserRecordGame(models.Model):
+	me = models.ForeignKey(User, related_name="record", on_delete=models.CASCADE)
+	win = models.IntegerField(default=0)
+	lose = models.IntegerField(default=0)
+	rating = models.IntegerField(default=0)
 
 # 사용자의 친구 기록
-# class UserRecordFriends(models.model):
-# 	me = models.ForeignKey(User, on_delete=models.CASCADE)
-# 	friends = models.CharField(default="")
+class UserRecordFriends(models.Model):
+	me = models.ForeignKey(User, related_name="friends", on_delete=models.CASCADE)
+	friends = models.ForeignKey(User, related_name="friend_of", on_delete=models.CASCADE)
 
 
 # class UserRecentlyRecode(models.model):

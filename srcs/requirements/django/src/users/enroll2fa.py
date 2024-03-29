@@ -9,14 +9,14 @@ from users.utils import random_key, access_get_name
 
 def enroll_key(name, code, what2fa):
     user = User.objects.get(username=name)
-    key = UserKey.objects.get(me_id=user)
+    key = UserKey.objects.get(me=user)
     key.auth2fa = what2fa
     key.twofactorkey = code
     key.save()
 
 def enroll_key(name, code, what2fa, otp_secret):
     user = User.objects.get(username=name)
-    key = UserKey.objects.get(me_id=user)
+    key = UserKey.objects.get(me=user)
     key.auth2fa = what2fa
     key.twofactorkey = code
     key.otp_secret = otp_secret

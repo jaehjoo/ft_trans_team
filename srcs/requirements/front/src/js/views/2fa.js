@@ -19,8 +19,8 @@ export default class TwoFactor extends AbstractView {
 	}
 
 	async executeScript() {
-		const access = localStorage.getItem('access');
 		const csrftoken = getCookie('csrftoken');
+		const access = localStorage.getItem('access');
 		const EMAILBtn = document.getElementById('EMAILFaBtn');
 		const SMSBtn = document.getElementById('SMSFaBtn');
 		const OTPBtn = document.getElementById('OTPFaBtn');
@@ -31,12 +31,12 @@ export default class TwoFactor extends AbstractView {
 		});
 		SMSBtn.addEventListener("click", async () => {
 			console.log("SMS button clicked!");
-			const data = await this.postData("https://transcendence.kgnj.kr/api/auth2fa", {'X-CSRFToken' : csrftoken }, {'access' : access, 'SMS' : "Y"});
+			const data = await this.postData("https://transcendence.kgnj.kr/api/auth2fa", {'X-CSRFToken' : csrftoken}, {'access' : access, 'SMS' : "Y"});
 			console.log(data);
 		});
 		OTPBtn.addEventListener("click", async () => {
 			console.log("OTP button clicked!");
-			const data = await this.postData("https://transcendence.kgnj.kr/api/auth2fa", {'X-CSRFToken' : csrftoken }, {'access' : access, 'OTP' : "Y"});
+			const data = await this.postData("https://transcendence.kgnj.kr/api/auth2fa", {'X-CSRFToken' : csrftoken}, {'access' : access, 'OTP' : "Y"});
 			console.log(data);
 		});
 	}

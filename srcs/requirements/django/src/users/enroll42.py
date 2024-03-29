@@ -1,5 +1,5 @@
 import requests, json, os
-from users.models import User, UserKey, UserAvatar
+from users.models import User, UserKey, UserAvatar, UserRecordGame
 
 def generate_42(request):
 	code = request.GET.get('code')
@@ -14,7 +14,10 @@ def generate_42(request):
 			'redirect_uri' : uri
 		}
 		data_42 = requests.post('https://api.intra.42.fr/oauth/token', data=data)
-		access_token = data_42.json()["access_token"]
+		try:
+			access_token = data_42.json()["access_token"]
+		except KeyError:
+			return None
 		data_user = requests.get('https://api.intra.42.fr/v2/me', headers={'Authorization': f'Bearer {access_token}'})
 		user_name = data_user.json()["login"]
 		display_name = data_user.json()['displayname']
@@ -34,5 +37,7 @@ def generate_42(request):
 			is_key.save()
 			is_avatar = UserAvatar(me=is_user)
 			is_avatar.save()
+			is_record_game = UserRecordGame(me=is_user)
+			is_record_game.save()
 			return is_user
 	return None

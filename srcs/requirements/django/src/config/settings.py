@@ -22,7 +22,7 @@ WSGI=os.environ['WSGI']
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-o6t1oz+tk^e6!8y*ij*4j#n=sus^ap)m@-!=72f1=q4)v-1f0@'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -43,7 +43,8 @@ if WSGI:
         'django.contrib.contenttypes',
         'django.contrib.sessions',
         'django.contrib.messages',
-        'django.contrib.staticfiles'
+        'django.contrib.staticfiles',
+        'django_extensions'
     ]
 else:
     INSTALLED_APPS = [
@@ -55,7 +56,8 @@ else:
         'django.contrib.contenttypes',
         'django.contrib.sessions',
         'django.contrib.messages',
-        'django.contrib.staticfiles'
+        'django.contrib.staticfiles',
+        'django_extensions'
     ]
 
 MIDDLEWARE = [
@@ -89,11 +91,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-ASGI_APPLICATION = 'config.asgi.application'
-
+if WSGI is not 1:
+    ASGI_APPLICATION = 'config.asgi.application'
 
 # CORS, CSRF
-CORS_ORIGIN_ALLOW_ALL = True
+CSRF_TRUSTED_ORIGINS = [
+    "https://localhost", "https://transcendence.kgnj.kr"
+]
+
+CSRF_COOKIE_SECURE = True
+
+SESSION_COOKIE_SECURE = True
+
+CORS_ORIGIN_ALLOW_ALL = False
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -102,10 +112,6 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ORIGIN_WHITELIST = [
-    "https://localhost", "https://trancendence.kgnj.kr"
-]
-
-CSRF_TRUSTED_ORIGINS = [
     "https://localhost", "https://transcendence.kgnj.kr"
 ]
 
@@ -125,7 +131,7 @@ CORS_ALLOW_HEADERS = (
     'host',
     'origin',
     'user-agent',
-    'X-CSRFToken',
+    'X-CsrfToken',
     'csrftoken',
     'x-requested-with',
 )
@@ -174,7 +180,7 @@ TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 # EMAIL
 

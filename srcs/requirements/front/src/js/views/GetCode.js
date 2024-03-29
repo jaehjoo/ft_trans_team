@@ -19,10 +19,10 @@ export default class GetCode extends AbstractView {
 
                 const data = await response.json();
                 if (data.success == "Y") {
-                    const str = "csrftoken=" + data.content.csrftoken
-                    document.cookie = str
-                    localStorage.setItem('access', data.content.access)
-                    localStorage.setItem('refresh', data.content.refresh)
+                    const csrftoken = "csrftoken=" + data.content.csrftoken;
+                    document.cookie = csrftoken;
+                    localStorage.setItem('access', data.content.access);
+                    localStorage.setItem('refresh', data.content.refresh);
                 }
             } catch (error) {
                 console.error('Error fetching access token:', error);
