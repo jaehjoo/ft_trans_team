@@ -2,9 +2,6 @@ import Button from "../../components/ui/Button";
 import Modal from "../../components/ui/CreateByModal";
 
 const Login = () => {
-  const loginButtonClickHandler = () => {
-    console.log("login");
-  };
   const ButtonText = document.createElement("div");
   ButtonText.classList.add(
     "d-flex",
@@ -21,12 +18,22 @@ const Login = () => {
   ButtonText.appendChild(loginLogo);
   ButtonText.appendChild(document.createTextNode("Sign in with 42 intra"));
 
+  const loginButtonClickHandler = () => {
+    console.log("login");
+
+    loginButton.disabled = true;
+    loginButton.removeEventListener("click", loginButtonClickHandler);
+    window.location.href = "/2fa";
+  };
+
   const loginButton = Button(
     "light",
     false,
     loginButtonClickHandler,
     ButtonText
   );
+
+  loginButton.style.border = "1px solid gray";
 
   const loginButtonWrap = document.createElement("div");
   loginButtonWrap.classList.add("d-flex", "justify-content-center", "w-100");
@@ -35,20 +42,17 @@ const Login = () => {
   const LoginContainer = document.createElement("div");
   LoginContainer.innerHTML = /*html*/ `
   <h1>42 Login</h1>
-  <h4>Welcome to 42 Transcendence Ping Pong Game!</h4>
+  <h5>Welcome to 42 Transcendence Ping Pong Game!</h5>
   `;
 
   LoginContainer.classList.add(
     "d-flex",
     "flex-column",
-    "p-2",
-    "bg-secondary",
+    "p-4",
     "justify-content-start",
     "align-items-start",
     "w-100",
-    "gap-4",
-
-    "bg-success"
+    "gap-4"
   );
 
   LoginContainer.appendChild(loginButtonWrap);
@@ -71,16 +75,12 @@ const LoginPage = () => {
     "d-flex",
     "justify-content-between",
     "align-items-center",
-    "flex-column",
-    "bg-primary"
+    "flex-column"
   );
   page.style.height = "50vh";
 
-  // const createBy = document.createElement("h6");
-  // createBy.textContent = "Created by 42 SEOUL Cadets";
-
   const createBy = document.createElement("div");
-  createBy.innerHTML = /*html*/ `${Modal()}`;
+  createBy.innerHTML = `${Modal()}`;
 
   page.appendChild(LoginContainer);
   page.appendChild(createBy);

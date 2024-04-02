@@ -9,14 +9,18 @@ const Main = (children) => {
   section.classList.add(
     "d-flex",
     "p-2",
-    "bg-secondary",
-    "justify-content-center",
+    "bg-light",
+    "justify-content-between",
     "align-items-center",
     "gap-2"
   );
 
+  const renderSection = document.createElement("div");
+  renderSection.classList.add("d-flex", "w-50", "flex-column", "gap-2");
+  section.appendChild(renderSection);
+
   if (children) {
-    section.appendChild(children);
+    renderSection.appendChild(children);
   }
 
   const img = document.createElement("img");
