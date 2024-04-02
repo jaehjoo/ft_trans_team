@@ -1,11 +1,10 @@
-const useState = (initialValue) => {
+const useState = (initialValue, render) => {
   let _val = initialValue;
-  const state = () => _val;
   const setState = (newVal) => {
     _val = newVal;
     render();
   };
-  return [state, setState];
+  return [_val, setState];
 };
 
 export default useState;
