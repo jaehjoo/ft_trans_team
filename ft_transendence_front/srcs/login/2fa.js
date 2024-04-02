@@ -1,5 +1,7 @@
 import Button from "../../components/ui/Button";
 import Modal from "../../components/ui/CreateByModal";
+import MainLayout from "../main/layout";
+import loginPage from "./login";
 
 const FaImgGroup = () => {
   const ImgGroup = document.createElement("div");
@@ -86,10 +88,15 @@ const FaFormGroup = () => {
   formGroup.appendChild(FormInput);
   FaForm.appendChild(FormButton);
 
-  FaForm.addEventListener("submit", (e) => {
+  const handdleSubmit = (e) => {
     e.preventDefault();
-    console.log("submit");
-  });
+    console.log("submit", FormInput.value);
+    MainLayout(loginPage());
+
+    FaForm.removeEventListener("submit", handdleSubmit);
+  };
+
+  FaForm.addEventListener("submit", handdleSubmit);
 
   wrapper.appendChild(FaForm);
 

@@ -1,43 +1,29 @@
+import parser from "../../utils/parser";
+
 const Main = (children) => {
-  const main = document.createElement("main");
-  main.classList.add("d-flex", "flex-column", "p-2", "bg-primary", "vh-100");
+  const MainStr = /*html*/ `
+    <main class="d-flex flex-column p-2 bg-primary vh-100 justify-content-between align-items-center">
+    <div class="d-flex w-100">
+      <header>42 Ping Pong</header>
+    </div>
+    <section class="d-flex p-2 bg-light justify-content-between align-items-center gap-2">
+      <div id="renderSection" class="d-flex w-50 flex-column gap-2">
+      </div>
+      <img src="../../public/img/main.png" alt="main" class="img-fluid w-50">
+    </section>
+    <footer>Made with by 42 Cadets</footer>
+  `;
 
-  const header = document.createElement("header");
-  header.textContent = "42 Ping Pong";
+  const mainElement = parser(MainStr, "main");
+  const renderSection = mainElement.querySelector("#renderSection");
+  renderSection.appendChild(children);
 
-  const section = document.createElement("section");
-  section.classList.add(
-    "d-flex",
-    "p-2",
-    "bg-light",
-    "justify-content-between",
-    "align-items-center",
-    "gap-2"
-  );
-
-  const renderSection = document.createElement("div");
-  renderSection.classList.add("d-flex", "w-50", "flex-column", "gap-2");
-  section.appendChild(renderSection);
-
-  if (children) {
-    renderSection.appendChild(children);
-  }
-
-  const img = document.createElement("img");
-  img.src = "../../public/img/main.png";
-  img.alt = "main";
-  img.classList.add("img-fluid", "w-50");
-
-  section.appendChild(img);
-
-  main.appendChild(header);
-  main.appendChild(section);
-
-  return main;
+  return mainElement;
 };
 
 const MainLayout = (children) => {
   const app = document.getElementById("app");
+  app.innerHTML = "";
   app.appendChild(Main(children));
 };
 
