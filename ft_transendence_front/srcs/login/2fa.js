@@ -1,147 +1,66 @@
-import Button from "../../components/ui/Button";
-import Modal from "../../components/ui/CreateByModal";
+import parser from "../../utils/parser";
+import Sended from "./2faSend";
 import MainLayout from "../main/layout";
-import loginPage from "./login";
 
 const FaImgGroup = () => {
-  const ImgGroup = document.createElement("div");
-  ImgGroup.classList.add(
-    "d-flex",
-    "justify-content-center",
-    "align-items-center",
-    "w-100"
+  const ImgGroup = parser(
+    /*html*/ `
+    <div class="d-flex justify-content-center align-items-center w-100" style="gap : 6rem;">
+    <img id="faMAIL" src="../../public/img/icons/mail.png" class="p-2" alt="email" style="width: 80px; cursor: pointer;">
+    <img id="faSMS" src="../../public/img/icons/sms.png"   class="p-2" alt="sms" style="width: 80px; cursor: pointer;">
+    <img id="faAPP" src="../../public/img/icons/app.png"   class="p-2" alt="app" style="width: 80px; cursor: pointer;">
+    </div>
+    `,
+    "div"
   );
 
-  ImgGroup.style.gap = "6rem";
+  const FaHandler = (key, node) => {
+    console.log(key);
 
-  const emailImg = document.createElement("img");
-  emailImg.src = "../../public/img/icons/mail.png";
-  emailImg.alt = "email";
-  emailImg.style.width = "50px";
-  emailImg.style.cursor = "pointer";
-  emailImg.addEventListener("click", () => {
-    console.log("email");
+    // make radio button
+    if (node.style.border === "2px solid blue") {
+      node.style.border = "none";
+    } else {
+      node.style.border = "2px solid blue";
+      node.style.borderRadius = "30%";
+    }
+
+    // MainLayout(Sended());
+    node.removeEventListener("click", () => FaHandler(key, node));
+  };
+
+  ImgGroup.childNodes.forEach((node) => {
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      const key = node.id.replace("fa", "");
+      node.addEventListener("click", () => FaHandler(key, node));
+    }
   });
-
-  const smsImg = document.createElement("img");
-  smsImg.src = "../../public/img/icons/sms.png";
-  smsImg.alt = "sms";
-  smsImg.style.width = "50px";
-  smsImg.style.cursor = "pointer";
-  smsImg.addEventListener("click", () => {
-    console.log("sms");
-  });
-
-  const appImg = document.createElement("img");
-  appImg.src = "../../public/img/icons/app.png";
-  appImg.alt = "app";
-  appImg.style.width = "50px";
-  appImg.style.cursor = "pointer";
-  appImg.addEventListener("click", () => {
-    console.log("app");
-  });
-
-  ImgGroup.appendChild(emailImg);
-  ImgGroup.appendChild(smsImg);
-  ImgGroup.appendChild(appImg);
 
   return ImgGroup;
 };
 
-const FaFormGroup = () => {
-  const wrapper = document.createElement("div");
-  wrapper.classList.add(
-    "d-flex",
-    "flex-column",
-    "w-100",
-    "justify-content-center",
-    "align-items-center"
-  );
-
-  const FaForm = document.createElement("form");
-  FaForm.classList.add(
-    "d-flex",
-    "flex-column",
-    "gap-4",
-    "p-4",
-    "justify-content-center",
-    "align-items-center"
-  );
-
-  const formGroup = document.createElement("div");
-  formGroup.classList.add("form-group");
-  const FormLabel = document.createElement("label");
-  FormLabel.htmlFor = "2fa";
-  FormLabel.textContent = "2FA Code";
-  const FormInput = document.createElement("input");
-  FormInput.type = "text";
-  FormInput.classList.add("form-control");
-  FormInput.id = "2fa";
-  FormInput.placeholder = "Enter Code";
-  const FormButton = document.createElement("button");
-  FormButton.type = "submit";
-  FormButton.classList.add("btn", "btn-primary", "w-100");
-  FormButton.textContent = "Submit";
-
-  FaForm.appendChild(formGroup);
-  formGroup.appendChild(FormLabel);
-  formGroup.appendChild(FormInput);
-  FaForm.appendChild(FormButton);
-
-  const handdleSubmit = (e) => {
-    e.preventDefault();
-    console.log("submit", FormInput.value);
-    MainLayout(loginPage());
-
-    FaForm.removeEventListener("submit", handdleSubmit);
-  };
-
-  FaForm.addEventListener("submit", handdleSubmit);
-
-  wrapper.appendChild(FaForm);
-
-  return wrapper;
-};
-
-const Fa = () => {
-  const FaContainer = document.createElement("div");
-  FaContainer.innerHTML = /*html*/ `
-  <div>
-  <h1>2FA</h1>
-  <p style="color:gray" >Please choose from 3 authentication methods.</p>
+const FaHeader = () => {
+  const FaContainerStr = /*html*/ `
+  <div class="d-flex flex-column p-4 justify-content-start align-items-start w-100 gap-2">
+    <div>
+      <h1>2FA</h1>
+      <p style="color:gray" >Please choose from 3 authentication methods.</p>
+    </div>
   </div>
   `;
-
-  FaContainer.classList.add(
-    "d-flex",
-    "flex-column",
-    "p-4",
-    "justify-content-start",
-    "align-items-start",
-    "w-100",
-    "gap-2"
-  );
-
-  const FaImgs = FaImgGroup();
-  FaContainer.appendChild(FaImgs);
-  const FaForm = FaFormGroup();
-  FaContainer.appendChild(FaForm);
-
-  return FaContainer;
+  return parser(FaContainerStr, "div");
 };
 
 const faPage = () => {
-  const FaContainer = Fa();
+  const pageStr = /*html*/ `
+  <div class="d-flex justify-content-between align-items-center flex-column" style="height: 50vh;">
+  </div>
+  `;
+  const page = parser(pageStr, "div");
 
-  const page = document.createElement("div");
-  page.classList.add(
-    "d-flex",
-    "justify-content-between",
-    "align-items-center",
-    "flex-column"
-  );
-  page.style.height = "50vh";
-
+  const FaContainer = FaHeader();
+  const FaImgs = FaImgGroup();
+  FaContainer.appendChild(FaImgs);
   page.appendChild(FaContainer);
 
   return page;

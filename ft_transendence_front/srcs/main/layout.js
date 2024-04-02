@@ -6,7 +6,7 @@ const Main = (children) => {
     <div class="d-flex w-100">
       <header>42 Ping Pong</header>
     </div>
-    <section class="d-flex p-2 bg-light justify-content-between align-items-center gap-2">
+    <section class="w-100 d-flex p-2 bg-light justify-content-between align-items-center gap-2">
       <div id="renderSection" class="d-flex w-50 flex-column gap-2">
       </div>
       <img src="../../public/img/main.png" alt="main" class="img-fluid w-50">
