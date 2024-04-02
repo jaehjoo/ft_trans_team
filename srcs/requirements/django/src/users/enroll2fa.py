@@ -1,9 +1,11 @@
-import os, json
+import os, json, requests, sys
 import onetimepass as otp
 import qrcode
 from django.core.mail import EmailMessage
 from django.http import JsonResponse
 from users.models import User, UserKey
+from sdk.api.message import Message
+from sdk.exceptions import CoolsmsException
 from users.jwt import decode_access
 from users.utils import random_key, access_get_name
 
@@ -14,7 +16,7 @@ def enroll_key(name, code, what2fa):
     key.twofactorkey = code
     key.save()
 
-def enroll_key(name, code, what2fa, otp_secret):
+def enroll_key_otp(name, code, what2fa, otp_secret):
     user = User.objects.get(username=name)
     key = UserKey.objects.get(me=user)
     key.auth2fa = what2fa
@@ -39,12 +41,32 @@ def send_email(request):
         return False
     email = user.email
     code = random_key(6)
-    subject = "transcendence.kgnj.kr 2fa 코드"							# 타이틀
-    to = [email]					# 수신할 이메일 주소
-    from_email = "wnwoduq@naver.com"			# 발신할 이메일 주소
-    message = "아래 코드를 입력해주세요\n" + code					# 본문 내용
+    subject = "transcendence.kgnj.kr 2fa 코드"  # 타이틀
+    to = [email]                               # 수신할 이메일 주소
+    from_email = "wnwoduq@naver.com"           # 발신할 이메일 주소
+    message = "아래 코드를 입력해주세요\n" + code	 # 본문 내용
     EmailMessage(subject=subject, body=message, to=to, from_email=from_email).send()
     enroll_key(name, code, 1)
+    return True
+
+def send_sms(request):
+    name = access_get_name(request)
+    try:
+        user = User.objects.get(username=name)
+    except User.DoesNotExist:
+        return False
+    key = UserKey.objects.get(me=user)
+    code = random_key(6)
+    api_key = os.environ.get('COOLSMS_API_KEY')
+    api_secret = os.environ.get('COOLSMS_API_SECRET')
+    params = dict()
+    params['type'] = 'sms'
+    params['to'] = '01029797512'
+    params['from'] = '01048103778'
+    params['text'] = '18234234'
+    cool = Message(api_key, api_secret)
+    response = cool.send(params)
+    enroll_key(name, code, 2)
     return True
 
 def send_otp(request):
@@ -63,7 +85,7 @@ def send_otp(request):
     if result:
         img = qrcode.make(make_otp_qrcode(secret_key))
         img.save("/app/src/django/.media/qr.jpg")
-        enroll_key(name, code, 3, secret_key)
+        enroll_key_otp(name, code, 3, secret_key)
         return True
     return False
 

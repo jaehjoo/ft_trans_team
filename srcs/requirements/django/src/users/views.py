@@ -178,7 +178,7 @@ def TwoFactor(request):
 			return JsonResponse(
 				{
 					'success' : 'Y',
-					'meesage' : 'success.auth.2fa',
+					'message' : 'success.auth.2fa',
 					'redirect_uri' : 'input2fa'
 				}
 			)
@@ -188,8 +188,18 @@ def TwoFactor(request):
 			return JsonResponse(
 				{
 					'success' : 'Y',
-					'message' : 'success.response.2fa',
+					'message' : 'success.auth.2fa',
 					'redirect_uri' : 'input2fa'
+				}
+			)
+	elif content.get('SMS', None):
+		data = enroll2fa.send_sms(request)
+		if data:
+			return JsonResponse(
+				{
+					'success' : 'Y',
+					'message' : 'success.auth.2fa',
+					'redirect_url' : 'input2fa'
 				}
 			)
 	return JsonResponse(
