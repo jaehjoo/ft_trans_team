@@ -1,69 +1,62 @@
-import parser from "../../utils/parser";
-import Sended from "./2faSend";
-import MainLayout from "../main/layout";
+import { useState, render } from "../../MyReact";
 
-const FaImgGroup = () => {
-  const ImgGroup = parser(
-    /*html*/ `
-    <div class="d-flex justify-content-center align-items-center w-100" style="gap : 6rem;">
-    <img id="faMAIL" src="../../public/img/icons/mail.png" class="p-2" alt="email" style="width: 80px; cursor: pointer;">
-    <img id="faSMS" src="../../public/img/icons/sms.png"   class="p-2" alt="sms" style="width: 80px; cursor: pointer;">
-    <img id="faAPP" src="../../public/img/icons/app.png"   class="p-2" alt="app" style="width: 80px; cursor: pointer;">
-    </div>
-    `,
-    "div"
-  );
-
-  const FaHandler = (key, node) => {
-    console.log(key);
-
-    // make radio button
-    if (node.style.border === "2px solid blue") {
-      node.style.border = "none";
-    } else {
-      node.style.border = "2px solid blue";
-      node.style.borderRadius = "30%";
-    }
-
-    // MainLayout(Sended());
-    node.removeEventListener("click", () => FaHandler(key, node));
+const FaImgGroup = (fa, setFa) => {
+  const clickHandler = (key) => {
+    setFa(key);
   };
 
-  ImgGroup.childNodes.forEach((node) => {
-    if (node.nodeType === Node.ELEMENT_NODE) {
-      const key = node.id.replace("fa", "");
-      node.addEventListener("click", () => FaHandler(key, node));
-    }
-  });
+  window.clickHandler = clickHandler;
 
-  return ImgGroup;
+  return /*html*/ `
+    <div class="d-flex justify-content-center align-items-center w-100" style="gap : 6rem;">
+    <img  src="../../public/img/icons/mail.png" onclick="clickHandler('mail')" class="p-2" alt="email" style="width: 80px; cursor: pointer; ${
+      fa === "mail" ? "border: 1px solid blue; border-radius: 30%" : ""
+    };"
+    } width: 80px; cursor: pointer;">
+    <img  src="../../public/img/icons/sms.png"   onclick="clickHandler('sms')" class="p-2" alt="sms" style="width: 80px; cursor: pointer; ${
+      fa === "sms" ? "border: 1px solid blue; border-radius: 30%" : ""
+    };">
+    <img  src="../../public/img/icons/app.png"   onclick="clickHandler('app')" class="p-2" alt="app" style="width: 80px; cursor: pointer; ${
+      fa === "app" ? "border: 1px solid blue; border-radius: 30%" : ""
+    };">
+    </div>
+    `;
 };
 
 const FaHeader = () => {
-  const FaContainerStr = /*html*/ `
-  <div class="d-flex flex-column p-4 justify-content-start align-items-start w-100 gap-2">
+  return /*html*/ `
+  <div class="d-flex flex-column justify-content-start align-items-start w-100 gap-2">
     <div>
       <h1>2FA</h1>
       <p style="color:gray" >Please choose from 3 authentication methods.</p>
     </div>
   </div>
   `;
-  return parser(FaContainerStr, "div");
 };
 
 const faPage = () => {
-  const pageStr = /*html*/ `
+  const [fa, setFa] = useState(null);
+
+  const clickHandler = () => {
+    console.log("send", fa, "you should remove event listener after sending");
+  };
+
+  window.faClickHandler = clickHandler;
+
+  return /*html*/ `
   <div class="d-flex justify-content-between align-items-center flex-column" style="height: 50vh;">
+  <div class="d-flex flex-column gap-4">
+    ${FaHeader()}
+    ${FaImgGroup(fa, setFa)}
+    </div>
+    <button 
+    ${fa === null ? "disabled" : ""}
+    class="btn btn-primary d-flex gap-2" onclick="faClickHandler()">
+    Send
+    </button>
+    <div></div>
   </div>
   `;
-  const page = parser(pageStr, "div");
-
-  const FaContainer = FaHeader();
-  const FaImgs = FaImgGroup();
-  FaContainer.appendChild(FaImgs);
-  page.appendChild(FaContainer);
-
-  return page;
 };
 
 export default faPage;
