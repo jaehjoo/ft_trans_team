@@ -2,24 +2,24 @@ FROM python:3.11.8-alpine3.18
 
 WORKDIR /app/src/django
 
+
+COPY ./requirements.txt .
+
 RUN apk add --no-cache gcc bash musl-dev jpeg-dev zlib-dev libffi-dev cairo-dev pango-dev gdk-pixbuf-dev
-
-RUN pip install daphne
-
 RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
 
-RUN mkdir -p /app/src/django/config
+RUN django-admin startproject config .
+RUN python3 manage.py startapp users
 RUN mkdir -p /app/src/django/.static /app/src/django/tools /app/src/django/.media
 
 COPY ./src/ /app/src/django/
-COPY ./requirements.txt .
-
 COPY ./tools/script.sh /app/src/django/tools/
 
-RUN pip install -r requirements.txt
+RUN pip install daphne
 RUN chmod +x /app/src/django/tools/script.sh
 
-EXPOSE $ASGI_PORT
+EXPOSE $SERVER_PORT
 
 ENTRYPOINT ["sh", "/app/src/django/tools/script.sh"]
-CMD [ "daphne", "-b", "0.0.0.0", "-p", "8001", "config.asgi:application" ]
+CMD [ "daphne", "-b", "0.0.0.0", "-p", "8000", "config.asgi:application" ]

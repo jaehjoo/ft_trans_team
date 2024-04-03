@@ -16,8 +16,6 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-WSGI=os.environ['WSGI']
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
@@ -28,36 +26,26 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'localhost', 'transcendence.kgnj.kr'
+    'localhost', 'transcendence.kgnj.kr', 'django'
 ]
 
 
 # Application definition
 
-if WSGI:
-    INSTALLED_APPS = [
-	    "users",
-        'corsheaders',
-        'django.contrib.admin',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
-        'django.contrib.messages',
-        'django.contrib.staticfiles',
-        'django_extensions'
-    ]
-else:
-    INSTALLED_APPS = [
-	    "daphne",
-        'corsheaders',
-        'channels',
-        'django.contrib.admin',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
-        'django.contrib.messages',
-        'django.contrib.staticfiles',
-        'django_extensions'
+INSTALLED_APPS = [
+    "daphne",
+    'channels',
+	'channels_postgres',
+    'users',
+    'chat',
+    'corsheaders',
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'django_extensions'
     ]
 
 MIDDLEWARE = [
@@ -91,8 +79,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-if WSGI is not 1:
-    ASGI_APPLICATION = 'config.asgi.application'
+ASGI_APPLICATION = 'config.asgi.application'
+
+# channels
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_postgres.core.PostgresChannelLayer',
+        'CONFIG': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': os.environ.get('POSTGRES_NAME'),
+            'USER': os.environ.get('POSTGRES_USER'),
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+            'HOST': os.environ.get('HOST_NAME'),
+            'PORT': os.environ.get('DB_PORT'),
+        },
+    },
+}
+
+
 
 # CORS, CSRF
 CSRF_TRUSTED_ORIGINS = [

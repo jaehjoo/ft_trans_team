@@ -9,3 +9,4 @@ onetimepass
 qrcode
 configparser
 coolsms_python_sdk
+channels-postgres
