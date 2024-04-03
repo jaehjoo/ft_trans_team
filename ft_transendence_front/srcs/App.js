@@ -12,6 +12,8 @@ export const App = () => {
     return `${MainLayout(LoginPage)}`;
   } else if (window.location.pathname === "/2fa") {
     return `${MainLayout(FaPage)}`;
+  } else if (window.location.pathname === "/main") {
+    return `${MainLayout()}`;
   }
 
   return /*html*/ `
