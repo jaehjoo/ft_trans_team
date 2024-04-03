@@ -3,6 +3,8 @@ import MainLayout from "./main/layout.js";
 import LoginPage from "./login/login.js";
 import FaPage from "./login/2fa.js";
 import MainPage from "./main/main.js";
+import LobbyLayout from "./lobby/layout.js";
+import CreatePage from "./lobby/Create.js";
 
 export const App = () => {
   if (window.location.pathname === "/") {
@@ -16,7 +18,7 @@ export const App = () => {
   } else if (window.location.pathname === "/main") {
     return `${MainLayout(MainPage)}`;
   } else if (window.location.pathname === "/create") {
-    return `${MainLayout()}`;
+    return `${LobbyLayout(CreatePage)}`;
   }
 
   return /*html*/ `

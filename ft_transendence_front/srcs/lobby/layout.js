@@ -6,17 +6,16 @@ const Main = (children) => {
       <header>42 Ping Pong</header>
     </div>
     <section class="w-100 d-flex p-2 bg-light justify-content-between align-items-center gap-2">
-      <div id="renderSection" class="d-flex w-50 flex-column gap-2">
+      <div id="renderSection" class="d-flex w-100 flex-column gap-2">
       ${children}
       </div>
-      <img src="../../public/img/main.png" alt="main" class="img-fluid w-50">
     </section>
     <footer>Made with by 42 Cadets</footer>
   `;
   return MainStr;
 };
 
-const MainLayout = (component) => {
+const LobbyLayout = (component) => {
   if (component === undefined) component = () => "";
   const children = component();
 
@@ -25,4 +24,4 @@ const MainLayout = (component) => {
   `;
 };
 
-export default MainLayout;
+export default LobbyLayout;
