@@ -2,6 +2,7 @@ import { CounterAndMeow } from "../components/test.js";
 import MainLayout from "./main/layout.js";
 import LoginPage from "./login/login.js";
 import FaPage from "./login/2fa.js";
+import MainPage from "./main/main.js";
 
 export const App = () => {
   if (window.location.pathname === "/") {
@@ -13,6 +14,8 @@ export const App = () => {
   } else if (window.location.pathname === "/2fa") {
     return `${MainLayout(FaPage)}`;
   } else if (window.location.pathname === "/main") {
+    return `${MainLayout(MainPage)}`;
+  } else if (window.location.pathname === "/create") {
     return `${MainLayout()}`;
   }
 
