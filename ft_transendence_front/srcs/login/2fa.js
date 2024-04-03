@@ -1,4 +1,5 @@
-import { useState, render } from "../../MyReact";
+import { useState } from "../../MyReact";
+import Sended from "./2faSend";
 
 const FaImgGroup = (fa, setFa) => {
   const clickHandler = (key) => {
@@ -11,8 +12,7 @@ const FaImgGroup = (fa, setFa) => {
     <div class="d-flex justify-content-center align-items-center w-100" style="gap : 6rem;">
     <img  src="../../public/img/icons/mail.png" onclick="clickHandler('mail')" class="p-2" alt="email" style="width: 80px; cursor: pointer; ${
       fa === "mail" ? "border: 1px solid blue; border-radius: 30%" : ""
-    };"
-    } width: 80px; cursor: pointer;">
+    };">
     <img  src="../../public/img/icons/sms.png"   onclick="clickHandler('sms')" class="p-2" alt="sms" style="width: 80px; cursor: pointer; ${
       fa === "sms" ? "border: 1px solid blue; border-radius: 30%" : ""
     };">
@@ -36,16 +36,23 @@ const FaHeader = () => {
 
 const faPage = () => {
   const [fa, setFa] = useState(null);
+  const [faSent, setFaSent] = useState(false);
 
   const clickHandler = () => {
     console.log("send", fa, "you should remove event listener after sending");
+    setFaSent(true);
   };
 
   window.faClickHandler = clickHandler;
 
   return /*html*/ `
   <div class="d-flex justify-content-between align-items-center flex-column" style="height: 50vh;">
-  <div class="d-flex flex-column gap-4">
+  
+  ${
+    faSent
+      ? /*html*/ `${Sended()}`
+      : /*html*/ `
+      <div class="d-flex flex-column gap-4">
     ${FaHeader()}
     ${FaImgGroup(fa, setFa)}
     </div>
@@ -55,6 +62,9 @@ const faPage = () => {
     Send
     </button>
     <div></div>
+  `
+  }
+    
   </div>
   `;
 };

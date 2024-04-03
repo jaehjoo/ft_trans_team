@@ -20,6 +20,7 @@ const Main = (children) => {
 };
 
 const MainLayout = (component) => {
+  if (component === undefined) component = () => "";
   const children = component();
 
   return /*html*/ `
