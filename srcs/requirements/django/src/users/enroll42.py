@@ -1,10 +1,10 @@
 import requests, json, os
-from users.models import User, UserKey, UserAvatar, UserRecordGame
+from users.models import User, UserKey, UserAvatar, UserRecordPongGame, UserRecordFightingGame
 
 def generate_42(request):
 	code = request.GET.get('code')
-	uri = "transcendence.kgnj.kr"
-	uri = "https://" + uri + "/shallwe"
+	uri = os.environ.get('SERVER_ADDRESS')
+	uri = uri + "/shallwe"
 	if code:
 		data = {
 			'grant_type' : 'authorization_code',
@@ -37,7 +37,9 @@ def generate_42(request):
 			is_key.save()
 			is_avatar = UserAvatar(me=is_user)
 			is_avatar.save()
-			is_record_game = UserRecordGame(me=is_user)
-			is_record_game.save()
+			is_record_ponggame = UserRecordPongGame(me=is_user)
+			is_record_ponggame.save()
+			is_record_fightinggame = UserRecordFightingGame(me=is_user)
+			is_record_fightinggame.save()
 			return is_user
 	return None

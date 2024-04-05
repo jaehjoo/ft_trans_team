@@ -9,19 +9,13 @@ from users.models import User, UserKey
 from users.jwt import decode_access
 from users.utils import random_key, access_get_name
 
-def enroll_key(name, code, what2fa):
-    user = User.objects.get(username=name)
-    key = UserKey.objects.get(me=user)
-    key.auth2fa = what2fa
-    key.twofactorkey = code
-    key.save()
-
 def enroll_key(name, code, what2fa, otp_secret):
     user = User.objects.get(username=name)
     key = UserKey.objects.get(me=user)
     key.auth2fa = what2fa
     key.twofactorkey = code
-    key.otp_secret = otp_secret
+    if what2fa == 3:
+        key.otp_secret = otp_secret
     key.save()
 
 def make_otp_qrcode(key):
@@ -39,18 +33,19 @@ def send_sms(request):
         user = User.objects.get(username=name)
     except User.DoesNotExist:
         return False
-    key = UserKey.objects.get(me=user)
+    if user.phone_number is None:
+        return False
     code = random_key(6)
     api_key = os.environ.get('COOLSMS_API_KEY')
     api_secret = os.environ.get('COOLSMS_API_SECRET')
     params = dict()
     params['type'] = 'sms'
-    params['to'] = '01029797512'
-    params['from'] = '01048103778'
-    params['text'] = '18234234'
+    params['to'] = user.phone_number
+    params['from'] = os.environ.get('COOLSMS_NUMBER')
+    params['text'] = "transcendence code 알림 : " + code
     cool = Message(api_key, api_secret)
-    response = cool.send(params)
-    enroll_key(name, code, 2)
+    cool.send(params)
+    enroll_key(name, code, 2, "")
     return True
 
 def send_email(request):
@@ -66,7 +61,7 @@ def send_email(request):
     from_email = "wnwoduq@naver.com"			# 발신할 이메일 주소
     message = "아래 코드를 입력해주세요\n" + code					# 본문 내용
     EmailMessage(subject=subject, body=message, to=to, from_email=from_email).send()
-    enroll_key(name, code, 1)
+    enroll_key(name, code, 1, "")
     return True
 
 def send_otp(request):
@@ -91,8 +86,7 @@ def send_otp(request):
 
 def check_code_2fa(request):
     code = json.loads(request.body).get('code', None)
-    payload = decode_access(json.loads(request.body).get('access', None))
-    usr_name = payload.get('user', None)
+    usr_name = access_get_name(request)
     if usr_name:
         try:
             user = User.objects.get(username=usr_name)
@@ -109,8 +103,6 @@ def check_code_2fa(request):
                 return JsonResponse(
                     {
                         'success' : 'Y',
-                        'messsage' : 'success.input2fa',
-                        'redirct_uri' : 'main'
                     }
                 )                
         except User.DoesNotExist:
@@ -118,13 +110,11 @@ def check_code_2fa(request):
                 {
                     'success' : 'N',
                     'messsage' : 'fail.input2fa',
-                    'redirect_uri' : 'login'
                 }
             )
     return JsonResponse(
         {
             'success' : 'N',
             'messsage' : 'fail.input2fa',
-            'redirect_uri' : 'login'
         }
     )

@@ -9,8 +9,7 @@ services:
     ports:
       - $NGINX_PORT:$NGINX_PORT
     depends_on:
-      - django-wsgi
-      - django-asgi
+      - django
     volumes:
       - ./requirements/front:/var/www/html
       - static:/var/www/html/static
@@ -20,43 +19,19 @@ services:
       - intra
     env_file:
       - .env
-  django-wsgi:
-    image: django-wsgi
-    build:
-      context: ./requirements/django
-      dockerfile: Dockerfile
-    container_name: django-wsgi
-    networks:
-      - intra
-    restart: always
-    volumes:
-      - static:/app/src/django/.static
-      - cert:/etc/nginx/ssl
-      - media:/app/src/django/.media
-    depends_on:
-      - db
-    env_file:
-      - .env
-    environment:
-      - POSTGRES_NAME=${DB_NAME}
-      - POSTGRES_PASSWORD=${DB_PASS}
-      - POSTGRES_USER=${DB_USER}
-      - HOST_NAME = ${HOST_NAME}
-      - DB_PORT=${DB_PORT}
-      - WSGI=1
-  django-asgi:
-    image: django-asgi
+  django:
+    image: django
     build:
       context: ./requirements/django
       dockerfile: Dockerfile-daphne
-    container_name: django-asgi
+    container_name: django
     restart: always
     networks:
       - intra
     depends_on:
       - db
-      - django-wsgi
     volumes:
+      - ./requirements/front:/var/www/html
       - static:/app/src/django/.static
       - media:/app/src/django/.media
       - cert:/etc/nginx/ssl
@@ -66,9 +41,8 @@ services:
       - POSTGRES_NAME=${DB_NAME}
       - POSTGRES_PASSWORD=${DB_PASS}
       - POSTGRES_USER=${DB_USER}
-      - HOST_NAME = ${HOST_NAME}
+      - HOST_NAME=${HOST_NAME}
       - DB_PORT=${DB_PORT}
-      - WSGI=0
   db:
     image: postgres:15-alpine3.18
     container_name: db

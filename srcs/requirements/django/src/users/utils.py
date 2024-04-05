@@ -14,6 +14,16 @@ def access_get_name(request):
 	name = payload.get('user', None)
 	return name
 
+# 메달 색을 정한다.
+# 0 = 동, 1 = 은, 2 = 금
+def medalcolor_calculate(rating):
+	if 0 <= rating < 600:
+		return 0
+	elif 0 <= rating < 1200:
+		return 1
+	else:
+		return 2
+
 def random_key(digits):
 	len = digits
 	ascii_str = string.ascii_letters

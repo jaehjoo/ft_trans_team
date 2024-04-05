@@ -1,25 +1,25 @@
 import json
-from django.http import JsonResponse, Http404
+from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from datetime import datetime
-from users.models import User, UserKey, UserAvatar, UserRecordFriends, UserRecordGame
+from users.models import User, UserAvatar, UserRecordFriends, UserRecordPongGame, UserRecordFightingGame
 from users import jwt, enroll42, enroll2fa
 from users.utils import access_get_name
 from users.changevalue import change_user_value, change_avatar_value
 
-# jwt access 토큰이 정상/비정상 여부 확인
-def auth_access(request):
+# jwt access, refresh 토큰이 정상/비정상 여부 확인
+def auth_token(request, token):
 	dict_access = None
 	if request.method == 'GET':
 		try:
-			data = request.GET.get('access')
+			data = request.GET.get(token)
 			dict_access = jwt.decode_access(data)
 		except:
 			return None
 	elif request.method == 'POST':
 		try:
 			token_json = json.loads(request.body)
-			dict_access = jwt.decode_access(token_json.get('access', None))
+			dict_access = jwt.decode_access(token_json.get(token, None))
 		except json.JSONDecodeError:
 			return None
 	else:
@@ -28,42 +28,10 @@ def auth_access(request):
 			date = dict_access.get('exp', None)
 			if date:
 				try:
-					user = User.objects.get(username=dict_access.get('user', None))
+					user = User.objects.get(username=dict_access.get(token, None))
 				except User.DoesNotExist:
 					return None
 				if date > float(datetime.now()):
-					user.connect = "Y"
-					user.save()
-					return dict_access
-				else:
-					user.connect = "N"
-					user.save()
-	return None
-
-# jwt refresh 토큰 정상/비정상 여부 확인
-def auth_refresh(request):
-	if request.method == 'GET':
-		try:
-			data = request.GET.get('refresh')
-			dict_access = jwt.decode_access(data)
-		except json.JSONDecodeError:
-			return None
-	elif request.method == 'POST':
-		try:
-			token_json = json.loads(request.body)
-			dict_access = jwt.decode_access(token_json.get('refresh', None))
-		except json.JSONDecodeError:
-			return None
-	else:
-		return None
-	if dict_access:
-			date = dict_access.get('exp', None)
-			if date:
-				try:
-					user = User.objects.get(username=dict_access.get('user', None))
-				except User.DoesNotExist:
-					return None
-				if date > datetime.now():
 					user.connect = "Y"
 					user.save()
 					return dict_access
@@ -88,16 +56,14 @@ def login(request):
 			{
 				'success' : 'N',
 				'message' : 'fail.login.nopost',
-				'redirect_uri' : 'main'
 			}
 		)
-	if auth_access(request):
+	if auth_token(request, 'access'):
 		csrftoken = get_token(request)
 		return JsonResponse(
 			{
 				'success' : 'Y',
 				'message' : 'success.login.already',
-				'redirect_uri' : 'main',
 				'content' : {
 					'csrftoken' : csrftoken
 				}
@@ -109,8 +75,6 @@ def login(request):
 		return JsonResponse(
 			{
 				'success' : 'Y',
-				'message' : 'success.auth.42',
-				'redirect_uri' : 'auth2fa',
 				'content' : {
 					'access' : jwt.generate_access(user),
 					'refresh' : jwt.generate_refresh(user),
@@ -122,7 +86,6 @@ def login(request):
 		{
 			'success' : 'N',
 			'meesage' : 'fail.auth.42',
-			'redirect_uri' : 'login'
 		}
 	)
 
@@ -130,14 +93,12 @@ def login(request):
 # GET : 로그인 여부 확인하고 답장 보냄 
 def main(request):
 	if request.method == 'GET':
-		access = auth_access(request)
-		refresh = auth_access(request)
+		access = auth_token(request, 'access')
+		refresh = auth_token(request, 'refresh')
 		if access:
 			return JsonResponse( 
 				{
 					"success" : "Y",
-					"messages" : "success.login",
-					"redirect_uri" : "main",
 				}
 			)
 		elif refresh:
@@ -146,8 +107,7 @@ def main(request):
 				return JsonResponse(
 					{
 						"success" : "N",
-						"message" : "fail.auth.access",
-						"redirect_uri" : "main",
+						'message' : 'fail.auth.access',
 						"content" : {
 							'access' : jwt.generate_access(user_obj)
 						}
@@ -169,7 +129,6 @@ def TwoFactor(request):
 			{
 				'success' : 'N',
 				'message' : 'fail.auth.2fa',
-				'redirect_uri' : 'login'
 			}
 		)
 	content = json.loads(request.body)
@@ -178,8 +137,6 @@ def TwoFactor(request):
 			return JsonResponse(
 				{
 					'success' : 'Y',
-					'meesage' : 'success.auth.2fa',
-					'redirect_uri' : 'input2fa'
 				}
 			)
 	elif content.get('SMS', None):
@@ -188,8 +145,6 @@ def TwoFactor(request):
 			return JsonResponse(
 				{
 					'success' : 'Y',
-					'message' : 'success.auth.2fa',
-					'redirect_url' : 'input2fa'
 				}
 			)
 	elif content.get('OTP', None):
@@ -198,15 +153,12 @@ def TwoFactor(request):
 			return JsonResponse(
 				{
 					'success' : 'Y',
-					'message' : 'success.response.2fa',
-					'redirect_uri' : 'input2fa'
 				}
 			)
 	return JsonResponse(
 		{
 			'success' : "N",
 			'message' : 'fail.response.2fa',
-			'redirect uri' : 'login'
 		}
 	)
 
@@ -220,7 +172,6 @@ def inputTwoFactor(request):
 			{
 				'success' : 'N',
 				'message' : 'fail.auth.2fa',
-				'redirect_uri' : 'auth2fa'
 			}
 		)
 
@@ -234,14 +185,14 @@ def info(request):
 			{
 				'success' : 'N',
 				'message' : 'fail.info',
-				'redirect_uri' : 'main'
 			}
 		)
 	if request.method == 'GET':
 		try:
 			user = User.objects.get(name)
 			avatar = UserAvatar.objects.get(me=user)
-			game_record = UserRecordGame.objects.get(me=user)
+			ponggame_record = UserRecordPongGame.objects.get(me=user)
+			fightinggame_record = UserRecordFightingGame.objects.get(me=user)
 			return JsonResponse(
 				{
 					'basic' : {
@@ -257,10 +208,15 @@ def info(request):
 						'skin_color' : avatar.skin_color,
 						'medal_color' : avatar.medal_color
 					},
-					'game_record' : {
-						'win' : game_record.win,
-						'lose' : game_record.lose,
-						'rating' : game_record.rating
+					'ponggame_record' : {
+						'win' : ponggame_record.win,
+						'lose' : ponggame_record.lose,
+						'rating' : ponggame_record.rating
+					},
+					'fightinggame_record' : {
+						'win' : fightinggame_record.win,
+						'lose' : fightinggame_record.lose,
+						'rating' : fightinggame_record.rating
 					}
 				}
 			)
@@ -269,7 +225,6 @@ def info(request):
 				{
 					'success' : 'N',
 					'message' : 'fail.search.user',
-					'redirect_uri' : 'login'
 				}
 			)
 	elif request.method == 'POST':
@@ -293,16 +248,14 @@ def info(request):
 			return JsonResponse(
 				{
 					'success' : 'N',
-					'message' : 'fail.search.user',
-					'redirect_uri' : 'login'				
+					'message' : 'fail.search.user',				
 				}
 			)
 	else:
 		return JsonResponse(
 			{
 				'success' : 'N',
-				'message' : 'fail.search.user',
-				'redirect_uri' : 'login'				
+				'message' : 'fail.search.user',			
 			}
 		)		
 
@@ -316,7 +269,6 @@ def friends(request):
 			{
 				'success' : 'N',
 				'message' : 'fail.get.friends',
-				'redirect_uri' : 'login'
 			}
 		)
 	if request.method is 'GET':
@@ -327,7 +279,6 @@ def friends(request):
 				{
 					'success' : 'N',
 					'message' : 'fail.user.dosenotexist',
-					'redirect_uri' : 'login'
 				}
 			)
 		user_friends = user.friends.all()
@@ -342,7 +293,6 @@ def friends(request):
 				{
 					'success' : 'N',
 					'message' : 'fail.user.doesnotexist',
-					'redirect_uri' : 'login'
 				}
 			)
 		mode = json.loads(request.body).get('mode', None)
@@ -355,8 +305,6 @@ def friends(request):
 				return JsonResponse(
 					{
 						'success' : 'Y',
-						'message' : 'success.add.friends',
-						'redirect_uri' : 'friend_list'
 					}
 				)
 			except User.DoesNotExist:
@@ -364,7 +312,6 @@ def friends(request):
 					{
 						'success' : 'N',
 						'message' : 'fail.find.friend',
-						'redirect_uri' : 'main'
 					}
 				)
 		elif mode is 'del':
@@ -376,16 +323,12 @@ def friends(request):
 				return JsonResponse(
 					{
 						'success' : 'Y',
-						'message' : 'success.del.friends',
-						'redirect_uri' : 'friend_list'
 					}
 				)
 			except User.DoesNotExist:
 				return JsonResponse(
 					{
 						'success' : 'Y',
-						'message' : 'success.add.friends',
-						'redirect_uri' : 'friend_list'
 					}
 				)
 	else:
@@ -393,7 +336,6 @@ def friends(request):
 			{
 				'success' : 'N',
 				'message' : 'fail.request.method',
-				'redirect_uri' : 'main'
 			}
 		)
 
@@ -410,6 +352,5 @@ def userlist(request):
 			{
 				'success' : 'N',
 				'message' : 'fail.request.method',
-				'redirect_uri' : 'main'
 			}
 		)

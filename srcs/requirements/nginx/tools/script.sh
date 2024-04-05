@@ -7,6 +7,7 @@ sed -i "s/listen s ssl;/listen ${NGINX_PORT} ssl;/g" /etc/nginx/sites-available/
 sed -i "s/listen \[::\]: s ssl;/listen \[::\]:${NGINX_PORT} ssl;/g" /etc/nginx/sites-available/nginx-app.conf
 sed -i "s/ssl_certificate s;/ssl_certificate ${SSL_CRT};/g" /etc/nginx/sites-available/nginx-app.conf
 sed -i "s/ssl_certificate_key s;/ssl_certificate_key ${SSL_KEY};/g" /etc/nginx/sites-available/nginx-app.conf
+sed -i "s/server_name s;/server_name ${SERVER_ADDRESS};/g" /etc/nginx/sites-available/nginx-app.conf
 
 echo "set openssl"
 openssl req -x509 -nodes -days 365 -newkey rsa:4096 \

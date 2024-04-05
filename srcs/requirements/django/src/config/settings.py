@@ -26,7 +26,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'localhost', 'transcendence.kgnj.kr', 'django'
+    'transcendence.kgnj.kr'
 ]
 
 
@@ -100,23 +100,19 @@ CHANNEL_LAYERS = {
 
 # CORS, CSRF
 CSRF_TRUSTED_ORIGINS = [
-    "https://localhost", "https://transcendence.kgnj.kr"
+    "https://transcendence.kgnj.kr"
 ]
-
-CSRF_COOKIE_SECURE = True
-
-SESSION_COOKIE_SECURE = True
 
 CORS_ORIGIN_ALLOW_ALL = False
 
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
-    "https://localhost", "https://transcendence.kgnj.kr"
+    "https://transcendence.kgnj.kr"
 ]
 
 CORS_ORIGIN_WHITELIST = [
-    "https://localhost", "https://transcendence.kgnj.kr"
+    "https://transcendence.kgnj.kr"
 ]
 
 CORS_ALLOW_HEADERS = (

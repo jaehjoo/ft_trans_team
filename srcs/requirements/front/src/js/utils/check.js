@@ -12,6 +12,6 @@ export async function check_jwt_token() {
 		url = url + "?access=null&refresh=null"
 		const response = await fetch(url, {
 			method : 'GET'
-		});
+		}).catch(error => console.log(error));
 	}
 }

@@ -5,9 +5,9 @@ from django.contrib.auth.models import AbstractUser
 class User(AbstractUser):
 	# 사용자마다 발행하는 고유 번호
 	id = models.BigAutoField(help_text="USER ID", primary_key=True)
-	# 프로필 표시 정보
 	username = models.CharField(max_length=80, unique=True)
-	display_name = models.CharField(max_length=50)
+	# 프로필 표시 정보
+	display_name = models.CharField(max_length=80)
 	email = models.CharField(max_length=80, blank=True)
 	phone_number = models.CharField(max_length=80, blank=True)
 	# login 여부
@@ -35,11 +35,19 @@ class UserAvatar(models.Model):
 	eye = models.IntegerField(default=0)
 	lip = models.IntegerField(default=0)
 	skin_color = models.IntegerField(default=0)
-	medal_color = models.IntegerField(default=0)
+	pongmedal_color = models.IntegerField(default=0)
+	fightingmedal_color = models.IntegerField(default=0)
 
-# 사용자의 게임 기록
-class UserRecordGame(models.Model):
-	me = models.ForeignKey(User, related_name="record", on_delete=models.CASCADE)
+# 사용자의 탁구 게임 기록
+class UserRecordPongGame(models.Model):
+	me = models.ForeignKey(User, related_name="pongrecord", on_delete=models.CASCADE)
+	win = models.IntegerField(default=0)
+	lose = models.IntegerField(default=0)
+	rating = models.IntegerField(default=0)
+
+# 사용자의 격투 게임 기록
+class UserRecordFightingGame(models.Model):
+	me = models.ForeignKey(User, related_name="fightingrecord", on_delete=models.CASCADE)
 	win = models.IntegerField(default=0)
 	lose = models.IntegerField(default=0)
 	rating = models.IntegerField(default=0)
