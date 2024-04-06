@@ -6,6 +6,8 @@ import MainPage from "./main/main.js";
 import LobbyLayout from "./lobby/layout.js";
 import CreatePage from "./lobby/Create.js";
 import JoinPage from "./lobby/Join.js";
+import OneVersusOne from "./lobby/1vs1.js";
+import TournamentLobby from "./lobby/Tournament.js";
 
 export const App = () => {
   if (window.location.pathname === "/") {
@@ -22,6 +24,10 @@ export const App = () => {
     return `${LobbyLayout(CreatePage)}`;
   } else if (window.location.pathname === "/join") {
     return `${LobbyLayout(JoinPage)}`;
+  } else if (window.location.pathname === "/game/1v1") {
+    return `${LobbyLayout(OneVersusOne)}`;
+  } else if (window.location.pathname === "/game/tournament") {
+    return `${LobbyLayout(TournamentLobby)}`;
   }
 
   return /*html*/ `

@@ -1,31 +1,37 @@
-const JoinModal = (index, d) => {
+const JoinModal = (index, data) => {
   const modalId = `staticBackdrop${index}`; // 고유한 모달 id 생성
 
-  const JoinHandler = () => {
-    console.log("fetch", index, "you should remove event listener here");
-    console.log(d);
+  let currentModal = index;
+
+  const JoinButtonHandler = (e) => {
+    currentModal = e.target.parentNode.getAttribute("key");
+    console.log("JoinButtonHandler", currentModal);
   };
 
-  const submitHandler = (e) => {
+  const submitHandler = (idx) => (e) => {
     e.preventDefault();
     console.log("submit", e.target[0].value);
+    console.log("Modal Index:", idx);
+
+    if (data[currentModal].type === "one") window.location.href = "/game/1v1";
+    else window.location.href = "/game/tournament";
   };
 
   const closeModal = () => {
-    window.removeEventListener("click", JoinHandler);
-    window.removeEventListener("submit", submitHandler);
+    window.removeEventListener("submit", submitHandler(index));
     window.removeEventListener("click", closeModal);
     window.location.reload();
   };
 
-  window.JoinHandler = JoinHandler;
-  window.JoinSubmitHandler = submitHandler;
+  window.JoinButtonHandler = JoinButtonHandler;
+  window.JoinSubmitHandler = submitHandler(index);
   window.closeModal = closeModal;
 
   return /*html*/ `
+
   <div key=${index} class="d-flex justify-content-center align-items-center w-100">
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#${modalId}" onclick="JoinHandler(${index})" ${
-    d.status === "Started" ? "disabled" : ""
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#${modalId}" onclick="JoinButtonHandler(event)" ${
+    data[index].status === "Started" ? "disabled" : ""
   }>
       Join
     </button>
@@ -36,15 +42,15 @@ const JoinModal = (index, d) => {
         <div class="modal-content">
           <div class="modal-header">
             <h1 class="modal-title fs-5" id="${modalId}Label">${
-    d.type === "one" ? "1 VS 1" : "Tournament"
+    data[index].type === "one" ? "1 VS 1" : "Tournament"
   }</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()"></button>
           </div>
-          <form onsubmit="JoinSubmitHandler(event)">
+          <form onsubmit="JoinSubmitHandler(event, ${index})">
             <div class="modal-body">
-              <p>${d.title}</p>
+              <p>${data[index].title}</p>
               ${
-                d.private === true
+                data[index].private === true
                   ? `<input type="password" class="form-control" placeholder="Enter password" required>`
                   : ``
               }
