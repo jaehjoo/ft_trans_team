@@ -5,6 +5,7 @@ import FaPage from "./login/2fa.js";
 import MainPage from "./main/main.js";
 import LobbyLayout from "./lobby/layout.js";
 import CreatePage from "./lobby/Create.js";
+import JoinPage from "./lobby/Join.js";
 
 export const App = () => {
   if (window.location.pathname === "/") {
@@ -19,6 +20,8 @@ export const App = () => {
     return `${MainLayout(MainPage)}`;
   } else if (window.location.pathname === "/create") {
     return `${LobbyLayout(CreatePage)}`;
+  } else if (window.location.pathname === "/join") {
+    return `${LobbyLayout(JoinPage)}`;
   }
 
   return /*html*/ `
