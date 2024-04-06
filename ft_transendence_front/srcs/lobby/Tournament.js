@@ -22,7 +22,13 @@ const TournamentLobby = () => {
     console.log("Start", "you should remove event listener");
   };
 
-  window.StartOneGame = StartButton;
+  const LeaveButton = () => {
+    console.log("Leave", "you should remove event listener");
+    window.location.href = "/join";
+  };
+
+  window.StartGame = StartButton;
+  window.LeaveGame = LeaveButton;
 
   return /*html*/ `
   <div style="height : 70vh;" class="d-flex justify-content-center align-items-center gap-4">
@@ -78,8 +84,8 @@ const TournamentLobby = () => {
   </div>
 
     <div style="position: fixed; bottom : 250px;" class="w-100 d-flex justify-content-between p-4">
-    <a href="/join"><button class="btn btn-danger" style="width: 100px;">Leave</button></a>
-    <button class="btn btn-primary" style="width: 100px;" onclick="StartOneGame()">Start</button>
+    <button class="btn btn-danger" style="width: 100px;" onclick="LeaveGame()">Leave</button>
+    <button class="btn btn-primary" style="width: 100px;" onclick="StartGame()">Start</button>
     </div>
   </div>
   `;
