@@ -97,7 +97,7 @@ const JoinPage = () => {
               d.status === "Started" ? "color: red;" : "color: green;"
             }">${d.status}</div>
 
-            ${JoinModal(idx, d)}
+            ${JoinModal(idx, data)}
           </div>
           
         </div>
