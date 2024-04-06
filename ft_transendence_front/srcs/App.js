@@ -8,6 +8,7 @@ import CreatePage from "./lobby/Create.js";
 import JoinPage from "./lobby/Join.js";
 import OneVersusOne from "./lobby/1vs1.js";
 import TournamentLobby from "./lobby/Tournament.js";
+import GameResult from "./lobby/result.js";
 
 export const App = () => {
   if (window.location.pathname === "/") {
@@ -28,6 +29,8 @@ export const App = () => {
     return `${LobbyLayout(OneVersusOne)}`;
   } else if (window.location.pathname === "/game/tournament") {
     return `${LobbyLayout(TournamentLobby)}`;
+  } else if (window.location.pathname === "/game/result") {
+    return `${LobbyLayout(GameResult)}`;
   }
 
   return /*html*/ `
