@@ -1,3 +1,5 @@
+import { useState } from "../../MyReact";
+
 const Players = [
   {
     name: "Player 1",
@@ -10,6 +12,8 @@ const Players = [
 ];
 
 const OneVersusOne = () => {
+  const [loading, setLoading] = useState(true);
+
   const StartButton = () => {
     console.log("Start", "you should remove event listener");
   };
@@ -23,9 +27,15 @@ const OneVersusOne = () => {
   window.LeaveGame = LeaveButton;
 
   return /*html*/ `
-  <div style="height : 70vh;" class="d-flex justify-content-center align-items-center gap-4">
-
-
+  ${
+    loading
+      ? /*html*/ `
+    <div style="height : 70vh;" class="d-flex justify-content-center align-items-center">
+      <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>`
+      : /*html*/ `<div style="height : 70vh;" class="d-flex justify-content-center align-items-center gap-4">
   <div class="d-flex gap-4">
     <div class="card" style="width: 18rem;">
       <img src="http://via.placeholder.com/640x480" class="card-img-top" alt="...">
@@ -54,7 +64,8 @@ const OneVersusOne = () => {
     </div>
 
   </div>
-  `;
+  `
+  }`;
 };
 
 export default OneVersusOne;
