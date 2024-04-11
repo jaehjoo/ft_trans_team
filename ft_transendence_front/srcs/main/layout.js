@@ -1,7 +1,7 @@
 const Main = (children) => {
   if (children === undefined) children = "";
   const MainStr = /*html*/ `
-    <main class="d-flex flex-column p-2 bg-primary vh-100 justify-content-between align-items-center">
+    <main class="d-flex flex-column p-2 bg-light vh-100 justify-content-between align-items-center">
     <div class="d-flex w-100">
       <header>42 Ping Pong</header>
     </div>
