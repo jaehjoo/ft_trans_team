@@ -42,8 +42,13 @@ const MyPage = () => {
     alert("아바타 변경");
   };
 
+  const deleteAccount = () => {
+    alert("계정 삭제");
+  };
+
   window.goHome = goHome;
   window.changeAvatar = changeAvatar;
+  window.deleteAccount = deleteAccount;
 
   return /*html*/ `
   <div class="w-100 p-4 d-flex flex-column gap-2">
@@ -79,6 +84,31 @@ const MyPage = () => {
 
     <button onclick="changeAvatar()" class="btn btn-primary">아바타 변경</button>
     <button onclick="goHome()" class="btn btn-secondary">Go Home</button>
+    
+
+    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+      Delete Account
+    </button>
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h1 class="modal-title fs-5" id="staticBackdropLabel">Are you Sure ?</h1>
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure you want to delete your account?</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      <button type="button" class="btn btn-danger" onclick="deleteAccount()">Delete</button>
+    </div>
+  </div>
+</div>
+</div>
+
   </div>
   `;
 };
