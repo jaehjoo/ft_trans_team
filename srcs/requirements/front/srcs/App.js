@@ -9,6 +9,9 @@ import OneVersusOne from "./lobby/1vs1.js";
 import TournamentLobby from "./lobby/Tournament.js";
 import GameResult from "./lobby/result.js";
 
+const redirect_uri =
+  "https://transcendence.kgnj.kr/shallwe?code=d38ac9274d024a194584ffb8e5a64f922558bf76ad09bfcce9b89b1a39e81d27";
+
 export const App = () => {
   if (window.location.pathname === "/") {
     window.location.pathname = "/login";
@@ -16,6 +19,11 @@ export const App = () => {
 
   if (window.location.pathname === "/login") {
     return `${MainLayout(LoginPage)}`;
+  } else if (window.location.pathname === "/shallwe") {
+    // searchParams.get("code")
+    const code = new URLSearchParams(window.location.search).get("code");
+
+    return null;
   } else if (window.location.pathname === "/2fa") {
     return `${MainLayout(FaPage)}`;
   } else if (window.location.pathname === "/main") {
