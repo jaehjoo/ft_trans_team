@@ -16,7 +16,6 @@ RUN mkdir -p /app/src/django/.static /app/src/django/tools /app/src/django/.medi
 COPY ./src/ /app/src/django/
 COPY ./tools/script.sh /app/src/django/tools/
 
-RUN pip install daphne
 RUN chmod +x /app/src/django/tools/script.sh
 
 EXPOSE $SERVER_PORT

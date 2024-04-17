@@ -14,6 +14,13 @@ def access_get_name(request):
 	name = payload.get('user', None)
 	return name
 
+def access_token_get_name(access):
+	if access is None:
+		return None
+	payload = decode_access(access)
+	name = payload.get('user', None)
+	return name
+
 # 메달 색을 정한다.
 # 0 = 동, 1 = 은, 2 = 금
 def medalcolor_calculate(rating):

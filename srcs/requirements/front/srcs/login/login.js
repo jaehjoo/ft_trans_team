@@ -1,4 +1,4 @@
-import Modal from "../../components/ui/CreateByModal";
+import Modal from "../../components/ui/CreateByModal.js";
 
 const Login = () => {
   const loginButtonClickHandler = () => {

@@ -49,7 +49,7 @@ def auth_42(request):
 	return None
 
 # login 검증
-# POST : 들어온 jwt 토큰 및 42 인가 코드 확인
+# GET : 들어온 jwt 토큰 및 42 인가 코드 확인
 def login(request):
 	if request.method == 'POST':
 		return JsonResponse(
@@ -204,9 +204,8 @@ def info(request):
 					'avatar' : {
 						'hair' : avatar.hair,
 						'eye' : avatar.eye,
-						'lip' : avatar.lip,
+						'mouth' : avatar.lip,
 						'skin_color' : avatar.skin_color,
-						'medal_color' : avatar.medal_color
 					},
 					'ponggame_record' : {
 						'win' : ponggame_record.win,
@@ -261,7 +260,7 @@ def info(request):
 
 # 친구 정보를 출력
 # GET : 친구 정보를 전송
-# POST : mode is add(친구를 추가) or del(친구 삭제), friend_name is friend username
+# POST : mode is add(친구를 추가) or del(친구 삭제)
 def friends(request):
 	name = access_get_name(request)
 	if name is None:
@@ -284,7 +283,8 @@ def friends(request):
 		user_friends = user.friends.all()
 		for idx, friend in user_friends:
 			dict[idx] = friend.name
-		return JsonResponse(json.dumps(dict))
+		total = {'friendsList': dict}
+		return JsonResponse(json.dumps(total))
 	elif request.method is 'POST':
 		try:
 			user = User.objects.get(username=name)
@@ -346,7 +346,8 @@ def userlist(request):
 		u_list = User.ogjects.all()
 		for idx, user in u_list:
 			dict[idx] = user.username
-		return JsonResponse(json.dumps(dict))
+		total = {'userList': dict}
+		return JsonResponse(json.dumps(total))
 	else:
 		return JsonResponse(
 			{

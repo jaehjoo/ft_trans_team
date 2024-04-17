@@ -10,7 +10,7 @@ export default class Settings extends AbstractView {
 		return `
 			<h1>Settings</h1>
 			<p>Manage your privacy and configuration.</p>
-			<a href="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-d69879cc4fdcaed4bfcb7657ffe1835e3018b3d6a40bb05950d8abc18f0b2735&redirect_uri=https%3A%2F%2Ftranscendence.kgnj.kr%2Fshallwe&response_type=code">42Auth</button>
+			<a href="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-3f97e5a7884daa587a8fbdcab6bbc5e1c4ff366e0858e0e46097ed9abd24fef7&redirect_uri=https%3A%2F%2Ftranscendence.kgnj.kr%2Fshallwe&response_type=code">42Auth</button>
 		`;
 	}
 }

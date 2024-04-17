@@ -1,4 +1,4 @@
-import GameModal from "./GameModal";
+import GameModal from "./GameModal.js";
 
 const ButtonGroup = () => {
   const playButton = () => {

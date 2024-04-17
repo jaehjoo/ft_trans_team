@@ -1,5 +1,5 @@
-import { useState } from "../../MyReact";
-import Sended from "./2faSend";
+import { useState } from "../../MyReact.js";
+import Sended from "./2faSend.js";
 
 const FaImgGroup = (fa, setFa) => {
   const clickHandler = (key) => {

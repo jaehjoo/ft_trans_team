@@ -2,11 +2,13 @@
 import json
 
 from channels.generic.websocket import AsyncWebsocketConsumer
+from urllib.parse import parse_qs
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
+        self.query = parse_qs(self.scope['query_string'].decode('utf-8'))
         self.room_group_name = f"chat_{self.room_name}"
 
         # Join room group
@@ -14,7 +16,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         await self.accept()
 
-        await self.send(text_data=json.dumps({"message": "hello! client!"}))
+        await self.channel_layer.group_send(self.room_group_name, {"type": "chat.message", "message": self.query['message']})
 
     async def disconnect(self, close_code):
         # Leave room group
@@ -35,4 +37,4 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = event["message"]
 
         # Send message to WebSocket
-        await self.send(text_data=json.dumps({"message": message + " man!"}))
+        await self.send(text_data=json.dumps({"message": message}))

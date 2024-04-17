@@ -1,4 +1,4 @@
-import { useState } from "../../../MyReact";
+import { useState } from "../../../MyReact.js";
 
 const ModalContent = () => {
   const handleClick = (text) => {
