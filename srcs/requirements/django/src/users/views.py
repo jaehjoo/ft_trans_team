@@ -133,21 +133,23 @@ def TwoFactor(request):
 		)
 	content = json.loads(request.body)
 	if content.get('email', None):
+		email = content.get('email')
 		if enroll2fa.send_email(request):
 			return JsonResponse(
 				{
 					'success' : 'Y',
 				}
 			)
-	elif content.get('SMS', None):
-		data = enroll2fa.send_sms(request)
+	elif content.get('sms', None):
+		sms = content.get('sms')
+		data = enroll2fa.send_sms(request, sms)
 		if data:
 			return JsonResponse(
 				{
 					'success' : 'Y',
 				}
 			)
-	elif content.get('OTP', None):
+	elif content.get('otp', None):
 		data = enroll2fa.send_otp(request)
 		if data:
 			return JsonResponse(

@@ -24,14 +24,23 @@ export const App = () => {
     if (code) {
       fetch(`/api/auth42?code=${code}`)
         .then((res) => {
-          localStorage.setItem("access_token", res.content.access);
-          localStorage.setItem("refresh_token", res.content.refresh);
-          localStorage.setItem("csrf_token", res.content.csrftoken);
-
-          window.location.href = "/2fa";
+          res.json().then((data) => {
+            if (data.success === "Y") {
+              localStorage.setItem("access_token", data.content.access);
+              localStorage.setItem("refresh_token", data.content.refresh);
+              localStorage.setItem("csrf_token", data.content.csrftoken);
+              window.location.href = `/2fa`;
+            } else {
+              console.log(data);
+              window.location.href = URL;
+            }
+          });
         })
         .catch((err) => {
           console.log(err);
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("refresh_token");
+          localStorage.removeItem("csrf_token");
           window.location.href = URL;
         });
     }

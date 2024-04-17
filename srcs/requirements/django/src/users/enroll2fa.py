@@ -27,14 +27,16 @@ def make_otp_qrcode(key):
     digits = "6"
     return prefix + type + label + "?" + secret + "&" + issuer + "&" + digits
 
-def send_sms(request):
+def send_sms(request, value):
     name = access_get_name(request)
     try:
         user = User.objects.get(username=name)
     except User.DoesNotExist:
         return False
-    if user.phone_number is None:
+    if len(value) is not 11:
         return False
+    user.phone_number = value
+    user.save()
     code = random_key(6)
     api_key = os.environ.get('COOLSMS_API_KEY')
     api_secret = os.environ.get('COOLSMS_API_SECRET')
@@ -94,7 +96,7 @@ def check_code_2fa(request):
             if key.auth2fa is 3:
                 result = otp.valid_totp(code, key.otp_secret)           
             elif key.auth2fa is not 0:
-                result = code is key.twofactorkey
+                result = (code == key.twofactorkey)
             else:
                 result = False
             key.twofactorkey = ""
