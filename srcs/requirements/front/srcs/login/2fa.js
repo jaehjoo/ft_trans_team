@@ -10,13 +10,13 @@ const FaImgGroup = (fa, setFa) => {
 
   return /*html*/ `
     <div class="d-flex justify-content-center align-items-center w-100" style="gap : 6rem;">
-    <img  src="../../public/img/icons/mail.png" onclick="clickHandler('mail')" class="p-2" alt="email" style="width: 80px; cursor: pointer; ${
+    <img  src="../img/icons/mail.png" onclick="clickHandler('mail')" class="p-2" alt="email" style="width: 80px; cursor: pointer; ${
       fa === "mail" ? "border: 1px solid blue; border-radius: 30%" : ""
     };">
-    <img  src="../../public/img/icons/sms.png"   onclick="clickHandler('sms')" class="p-2" alt="sms" style="width: 80px; cursor: pointer; ${
+    <img  src="../img/icons/sms.png"   onclick="clickHandler('sms')" class="p-2" alt="sms" style="width: 80px; cursor: pointer; ${
       fa === "sms" ? "border: 1px solid blue; border-radius: 30%" : ""
     };">
-    <img  src="../../public/img/icons/app.png"   onclick="clickHandler('app')" class="p-2" alt="app" style="width: 80px; cursor: pointer; ${
+    <img  src="../img/icons/app.png"   onclick="clickHandler('app')" class="p-2" alt="app" style="width: 80px; cursor: pointer; ${
       fa === "app" ? "border: 1px solid blue; border-radius: 30%" : ""
     };">
     </div>

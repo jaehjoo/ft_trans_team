@@ -9,7 +9,7 @@ const Main = (children) => {
       <div id="renderSection" class="d-flex w-50 flex-column gap-2">
       ${children}
       </div>
-      <img src="../../public/img/main.png" alt="main" class="img-fluid w-50">
+      <img src="../img/main.png" alt="main" class="img-fluid w-50">
     </section>
     <footer>Made with by 42 Cadets</footer>
   `;

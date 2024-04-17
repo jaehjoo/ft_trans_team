@@ -15,7 +15,7 @@ const Login = () => {
       <h5>Welcome to 42 Transcendence Ping Pong Game!</h5>
       <div class="d-flex w-100 justify-content-center align-items-center mt-5">
       <button class="btn btn-light d-flex gap-2" onclick="loginButtonClickHandler()" style="border : 0.5px solid gray">
-        <img src="../../public/img/42.png" alt="42 logo" style="width: 25px;">
+        <img src="../../img/42.png" alt="42 logo" style="width: 25px;">
         <span>Sign in with 42 intra</span>
       </button>
       </div>
