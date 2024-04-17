@@ -9,8 +9,7 @@ import OneVersusOne from "./lobby/1vs1.js";
 import TournamentLobby from "./lobby/Tournament.js";
 import GameResult from "./lobby/result.js";
 
-const redirect_uri =
-  "https://transcendence.kgnj.kr/shallwe?code=d38ac9274d024a194584ffb8e5a64f922558bf76ad09bfcce9b89b1a39e81d27";
+export const URL = "https://transcendence.kgnj.kr";
 
 export const App = () => {
   if (window.location.pathname === "/") {
@@ -20,8 +19,22 @@ export const App = () => {
   if (window.location.pathname === "/login") {
     return `${MainLayout(LoginPage)}`;
   } else if (window.location.pathname === "/shallwe") {
-    // searchParams.get("code")
     const code = new URLSearchParams(window.location.search).get("code");
+
+    if (code) {
+      fetch(`/api/auth42?code=${code}`)
+        .then((res) => {
+          localStorage.setItem("access_token", res.content.access);
+          localStorage.setItem("refresh_token", res.content.refresh);
+          localStorage.setItem("csrf_token", res.content.csrftoken);
+
+          window.location.href = "/2fa";
+        })
+        .catch((err) => {
+          console.log(err);
+          window.location.href = URL;
+        });
+    }
 
     return null;
   } else if (window.location.pathname === "/2fa") {
