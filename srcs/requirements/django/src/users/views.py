@@ -2,7 +2,7 @@ import json
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from datetime import datetime
-from users.models import User, UserAvatar, UserRecordFriends, UserRecordPongGame, UserRecordFightingGame
+from users.models import User, UserAvatar, UserKey, UserRecordFriends, UserRecordPongGame, UserRecordFightingGame
 from users import jwt, enroll42, enroll2fa
 from users.utils import access_get_name
 from users.changevalue import change_user_value, change_avatar_value
@@ -32,11 +32,11 @@ def auth_token(request, token):
 				except User.DoesNotExist:
 					return None
 				if date > float(datetime.now()):
-					user.connect = "Y"
+					user.connect = True
 					user.save()
 					return dict_access
 				else:
-					user.connect = "N"
+					user.connect = False
 					user.save()
 	return None
 
@@ -117,7 +117,6 @@ def main(request):
 		{
 			"success" : "N",
 			"message" : "fail.auth.all",
-			"redirect_uri" : "login"
 		}
 	)
 
@@ -133,7 +132,6 @@ def TwoFactor(request):
 		)
 	content = json.loads(request.body)
 	if content.get('email', None):
-		email = content.get('email')
 		if enroll2fa.send_email(request):
 			return JsonResponse(
 				{
@@ -197,17 +195,16 @@ def info(request):
 			fightinggame_record = UserRecordFightingGame.objects.get(me=user)
 			return JsonResponse(
 				{
-					'basic' : {
-						'username' : user.username,
+					'user' : {
 						'displayname' : user.display_name,
 						'email' : user.email,
-						'phone_number' : user.phone_number
 					},
 					'avatar' : {
 						'hair' : avatar.hair,
 						'eye' : avatar.eye,
-						'mouth' : avatar.lip,
-						'skin_color' : avatar.skin_color,
+						'lip' : avatar.lip,
+						'face' : avatar.face,
+						'body' : avatar.body,
 					},
 					'ponggame_record' : {
 						'win' : ponggame_record.win,
@@ -237,6 +234,7 @@ def info(request):
 			ava_val = change_avatar_value(avatar, change_value.get('avatar', None))
 			return JsonResponse(
 				{
+					'success' : 'Y',
 					'user' : {
 						json.dumps(user_val)
 					},
@@ -282,10 +280,23 @@ def friends(request):
 					'message' : 'fail.user.dosenotexist',
 				}
 			)
+		friends_dict = {}
 		user_friends = user.friends.all()
-		for idx, friend in user_friends:
-			dict[idx] = friend.name
-		total = {'friendsList': dict}
+		tmp_idx = 0
+		for friend_relation in user_friends:
+			friend = friend_relation.friends
+			pong_record = friend.pongrecord.first()
+			fighting_record = friend.fightingrecord.first()
+			friends_dict[tmp_idx] = {
+				'name' : friend.display_name,
+				'connect' : friend.connect,
+				'pongWin' : pong_record.win,
+				'pongLose' : pong_record.lose,
+				'fightingWin' : fighting_record.win,
+				'fightingLose' : fighting_record.lose,
+			}
+			tmp_idx += 1
+		total = {'friendsList': friends_dict}
 		return JsonResponse(json.dumps(total))
 	elif request.method is 'POST':
 		try:
@@ -344,11 +355,26 @@ def friends(request):
 # 사용자 명단을 알려준다
 # GET : 사용자 명단 전달
 def userlist(request):
+	name = access_get_name(request)
+	if name is None:
+		return JsonResponse(
+			{
+				'success' : 'N',
+				'message' : 'fail.list.notUser'
+			}
+		)
 	if request.method is 'GET':
+		userList = {}
 		u_list = User.ogjects.all()
-		for idx, user in u_list:
-			dict[idx] = user.username
-		total = {'userList': dict}
+		tmp_idx = 0
+		for users in u_list:
+			if users.username is name:
+				continue
+			userList[tmp_idx] = {
+				'name' : users.display_name,
+			}
+			tmp_idx += 1
+		total = {'userList': userList}
 		return JsonResponse(json.dumps(total))
 	else:
 		return JsonResponse(
@@ -357,3 +383,66 @@ def userlist(request):
 				'message' : 'fail.request.method',
 			}
 		)
+
+
+# 사용자 접속 종료
+# POST : 사용자 접속 종료
+def logout(request):
+	name = access_get_name(name)
+	if name is None:
+		return JsonResponse(
+			{
+				'success' : 'N',
+				'message' : 'fail.logout.notAccess',
+			}
+		)
+	if request.method is 'POST':
+		try:
+			is_user = User.objects.get(username=name)
+			is_user.connect = False
+			is_key = UserKey.objects.get(me=is_user)
+			is_key.auth42 = 0
+			is_user.save()
+			is_key.save()
+			return JsonResponse(
+				{
+					'success' : 'Y'
+				}
+			)
+		except User.DoesNotExist:
+			is_user = None
+	return JsonResponse(
+		{
+			'success' : 'N',
+			'message' : 'fail.logout.notUser',
+		}
+	)
+
+# 사용자 정보를 영구 제거
+# POST : 제거
+def delete(request):
+	name = access_get_name(name)
+	if name is None:
+		return JsonResponse(
+			{
+				'success' : 'N',
+				'message' : 'fail.delete.notAccess',
+			}
+		)
+	if request.method is 'POST':
+		try:
+			is_user = User.objects.get(username=name)
+			is_user.delete()
+			return JsonResponse(
+				{
+					'success' : 'Y',
+				}
+			)
+		except User.DoesNotExist:
+			is_user = None
+	return JsonResponse(
+		{
+			'success' : 'N',
+			'message' : 'fail.delete.notUser',
+		}
+	)

@@ -34,7 +34,8 @@ class UserAvatar(models.Model):
 	hair = models.IntegerField(default=0)
 	eye = models.IntegerField(default=0)
 	lip = models.IntegerField(default=0)
-	skin_color = models.IntegerField(default=0)
+	face = models.IntegerField(default=0)
+	body = models.IntegerField(default=0)
 	pongmedal_color = models.IntegerField(default=0)
 	fightingmedal_color = models.IntegerField(default=0)
 
@@ -56,7 +57,6 @@ class UserRecordFightingGame(models.Model):
 class UserRecordFriends(models.Model):
 	me = models.ForeignKey(User, related_name="friends", on_delete=models.CASCADE)
 	friends = models.ForeignKey(User, related_name="friend_of", on_delete=models.CASCADE)
-
 
 # class UserRecentlyRecode(models.model):
 # 	me = models.ForeignKey(User, on_delete=models.CASCADE)

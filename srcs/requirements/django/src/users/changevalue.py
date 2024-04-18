@@ -21,17 +21,23 @@ def change_avatar_value(avatar, avatar_value):
 	hair = avatar_value.get('hair', None)
 	eye = avatar_value.get('eye', None)
 	lip = avatar_value.get('lip', None)
-	skin_color = avatar_value.get('skin_color', None)
-	medal_color = avatar_value.get('medal_color', None)
+	face = avatar_value.get('face', None)
+	body = avatar_value.get('body', None)
+	pongmedal_color = avatar_value.get('pongmedal_color', None)
+	fightingmedal_color = avatar_value.get('fighting_color', None)
 	if hair:
 		avatar.hair = hair
 	if eye:
 		avatar.eye = eye
 	if lip:
 		avatar.lip = lip
-	if skin_color:
-		avatar.skin_color = skin_color
-	if medal_color:
-		avatar.medal_color = medal_color
+	if face:
+		avatar.face = face
+	if body:
+		avatar.body = body
+	if pongmedal_color:
+		avatar.pongmedal_color = pongmedal_color
+	if fightingmedal_color:
+		avatar.fightingmedal_color = fightingmedal_color
 	avatar.save()
 	return dict
