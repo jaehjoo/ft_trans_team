@@ -4,40 +4,29 @@ from django.middleware.csrf import get_token
 from datetime import datetime
 from users.models import User, UserAvatar, UserKey, UserRecordFriends, UserRecordPongGame, UserRecordFightingGame
 from users import jwt, enroll42, enroll2fa
-from users.utils import access_get_name
+from users.utils import access_get_name, access_get_exp, refresh_get_exp, refresh_get_name
 from users.changevalue import change_user_value, change_avatar_value
 
 # jwt access, refresh 토큰이 정상/비정상 여부 확인
 def auth_token(request, token):
-	dict_access = None
-	if request.method == 'GET':
+	if token == 'access':
+		name = access_get_name(request)
+		exp = access_get_exp(request)
+	elif token == 'refresh':
+		name = refresh_get_name(request)
+		exp = refresh_get_exp(request)
+	if exp:
 		try:
-			data = request.GET.get(token)
-			dict_access = jwt.decode_access(data)
-		except:
+			user = User.objects.get(username=name)
+		except User.DoesNotExist:
 			return None
-	elif request.method == 'POST':
-		try:
-			token_json = json.loads(request.body)
-			dict_access = jwt.decode_access(token_json.get(token, None))
-		except json.JSONDecodeError:
-			return None
-	else:
-		return None
-	if dict_access:
-			date = dict_access.get('exp', None)
-			if date:
-				try:
-					user = User.objects.get(username=dict_access.get(token, None))
-				except User.DoesNotExist:
-					return None
-				if date > float(datetime.now()):
-					user.connect = True
-					user.save()
-					return dict_access
-				else:
-					user.connect = False
-					user.save()
+		if float(exp) > datetime.now().timestamp():
+			user.connect = True
+			user.save()
+			return name
+		else:
+			user.connect = False
+			user.save()
 	return None
 
 # auth42 : 42 인증 절차 처리
@@ -58,17 +47,23 @@ def login(request):
 				'message' : 'fail.login.nopost',
 			}
 		)
-	if auth_token(request, 'access'):
-		csrftoken = get_token(request)
-		return JsonResponse(
-			{
-				'success' : 'Y',
-				'message' : 'success.login.already',
-				'content' : {
-					'csrftoken' : csrftoken
+	name = auth_token(request, 'access')
+	if name:
+		user = User.objects.get(username=name)
+		key = UserKey.objects.get(me=user)
+		has2fa = key.auth2fa
+		if has2fa:
+			csrftoken = get_token(request)
+			return JsonResponse(
+				{
+					'success' : 'Y',
+					'message' : 'success.login.already',
+					'content' : {
+						'csrftoken' : csrftoken,
+						'name' : name
+					}
 				}
-			}
-		)
+			)
 	user = auth_42(request)
 	if user:
 		csrftoken = get_token(request)
@@ -78,7 +73,7 @@ def login(request):
 				'content' : {
 					'access' : jwt.generate_access(user),
 					'refresh' : jwt.generate_refresh(user),
-					'csrftoken' : csrftoken
+					'csrftoken' : csrftoken,
 				}
 			}
 		)
@@ -96,11 +91,18 @@ def main(request):
 		access = auth_token(request, 'access')
 		refresh = auth_token(request, 'refresh')
 		if access:
-			return JsonResponse( 
-				{
-					"success" : "Y",
-				}
-			)
+			user = User.objects.get(username=access)
+			key = UserKey.objects.get(me=user)
+			has2fa = key.auth2fa
+			if has2fa:
+				return JsonResponse( 
+					{
+						"success" : "Y",
+						"content" : {
+							"name" : access
+						}
+					}
+				)
 		elif refresh:
 			user_obj = User.objects.get(username=refresh.get('name'))
 			if user_obj:
@@ -187,6 +189,16 @@ def info(request):
 				'message' : 'fail.info',
 			}
 		)
+	user = User.objects.get(username=name)
+	key = UserKey.objects.get(me=user)
+	has2fa = key.auth2fa
+	if has2fa == 0:
+		return JsonResponse(
+			{
+				'success' : 'N',
+				'message' : 'fail.nhave.2fa'
+			}
+		)
 	if request.method == 'GET':
 		try:
 			user = User.objects.get(name)
@@ -268,6 +280,16 @@ def friends(request):
 			{
 				'success' : 'N',
 				'message' : 'fail.get.friends',
+			}
+		)
+	user = User.objects.get(username=name)
+	key = UserKey.objects.get(me=user)
+	has2fa = key.auth2fa
+	if has2fa == 0:
+		return JsonResponse(
+			{
+				'success' : 'N',
+				'message' : 'fail.nhave.2fa'
 			}
 		)
 	if request.method is 'GET':
@@ -363,6 +385,16 @@ def userlist(request):
 				'message' : 'fail.list.notUser'
 			}
 		)
+	user = User.objects.get(name)
+	key = UserKey.objects.get(me=user)
+	has2fa = key.auth2fa
+	if has2fa == 0:
+		return JsonResponse(
+			{
+				'success' : 'N',
+				'message' : 'fail.nhave.2fa'
+			}
+		)
 	if request.method is 'GET':
 		userList = {}
 		u_list = User.ogjects.all()
@@ -396,6 +428,16 @@ def logout(request):
 				'message' : 'fail.logout.notAccess',
 			}
 		)
+	user = User.objects.get(name)
+	key = UserKey.objects.get(me=user)
+	has2fa = key.auth2fa
+	if has2fa == 0:
+		return JsonResponse(
+			{
+				'success' : 'N',
+				'message' : 'fail.nhave.2fa'
+			}
+		)
 	if request.method is 'POST':
 		try:
 			is_user = User.objects.get(username=name)
@@ -427,6 +469,16 @@ def delete(request):
 			{
 				'success' : 'N',
 				'message' : 'fail.delete.notAccess',
+			}
+		)
+	user = User.objects.get(name)
+	key = UserKey.objects.get(me=user)
+	has2fa = key.auth2fa
+	if has2fa == 0:
+		return JsonResponse(
+			{
+				'success' : 'N',
+				'message' : 'fail.nhave.2fa'
 			}
 		)
 	if request.method is 'POST':

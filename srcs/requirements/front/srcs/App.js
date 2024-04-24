@@ -25,6 +25,7 @@ export const App = () => {
       fetch(`/api/auth42?code=${code}`)
         .then((res) => {
           res.json().then((data) => {
+            console.log(data)
             if (data.success === "Y") {
               localStorage.setItem("access_token", data.content.access);
               localStorage.setItem("refresh_token", data.content.refresh);

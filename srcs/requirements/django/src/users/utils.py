@@ -1,6 +1,45 @@
 import string, random, json
 from users.jwt import decode_access
 
+def refresh_get_exp(request):
+	if request.method == 'GET':
+		access = request.GET.get('refresh')
+	elif request.method == 'POST':
+		access = json.loads(request.body).get('refresh', None)
+	else:
+		access = None
+	if access is None:
+		return None
+	payload = decode_access(access)
+	name = payload.get('exp', None)
+	return name
+
+def refresh_get_name(request):
+	if request.method == 'GET':
+		access = request.GET.get('refresh')
+	elif request.method == 'POST':
+		access = json.loads(request.body).get('refresh', None)
+	else:
+		access = None
+	if access is None:
+		return None
+	payload = decode_access(access)
+	name = payload.get('user', None)
+	return name
+
+def access_get_exp(request):
+	if request.method == 'GET':
+		access = request.GET.get('access')
+	elif request.method == 'POST':
+		access = json.loads(request.body).get('access', None)
+	else:
+		access = None
+	if access is None:
+		return None
+	payload = decode_access(access)
+	name = payload.get('exp', None)
+	return name
+
 def access_get_name(request):
 	if request.method == 'GET':
 		access = request.GET.get('access')
