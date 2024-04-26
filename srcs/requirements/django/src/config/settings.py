@@ -37,7 +37,6 @@ INSTALLED_APPS = [
     'channels',
 	'channels_postgres',
     'users',
-    'chat',
     'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
