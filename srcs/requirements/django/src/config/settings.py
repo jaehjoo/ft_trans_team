@@ -36,7 +36,8 @@ INSTALLED_APPS = [
     "daphne",
     'channels',
 	'channels_postgres',
-    'users',
+    'users.apps.UsersConfig',
+	'game.apps.GameConfig',
     'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -45,7 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions'
-    ]
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -95,7 +96,16 @@ CHANNEL_LAYERS = {
     },
 }
 
-
+LOGGING = {
+    "version": 1,  # the dictConfig format version
+    "disable_existing_loggers": False,  # retain the default loggers
+	"handlers" : {
+		"file" : {
+			"class" : "logging.FileHandler",
+			"filename" : "general.log"
+        }
+    }
+}
 
 # CORS, CSRF
 CSRF_TRUSTED_ORIGINS = [

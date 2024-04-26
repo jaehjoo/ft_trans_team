@@ -23,5 +23,4 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 	path('pingpong', pong),
 	path('api/', include("users.urls")),
-	path("chat/", include("chat.urls")),
 ]
