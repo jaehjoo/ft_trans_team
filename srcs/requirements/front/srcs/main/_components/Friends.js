@@ -1,14 +1,20 @@
 import Sidebar from "../../../components/ui/Sidebar.js";
 
 const fetchFriends = async () => {
-  const response = await fetch("/api/friends");
+  const access = localStorage.getItem("access_token") || "null";
+  const response = await fetch(`/api/friends?access=${access}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
   const data = await response.json();
-  console.log(data);
   return data;
 };
 
 const Friends = () => {
   fetchFriends();
+
   return /*html*/ `
     ${Sidebar("Friends List", ["Alice", "Bob", "Charlie"])}
 `;

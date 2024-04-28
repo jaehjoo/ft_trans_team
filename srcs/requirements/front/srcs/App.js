@@ -8,6 +8,7 @@ import MyPage from "./main/mypage.js";
 import OneVersusOne from "./lobby/1vs1.js";
 import TournamentLobby from "./lobby/Tournament.js";
 import GameResult from "./lobby/result.js";
+import PingPong from "./games/pingpong.js";
 
 export const URL = "https://transcendence.kgnj.kr";
 
@@ -25,7 +26,7 @@ export const App = () => {
       fetch(`/api/auth42?code=${code}`)
         .then((res) => {
           res.json().then((data) => {
-            console.log(data)
+            console.log(data);
             if (data.success === "Y") {
               localStorage.setItem("access_token", data.content.access);
               localStorage.setItem("refresh_token", data.content.refresh);
@@ -59,6 +60,9 @@ export const App = () => {
     return `${LobbyLayout(TournamentLobby)}`;
   } else if (window.location.pathname === "/game/result") {
     return `${LobbyLayout(GameResult)}`;
+  } else if (window.location.pathname === "/pingpong") {
+    document.body.innerHTML = "";
+    PingPong();
   }
 
   return /*html*/ `

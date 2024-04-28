@@ -1,4 +1,4 @@
-import os, json
+import os, json, logging
 import onetimepass as otp
 import qrcode
 from django.core.mail import EmailMessage
@@ -8,6 +8,8 @@ from sdk.exceptions import CoolsmsException
 from users.models import User, UserKey
 from users.jwt import decode_access
 from users.utils import random_key, access_get_name
+
+logger = logging.getLogger(__name__)
 
 def enroll_key(name, code, what2fa, otp_secret):
     user = User.objects.get(username=name)

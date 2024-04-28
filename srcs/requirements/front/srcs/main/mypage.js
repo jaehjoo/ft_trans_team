@@ -1,3 +1,5 @@
+import { useState } from "../../MyReact.js";
+
 const data = {
   name: "dkham",
   record: {
@@ -29,7 +31,22 @@ const data = {
   ],
 };
 
+let myName = "";
+
+const myPageFetch = async () => {
+  const access = localStorage.getItem("access_token") || "null";
+  const response = await fetch(`/api/info?access=${access}`, {
+    method: "GET",
+    "Content-Type": "application/json",
+  });
+  const data = await response.json();
+  console.log(data);
+  return data;
+};
+
 const MyPage = () => {
+  const [name, setName] = useState(myName);
+  myPageFetch();
   const oneTotal = data.record.OneByOne.win + data.record.OneByOne.lose;
   const TournamentTotal =
     data.record.Tournament.win + data.record.Tournament.lose;
@@ -42,8 +59,20 @@ const MyPage = () => {
     alert("아바타 변경");
   };
 
-  const deleteAccount = () => {
-    alert("계정 삭제");
+  const deleteAccount = async () => {
+    const data = {
+      access: localStorage.getItem("access_token"),
+    };
+    const res = await fetch("/api/delete", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": localStorage.getItem("csrf_token"),
+      },
+      body: JSON.stringify(data),
+    });
+    localStorage.clear();
+    window.location.href = "/login";
   };
 
   window.goHome = goHome;
