@@ -3,6 +3,7 @@ import json, logging, asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
 from game.info import Room
 from game.models import PracticeGameRoom
+from users.models import UserRecordPongGame
 from users.utils import random_key
 from channels.db import database_sync_to_async
 from asgiref.sync import sync_to_async
@@ -10,6 +11,7 @@ from asgiref.sync import sync_to_async
 logger = logging.getLogger(__name__)
 
 class practicePongConsumers(AsyncWebsocketConsumer):
+    rating_differece = 100
     # 생성된 게임방을 저장할 게임방 명단 클래스
     class RoomList:
         pass
@@ -100,20 +102,36 @@ class practicePongConsumers(AsyncWebsocketConsumer):
                 await self.channel_layer.group_discard("game_queue", self.channel_name)
                 await self.set_player1()
                 player = await self.get_player()
-                await self.channel_layer.group_send(
-                    self.game_group_name, {
-                        "type" : 'game.message',
-                        "data" : {
-                            "mode" : "set.game",
-                            "player0" : player["player0"],
-                            "player1" : player["player1"],
-                            "group" : self.game_group_name,
+                if await self.check_rating():
+                    await self.channel_layer.group_send(
+                        self.game_group_name, {
+                            "type" : 'game.message',
+                            "data" : {
+                                "mode" : "set.game",
+                                "player0" : player["player0"],
+                                "player1" : player["player1"],
+                                "group" : self.game_group_name,
+                            }
                         }
-                    }
-                )
+                    )
             else:
                 await self.join_matching()
     
+    # 두 플레이어의 레이팅을 확인하여 게임을 시작할지 말지 결정
+    @database_sync_to_async
+    def check_rating(self):
+        player = self.get_player()
+        player0 = player.player0
+        player1 = player.player1
+        logger.error(f"Player0 rating: {player0.rating}, Player1 rating: {player1.rating}")
+        # rating_difference의 default 값은 100.
+        if abs(player0.rating - player1.rating) < self.rating_differece:
+            self.rating_differece = 100
+            return True
+        else:
+            self.rating_differece += 200
+            return False
+
     # 본인이 속한 방을 불러온다. 없으면 None
     async def get_room(self):
         return getattr(self.RoomList, self.game_group_name, None)
