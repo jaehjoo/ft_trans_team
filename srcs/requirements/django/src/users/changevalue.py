@@ -1,9 +1,12 @@
 from users.models import User, UserKey, UserAvatar
+import logging
+
+logger = logging.getLogger(__name__)
 
 def change_user_value(user, user_value):
 	if user_value is None:
 		return False
-	displayname = user_value.get('display_name', None)
+	displayname = user_value.get('displayname', None)
 	email = user_value.get('email', None)
 	phone_number = user_value.get('phone_number', None)
 	if displayname:
@@ -40,4 +43,4 @@ def change_avatar_value(avatar, avatar_value):
 	if fightingmedal_color:
 		avatar.fightingmedal_color = fightingmedal_color
 	avatar.save()
-	return dict
+	return True

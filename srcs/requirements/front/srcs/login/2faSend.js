@@ -1,33 +1,30 @@
 const Sended = (fa) => {
-  const handdleSubmit = (e) => {
+  const handdleSubmit = async (e) => {
     e.preventDefault();
     const code = e.target[0].value;
 
-    fetch("/api/input2fa", {
-      method: "POST",
-      body: JSON.stringify({
-        code: code,
-        access: localStorage.getItem("access_token"),
-      }),
-      headers: {
-        "X-CSRFToken": localStorage.getItem("csrf_token"),
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => {
-        if (res.status !== 200) throw new Error("Error");
-        res.json().then((data) => {
-          if (data.success === "N") {
-            localStorage.clear();
-            window.location.href = "/login";
-          }
-          window.location.href = "/main";
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-        window.location.href = "/login";
+    try {
+      const res = await fetch("/api/input2fa", {
+        method: "POST",
+        body: JSON.stringify({
+          code: code,
+          access: localStorage.getItem("access_token"),
+        }),
+        headers: {
+          "X-CSRFToken": localStorage.getItem("csrf_token"),
+          "Content-Type": "application/json",
+        },
       });
+
+      if (res.success === "N") {
+        localStorage.clear();
+        window.location.href = "/login";
+      } else {
+        window.location.href = "/main";
+      }
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   window.handdleSubmit = handdleSubmit;
