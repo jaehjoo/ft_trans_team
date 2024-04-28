@@ -11,7 +11,7 @@ const GameViewport = {
   HEIGHT: 768,
 };
 
-window.addEventListener("load", function () {
+const StartCanvas = () => {
   const canvasEl = document.querySelector("canvas");
   const context = canvasEl.getContext("2d");
 
@@ -259,4 +259,6 @@ window.addEventListener("load", function () {
     else if (event.keyCode == 83) player.downPressed = false;
     else if (event.keyCode == 40) player.downPressed = false;
   }
-});
+};
+
+export default StartCanvas;
