@@ -1,34 +1,107 @@
-import json, logging, asyncio
-
+import json, asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
-from game.info import Room
-from game.models import PracticeGameRoom
-from users.models import UserRecordPongGame
-from users.utils import random_key
+from users.models import User, UserRecordPongGame
+from users.utils import access_token_get_name
+from game.models import GameRoom
+from game.pong_class import Player
 from channels.db import database_sync_to_async
 from asgiref.sync import sync_to_async
+from collections import deque
+from urllib.parse import parse_qs
 
-logger = logging.getLogger(__name__)
+# 게임 큐는 GameRoom 인스턴스를 저장 및 관리
+game_queue = {
+    "one" : deque(),
+    "two" : deque(),
+    "tournament" : deque(),
+}
 
-class practicePongConsumers(AsyncWebsocketConsumer):
+class PongOneMatch(AsyncWebsocketConsumer):
     rating_differece = 100
-    # 생성된 게임방을 저장할 게임방 명단 클래스
-    class RoomList:
-        pass
+    group_name = ""
 
-    # 웹소켓에서 연결 요청이 들어오면 받고 상대방 매칭 시도
     async def connect(self):
-        self.game_group_name = ""
-        await self.channel_layer.group_add("game_queue", self.channel_name)
+        query_string = parse_qs(self.scope['query_string'].decode())
+        access_token = query_string.get('access_token', [None])[0]
+        user_name = access_token_get_name(access_token)
+
+        if user_name == None:
+            await self.close()
+            return None
+        
+        user = await get_user_by_username(user_name)
+        if user == None:
+            await self.close()
+            return None
+
         await self.accept()
-        await self.send(text_data=json.dumps({
-            "type" : "game.message",
-            "data" : {
-                "mode" : "connect",
-                "name" : self.channel_name,
-            }
-        }))
-        await self.join_matching()
+        player = Player(user, user_name)
+        await self.try_matching(player)
+
+    async def try_matching(self, player):
+        room_count = len(game_queue["one"])
+
+        # 방이 없으면 방을 만들고 사용자를 추가
+        if room_count == 0:
+             # 그룹 이름은 방을 생성한 플레이어의 고유한 user_name 사용
+            self.group_name = f"pong_one_{player.name}"
+            await self.channel_layer.group_add(self.group_name, self.channel_name)
+            new_room = GameRoom(room_name=self.group_name, player0=player.name, status="waiting", mode="pingpong")
+            await database_sync_to_async(new_room.save)()
+            game_queue["one"].append(new_room)
+        # 방이 존재
+        else:
+            matched = False
+            # game_queue["one"]에서 "waiting"인 방을 찾는다
+            for room in game_queue["one"]:
+                if room.mode == "pingpong" and room.status == "waiting":
+                    if await self.check_rating(room.player0, player):
+                        await self.channel_layer.group_add(room.room_name, self.channel_name)
+                        room.player1 = player.name
+                        room.status = "playing"
+                        await database_sync_to_async(room.save)()
+                        self.group_name = room.room_name
+                        matched = True
+                        self.channel_layer.group_send(
+                            self.group_name, {
+                                "type" : 'game.message',
+                                "data" : {
+                                    "room_name" : self.group_name,
+                                    "mode" : room.mode,
+                                    "status": room.status,
+                                    "player0" : room.player0,
+                                    "player1" : room.player1,
+                                }
+                            }
+                        )
+                        self.game_start()
+                        break
+            # "waiting"인 방이 없으면 새로운 방을 만든다
+            if not matched:
+                self.group_name = f"pong_one_{player.name}"
+                await self.channel_layer.group_add(self.group_name, self.channel_name)
+                new_room = GameRoom(room_name=self.group_name, player0=player.name, status="waiting", mode="pingpong")
+                await database_sync_to_async(new_room.save)()
+                game_queue["one"].append(new_room)
+
+
+    async def check_rating(self, player, oppnent):
+        player_rating = await self.get_player_rating(player.name)
+        oppnent_rating = await self.get_player_rating(oppnent.name)
+        if abs(player_rating - oppnent_rating) <= self.rating_differece:
+            return True
+        else:
+            self.rating_differece += 200
+            return False
+        
+        
+    @database_sync_to_async
+    def get_player_rating(self, player_name):
+        return UserRecordPongGame.objects.get(user_name=player_name).rating
+    
+    # 웹소켓에 보낼 메세지들을 처리한다
+    async def game_message(self, event):
+        await self.send(text_data=json.dumps(event))
 
     # 연결을 종료
     async def disconnect(self, close_code):
@@ -116,21 +189,6 @@ class practicePongConsumers(AsyncWebsocketConsumer):
                 )
             else:
                 await self.join_matching()
-    
-    # 두 플레이어의 레이팅을 확인하여 게임을 시작할지 말지 결정
-    # @database_sync_to_async
-    # def check_rating(self):
-    #     player = self.get_player()
-    #     player0 = player.player0
-    #     player1 = player.player1
-    #     logger.error(f"Player0 rating: {player0.rating}, Player1 rating: {player1.rating}")
-    #     # rating_difference의 default 값은 100.
-    #     if abs(player0.rating - player1.rating) < self.rating_differece:
-    #         self.rating_differece = 100
-    #         return True
-    #     else:
-    #         self.rating_differece += 200
-    #         return False
 
     # 본인이 속한 방을 불러온다. 없으면 None
     async def get_room(self):
@@ -157,9 +215,6 @@ class practicePongConsumers(AsyncWebsocketConsumer):
             }
         )
 
-    # 웹소켓에 보낼 메세지들을 처리한다
-    async def game_message(self, event):
-        await self.send(text_data=json.dumps(event))
 
     # database를 이용하여 사람 수를 세거나 할 때 사용
     @database_sync_to_async
@@ -210,3 +265,14 @@ class practicePongConsumers(AsyncWebsocketConsumer):
     def get_player(self):
         is_room = PracticeGameRoom.objects.get(name=self.game_group_name)
         return {"player0": is_room.player0, "player1": is_room.player1}
+
+# class PongTwoMatch(AsyncWebsocketConsumer):
+
+# class PongTournamentMatch(AsyncWebsocketConsumer):
+
+@database_sync_to_async
+def get_user_by_username(username):
+    try:
+        return User.objects.get(username=username)
+    except User.DoesNotExist:
+        return None
