@@ -33,7 +33,7 @@ export const StartCanvas = () => {
     STOP: false,
   };
 
-  access_token = localStorage.getItem('access_token')
+  const access_token = localStorage.getItem('access_token')
   const ws = new WebSocket(
     "wss://" + window.location.host + "/ws/game/pongonebyone?access=" + access_token
   );
@@ -106,6 +106,7 @@ export const StartCanvas = () => {
           entities[4].bar.X = textData.data["bar"]["x"];
           entities[4].bar.Y = textData.data["bar"]["y"];
         }
+        playingDraw();
       }
     };
   }
@@ -232,7 +233,6 @@ export const StartCanvas = () => {
       sceneDraw();
     } else {
       update(secondsPassed);
-      playingDraw();
       sendBarInfo();
     }
   }

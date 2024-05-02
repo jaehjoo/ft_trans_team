@@ -2,7 +2,7 @@ import json, logging, asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.layers import get_channel_layer
 from users.models import User, UserRecordPongGame
-from game.info_pong import Bar, Player, Team, Room
+from game.info_pong import Room
 from game.models import GameRoom
 from game.utils import rating_calculator
 from datetime import datetime
@@ -23,20 +23,20 @@ class PongOneConsumers(AsyncWebsocketConsumer):
         self.rating_differece = 100
         self.create_time = datetime.now()
         query_string = parse_qs(self.scope['query_string'].decode())
-        access_token = query_string.get('access_token', None)[0]
+        access_token = query_string.get('access', None)[0]
         self.user_name = access_token_get_name(access_token)
 
         if access_token == None or self.user_name == None:
             await self.close()
         
         self.rating =  await self.get_rating(self.user_name)
-        await self.channel_layer.group_add("game_queue", self.channel_name)
+        await self.channel_layer.group_add("game_queue", self.user_name)
         await self.accept()
         await self.send(text_data=json.dumps({
             "type" : "game.message",
             "data" : {
                 "mode" : "connect",
-                "name" : self.channel_name,
+                "name" : self.user_name,
             }
         }))
         await self.join_matching()
@@ -65,7 +65,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
             if room != None:
                 delattr(self.RoomList, self.game_group_name)
         else:
-            logger.error("websocket " + self.channel_name + ": abnormal termination")
+            logger.error("websocket " + self.user_name + ": abnormal termination")
             if self.game_group_name:
                 self.channel_layer.group_send(
                     self.game_group_name, {
@@ -88,7 +88,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
             if cnt == 1 and room == None:
                 setattr(self.RoomList, self.game_group_name, Room())
                 room = await self.get_room()
-                room.setPlayer({"name": msg_data['player0'], "rating": msg_data['player0Rating']}, {"name": msg_data['player1'], "rating": msg_data['player1Rating']})
+                room.setPlayer({"name": msg_data['player0'], "rating": 0}, {"name": msg_data['player1'], "rating": 0})
             if cnt == 2 and room != None:
                 await self.channel_layer.group_send(
                     self.game_group_name, {
@@ -101,7 +101,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
         # 각 플레이어들의 탁구채 위치 정보. 정보를 받으면 최신화
         if msg_type == 'bar.info':
             room = await self.get_room()
-            if room.player0.name == self.channel_name:
+            if room.player0.name == self.user_name:
                 room.player0.bar.x = msg_data['bar']['x']
                 room.player0.bar.y = msg_data['bar']['y']
             else:
@@ -153,20 +153,20 @@ class PongOneConsumers(AsyncWebsocketConsumer):
     # 사용자에게 받은 탁구채 위치 정보를 최신화
     async def update_bar_info(self):
         room = await self.get_room()
-        if room.player0.name == self.channel_name:
+        if room.player0.name == self.user_name:
             bar = {"x" : room.player0.bar.x, "y" : room.player0.bar.y}
-        elif room.player1.name == self.channel_name:
+        elif room.player1.name == self.user_name:
             bar = {"x" : room.player1.bar.x, "y" : room.player1.bar.y}
         await self.channel_layer.group_send(
             self.game_group_name, {
                 "type" : 'game.message',
                 "data" : {
                     "mode" : "update.bar",
-                    "name" : self.channel_name,
+                    "name" : self.user_name,
                     "bar" : {
                         "x" : bar['x'],
                         "y" : bar['y']
-                    }
+                    },
                 }
             }
         )
@@ -221,7 +221,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
     @database_sync_to_async
     def create_room(self):
         self.game_group_name = self.user_name + random_key(6)
-        is_room = GameRoom(room_name=self.game_group_name, mode="pingpong", status="waiting", player0=self.channel_name)
+        is_room = GameRoom(room_name=self.game_group_name, mode="pingpong", status="waiting", player0=self.user_name)
         is_room.save()
     
     # 들어갈 수 있는 방을 검색하고 들어간 방의 이름을 알려준다
@@ -233,7 +233,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
                 room.player1 = self.user_name
                 room.status = "full"
                 room.save()
-                return room.name
+                return room.room_name
         return "not"
     
     # 게임방에 두번째 사용자 등록
@@ -259,7 +259,6 @@ class PongOneConsumers(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_rating(self, name):
-        logger.error(name)
         is_user = User.objects.get(username=name)
         record = UserRecordPongGame.objects.get(me=is_user)
         return record.rating

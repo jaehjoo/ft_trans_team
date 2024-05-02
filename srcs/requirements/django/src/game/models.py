@@ -1,6 +1,7 @@
 from django.db import models
 
 class GameRoom(models.Model):
+	cnt = models.IntegerField(default=0)
 	room_name = models.CharField(default="", max_length=100, unique=True) # group_name
 	mode = models.CharField(default="") # "pingpong", "fighting"
 	status = models.CharField(max_length=20, default="") # "waiting", "full", "end"

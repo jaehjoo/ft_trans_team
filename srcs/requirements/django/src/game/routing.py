@@ -1,6 +1,6 @@
 from django.urls import re_path
 from django.urls import path
-from game.consumers import practiceFightingConsumers, fightConsumers, PongConsumers
+from game.consumers import fightConsumers, PongConsumers
 
 websocket_urlpatterns = [
 	re_path("ws/game/pongonebyone", PongConsumers.PongOneConsumers.as_asgi()),
