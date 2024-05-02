@@ -32,7 +32,7 @@ class practicePongConsumers(AsyncWebsocketConsumer):
 
     # 연결을 종료
     async def disconnect(self, close_code):
-        if close_code == 1001:
+        if close_code == 1000:
             if self.game_group_name:
                 self.channel_layer.group_discard(self.game_group_name, self.channel_name)
             room = self.get_room()

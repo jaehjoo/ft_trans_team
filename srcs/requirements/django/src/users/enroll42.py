@@ -20,7 +20,7 @@ def generate_42(request):
 			return None
 		data_user = requests.get('https://api.intra.42.fr/v2/me', headers={'Authorization': f'Bearer {access_token}'})
 		user_name = data_user.json()["login"]
-		display_name = data_user.json()['displayname']
+		display_name = data_user.json()['login']
 		user_email_address = data_user.json()['email']
 		user_phone_number = data_user.json()['phone']
 		try:
