@@ -36,15 +36,26 @@ class Ball:
 
 class Player:
     info: User
-    name = str 
+    name: str 
     paddle: Paddle
-    status: str
 
-    def __init__(self, User, name):
+    def __init__(self, User, name, rating):
         self.info = User
         self.name = name
+        self.rating = rating
         self.paddle = None
-        self.status = "not_ready" # "not_ready", "ready"
+
+class Team:
+    team0_player0: Player
+    team0_player1: Player
+    team1_player0: Player
+    team1_player1: Player
+
+    def __init__(self, team0_player0, team0_player1, team1_player0, team1_player1):
+        self.team0_player0 = team0_player0
+        self.team0_player1 = team0_player1
+        self.team1_player0 = team1_player0
+        self.team1_player1 = team1_player1
 
 # 게임 방을 만들기 전에 임시로 사용하는 클래스
 # class Room:
