@@ -48,6 +48,7 @@ class Room:
 	winner: str
 	player0: Player
 	player1: Player
+	Team: Team
 
 	def __init__(self):
 		self.winner = ""

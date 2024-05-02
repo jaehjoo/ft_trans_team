@@ -29,7 +29,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
         if access_token == None or self.user_name == None:
             await self.close()
         
-        self.rating =  await self.get_rating(self.user_name)
+        # self.rating =  await self.get_rating(self.user_name)
         await self.channel_layer.group_add("game_queue", self.user_name)
         await self.accept()
         await self.send(text_data=json.dumps({
@@ -287,6 +287,46 @@ class PongOneConsumers(AsyncWebsocketConsumer):
         player0record.save()
         player1record.save()
 
-# class PongTwoConsumers(AsyncWebsocketConsumer):
+class PongTwoConsumers(AsyncWebsocketConsumer):
+    class RoomList:
+        pass
 
+    async def connect(self):
+        self.game_group_name = ""
+        self.rating_differece = 100
+        self.create_time = datetime.now()
+        query_string = parse_qs(self.scope['query_string'].decode())
+        access_token = query_string.get('access', None)[0]
+        self.user_name = access_token_get_name(access_token)
+
+        if access_token == None or self.user_name == None:
+            await self.close()
+
+        self.rating = await self.get_rating(self.user_name)
+        await self.channel_layer.group_add("game_queue", self.user_name)
+        await self.accept()
+        await self.send(text_data=json.dumps({
+            "type" : "game.message",
+            "data" : {
+                "mode" : "connect",
+                "name" : self.user_name,
+            }
+        }))
+        await self.join_matching()
+
+    async def join_matching(self):
+        count = await self.get_room_cnt()
+        name = await self.get_room_name()
+        if count == 0 or name == "not":
+            await self.create_room()
+            await self.channel_layer.group_add(self.game_group_name, self.channel_name)
+            await self.channel_layer.group_discard("game_queue", self.channel_name)
+        else:
+            if name != "not":
+
+    @database_sync_to_async
+    def create_room(self):
+        self.game_group_name = self.user_name + random_key(6)
+        is_room = GameRoom(room_name=self.game_group_name, mode="pingpong", status="waiting", player0=self.user_name)
+        is_room.save()
 # class PongTournamentConsumers(AsyncWebsocketConsumer):
