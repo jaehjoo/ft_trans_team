@@ -11,7 +11,7 @@ const GameViewport = {
   HEIGHT: 768,
 };
 
-const StartCanvas = () => {
+export const StartCanvas = () => {
   const canvasEl = document.querySelector("canvas");
   const context = canvasEl.getContext("2d");
 
@@ -33,8 +33,9 @@ const StartCanvas = () => {
     STOP: false,
   };
 
+  access_token = localStorage.getItem('access_token')
   const ws = new WebSocket(
-    "wss://" + window.location.host + "/ws/game/practice"
+    "wss://" + window.location.host + "/ws/game/pongonebyone?access=" + access_token
   );
 
   let yourName = "";

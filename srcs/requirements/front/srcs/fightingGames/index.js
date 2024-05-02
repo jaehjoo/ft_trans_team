@@ -1,8 +1,8 @@
-import { TimeFighter } from "./TimeFighter.js"
-import { GameViewport } from "./constants/window.js";
-import { startBackground } from "./constants/image.js";
+import { TimeFighter } from "./src/TimeFighter.js"
+import { GameViewport } from "./src/constants/window.js";
+import { startBackground } from "./src/constants/image.js";
 
-window.addEventListener('load', function() {
+export const StartCanvas = () => {
 	const start = new Image();
 	const canvas = document.querySelector("canvas");
 	const context = canvas.getContext('2d');
@@ -22,4 +22,4 @@ window.addEventListener('load', function() {
 
 		timeFighter.start(0);
 	}, {once : true})
-})
+}

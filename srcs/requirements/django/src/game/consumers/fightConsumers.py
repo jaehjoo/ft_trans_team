@@ -305,6 +305,7 @@ class fightingConsumers(AsyncWebsocketConsumer):
     
     @database_sync_to_async
     def get_rating(self, name):
+        logger.error(name)
         is_user = User.objects.get(username=name)
         record = UserRecordFightingGame.objects.get(me=is_user)
         return record.rating

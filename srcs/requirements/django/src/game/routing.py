@@ -5,7 +5,7 @@ from game.consumers import practicePongConsumers, practiceFightingConsumers, fig
 
 websocket_urlpatterns = [
 	re_path("ws/game/pongonebyone", matching.PongOneMatch.as_asgi()),
-	re_path("ws/game/pongtwobytwo", matching.PongTwoMatch.as_asgi()),
-	re_path("ws/game/pongtournament", matching.PongTournamentMatch.as_asgi()),
+	# re_path("ws/game/pongtwobytwo", matching.PongTwoMatch.as_asgi()),
+	# re_path("ws/game/pongtournament", matching.PongTournamentMatch.as_asgi()),
 	path("ws/game/fighting", fightConsumers.fightingConsumers.as_asgi()),
 ]

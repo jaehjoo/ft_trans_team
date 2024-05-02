@@ -9,6 +9,7 @@ import OneVersusOne from "./lobby/1vs1.js";
 import TournamentLobby from "./lobby/Tournament.js";
 import GameResult from "./lobby/result.js";
 import PingPong from "./games/pingpong.js";
+import Fighting from "./fightingGames/fighting.js"
 
 export const URL = "https://transcendence.kgnj.kr";
 
@@ -63,6 +64,9 @@ export const App = () => {
   } else if (window.location.pathname === "/pingpong") {
     document.body.innerHTML = "";
     PingPong();
+  } else if (window.location.pathname === "/fighting") {
+    document.body.innerHTML = "";
+    Fighting();
   }
 
   return /*html*/ `
