@@ -1,6 +1,6 @@
 import { FighterState } from "./fighter.js"
 
-const ImageRoot = "./img/"
+const ImageRoot = "../../img/fightingGames/"
 
 export const startBackground = ImageRoot + "start/start.png";
 

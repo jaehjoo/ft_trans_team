@@ -1,4 +1,4 @@
-const SoundRoot = "./audio/"
+const SoundRoot = "../../audio/fightingGames/"
 
 export const stageMusic = [
 	SoundRoot + "background/battle/peace.wav",

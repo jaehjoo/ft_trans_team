@@ -5,6 +5,8 @@ import { startBackground } from "./src/constants/image.js";
 export const StartCanvas = () => {
 	const start = new Image();
 	const canvas = document.querySelector("canvas");
+	canvas.width = 1024;
+	canvas.height = 768;
 	const context = canvas.getContext('2d');
 
 	start.src = startBackground;

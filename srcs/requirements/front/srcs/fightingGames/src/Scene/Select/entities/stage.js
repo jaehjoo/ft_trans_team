@@ -14,7 +14,6 @@ export class Stage {
 	}
 
 	draw(context) {
-		context.drawImage(this.background, 0, 0);
 		context.drawImage(this.background, 0, 0, 1024, 768, 0, 0, 1024, 768);
 	}
 }

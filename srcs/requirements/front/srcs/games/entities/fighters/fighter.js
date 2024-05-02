@@ -12,9 +12,9 @@ export class Fighter {
     this.name = "";
   }
 
-  update(time) {
-    if (this.upPressed == true) this.bar.Y -= 7 * time * 60;
-    else if (this.downPressed == true) this.bar.Y += 7 * time * 60;
+  update(x, y) {
+    this.bar.X = x;
+    this.bar.Y = y;
   }
 
   draw(context) {

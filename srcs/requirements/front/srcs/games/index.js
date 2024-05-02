@@ -33,7 +33,7 @@ export const StartCanvas = () => {
     STOP: false,
   };
 
-  access_token = localStorage.getItem('access_token')
+  const access_token = localStorage.getItem('access_token')
   const ws = new WebSocket(
     "wss://" + window.location.host + "/ws/game/pongonebyone?access=" + access_token
   );
@@ -49,6 +49,7 @@ export const StartCanvas = () => {
       scene[0].draw(context);
     } else if (flag.STOP == true) {
       scene[1].draw(context);
+      ws.close("Session End");
     }
   }
 
@@ -78,6 +79,17 @@ export const StartCanvas = () => {
         );
       } else if (textData.data.mode == "game.start") {
         flag.START = true;
+        entities[2].update(textData.data['ball']['x'], textData.data['ball']['y'])
+        entities[3].update(textData.data['player0']['x'], textData.data['player0']['y'])
+        entities[4].update(textData.data['player1']['x'], textData.data['player1']['y'])
+      } else if (textData.data.mode == "info.update") {
+        entities[2].update(textData.data['ball']['x'], textData.data['ball']['y'])
+        entities[3].update(textData.data['player0']['x'], textData.data['player0']['y'])
+        entities[4].update(textData.data['player1']['x'], textData.data['player1']['y'])
+        entities[1].update(textData.data['score']['ONE'], textData.data['score']['TWO'])
+
+      } else if (textData.data.mode == "game.complete") {
+        flag.STOP = true;
       } else if (textData.data.mode == "abnormal.termination") {
         ws.send(
           JSON.stringify({
@@ -87,153 +99,20 @@ export const StartCanvas = () => {
             },
           })
         );
-        ws.onclose();
+        ws.close();
       }
     };
-  }
-
-  function updateBar() {
-    ws.onmessage = (msg) => {
-      let textData = JSON.parse(msg.data);
-      if (
-        textData.data.mode == "update.bar" &&
-        textData.data["name"] != yourName
-      ) {
-        if (yourName != entities[3].name) {
-          entities[3].bar.X = textData.data["bar"]["x"];
-          entities[3].bar.Y = textData.data["bar"]["y"];
-        } else {
-          entities[4].bar.X = textData.data["bar"]["x"];
-          entities[4].bar.Y = textData.data["bar"]["y"];
-        }
-      }
-    };
-  }
-
-  function checkWallCollision() {
-    if (
-      entities[2].ball.Y + entities[2].velocity.Y >
-        entities[0].background.HEIGHT -
-          entities[0].borderLine.WIDTH -
-          entities[2].ball.RADIUS ||
-      entities[2].ball.Y + entities[2].velocity.Y <
-        entities[0].borderLine.WIDTH + entities[2].ball.RADIUS
-    )
-      entities[2].velocity.Y *= -1;
-    if (entities[3].bar.Y < entities[0].borderLine.WIDTH)
-      entities[3].bar.Y = entities[0].borderLine.WIDTH;
-    if (
-      entities[3].bar.Y >
-      entities[0].background.HEIGHT -
-        entities[0].borderLine.WIDTH -
-        entities[3].bar.HEIGHT
-    )
-      entities[3].bar.Y =
-        entities[0].background.HEIGHT -
-        entities[0].borderLine.WIDTH -
-        entities[3].bar.HEIGHT;
-    if (entities[4].bar.Y < entities[0].borderLine.WIDTH)
-      entities[4].bar.Y = entities[0].borderLine.WIDTH;
-    if (
-      entities[4].bar.Y >
-      entities[0].background.HEIGHT -
-        entities[0].borderLine.WIDTH -
-        entities[4].bar.HEIGHT
-    )
-      entities[4].bar.Y =
-        entities[0].background.HEIGHT -
-        entities[0].borderLine.WIDTH -
-        entities[4].bar.HEIGHT;
-  }
-
-  function checkBarCollision() {
-    if (
-      entities[2].ball.X - entities[2].ball.RADIUS < entities[3].bar.X + 10 &&
-      entities[2].ball.Y + entities[2].velocity.Y >= entities[3].bar.Y &&
-      entities[2].ball.Y + entities[2].velocity.Y <=
-        entities[3].bar.Y + entities[3].bar.HEIGHT
-    )
-      entities[2].velocity.X *= -1.1;
-    if (
-      entities[2].ball.X + entities[2].ball.RADIUS >
-        entities[4].bar.X + entities[4].bar.WIDTH - 10 &&
-      entities[2].ball.Y + entities[2].velocity.Y >= entities[4].bar.Y &&
-      entities[2].ball.Y + entities[2].velocity.Y <=
-        entities[4].bar.Y + entities[4].bar.HEIGHT
-    )
-      entities[2].velocity.X *= -1.1;
-  }
-
-  function checkBoundary() {
-    let win;
-    if (entities[2].ball.X < entities[3].bar.X) {
-      entities[2].serve += 1;
-      entities[2].init();
-      entities[1].changeScore(1);
-    }
-    if (entities[2].ball.X > entities[4].bar.X + entities[4].bar.WIDTH) {
-      entities[2].serve += 1;
-      entities[2].init();
-      entities[1].changeScore(0);
-    }
-    entities[1].checkDuce();
-    win = entities[1].checkWin();
-    if (win) {
-      let player;
-      if (win == 1) player = entities[3].name;
-      else player = entities[4].name;
-      if (player == yourName) scene[1].win = 1;
-      else scene[1].win = 2;
-      flag.STOP = true;
-      ws.send(
-        JSON.stringify({
-          type: "game.clear",
-          data: {
-            winner: player,
-          },
-        })
-      );
-    }
-  }
-
-  function update(time) {
-    updateBar();
-    for (const entity of entities) {
-      entity.update(time);
-    }
-    checkWallCollision();
-    checkBarCollision();
-    checkBoundary();
-  }
-
-  function sendBarInfo() {
-    let bar;
-    if (yourName == entities[3].name) {
-      bar = { x: entities[3].bar.X, y: entities[3].bar.Y };
-    } else {
-      bar = { x: entities[4].bar.X, y: entities[4].bar.Y };
-    }
-    ws.send(
-      JSON.stringify({
-        type: "bar.info",
-        data: {
-          bar: { x: bar["x"], y: bar["y"] },
-        },
-      })
-    );
   }
 
   function start(time) {
     window.requestAnimationFrame(start);
     secondsPassed = (time - previousTime) / 1000;
     previousTime = time;
-    checkWebSocketMessage();
+    checkWebSocketMessage(secondsPassed);
     if (flag.START == false || flag.STOP == true) {
       sceneDraw();
     } else {
-      update(secondsPassed);
       playingDraw();
-      sendBarInfo();
     }
   }
 
@@ -245,21 +124,48 @@ export const StartCanvas = () => {
     let player;
     if (yourName == entities[3].name) player = entities[3];
     else player = entities[4];
-    if (event.keyCode == 87) player.upPressed = true;
-    else if (event.keyCode == 38) player.upPressed = true;
-    else if (event.keyCode == 83) player.downPressed = true;
-    else if (event.keyCode == 40) player.downPressed = true;
-  }
+    if (event.keyCode == 87)
+      player.upPressed = true;
+    else if (event.keyCode == 38)
+      player.upPressed = true;
+    else if (event.keyCode == 83)
+      player.downPressed = true;
+    else if (event.keyCode == 40)
+      player.downPressed = true;
+      ws.send(
+        JSON.stringify({
+          'type' : 'bar.info',
+          'data' : {
+            'name' : yourName,
+            'up' : player.upPressed,
+            'down' : player.downPressed,
+          }
+        })
+      )
+    }
 
   function keyUpHandler(event) {
     let player;
     if (yourName == entities[3].name) player = entities[3];
     else player = entities[4];
-    if (event.keyCode == 87) player.upPressed = false;
-    else if (event.keyCode == 38) player.upPressed = false;
-    else if (event.keyCode == 83) player.downPressed = false;
-    else if (event.keyCode == 40) player.downPressed = false;
+    if (event.keyCode == 87) 
+      player.upPressed = false;
+    else if (event.keyCode == 38)
+      player.upPressed = false;
+    else if (event.keyCode == 83)
+      player.downPressed = false;
+    else if (event.keyCode == 40)
+      player.downPressed = false;
+    ws.send(
+      JSON.stringify({
+        'type' : 'bar.info',
+        'data' : {
+          'name' : yourName,
+          'up' : player.upPressed,
+          'down' : player.downPressed,
+        }
+      })
+    )
   }
-};
-
+}
 export default StartCanvas;

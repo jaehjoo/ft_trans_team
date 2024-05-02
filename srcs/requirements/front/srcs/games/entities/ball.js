@@ -31,9 +31,9 @@ export class Ball {
     }
   }
 
-  update(time) {
-    this.ball.X += this.velocity.X * time * 60;
-    this.ball.Y += this.velocity.Y * time * 60;
+  update(x, y) {
+    this.ball.X = x;
+    this.ball.Y = y;
   }
 
   draw(context) {

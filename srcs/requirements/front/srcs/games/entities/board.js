@@ -11,29 +11,9 @@ export class Board {
 		}
 	}
 
-	checkWin() {
-		if (this.score.ONE == this.score.WIN)
-			return 1;
-		if (this.score.TWO == this.score.WIN)
-			return 2;
-		return 0;
-	}
-
-	checkDuce() {
-		if (this.score.ONE == this.score.WIN - 1 && this.score.ONE == this.score.TWO) {
-			this.score.WIN += 1;
-		}
-	}
-
-	changeScore(player) {
-		if (player == 0)
-			this.score.ONE += 1;
-		else
-			this.score.TWO += 1;
-		this.checkDuce();
-	}
-
-	update() {
+	update(ONE, TWO) {
+		this.score.ONE = ONE;
+		this.score.TWO = TWO;
 	}
 
 	draw(context) {
