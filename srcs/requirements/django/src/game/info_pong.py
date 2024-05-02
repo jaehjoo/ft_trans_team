@@ -1,76 +1,60 @@
-from users.models import User
+class Bar:
+	x: int
+	y: int
 
-class Paddle:
-    x: int
-    y: int
-    width: int
-    height: int
-    speed: int
-    angle: int
-    color: str
-
-    def __init__(self, x, y, width, height, speed, angle, color):
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
-        self.speed = speed
-        self.angle = angle
-        self.color = color
-
-class Ball:
-    x: int
-    y: int
-    radius: int
-    speed: int
-    velocity: int
-    color: str
-
-    def __init__(self, x, y, radius, speed, velocity, color):
-        self.x = x
-        self.y = y
-        self.radius = radius
-        self.speed = speed
-        self.velocity = velocity
-        self.color = color
+	def __init__(self, x, y):
+		self.x = x
+		self.y = y
 
 class Player:
-    info: User
-    name: str 
-    paddle: Paddle
+	name: str
+	rating: int
+	bar: Bar
 
-    def __init__(self, User, name, rating):
-        self.info = User
-        self.name = name
-        self.rating = rating
-        self.paddle = None
+	def __init__(self, name, rating, bar):
+		self.name = name
+		self.rating = rating
+		self.bar = bar
 
 class Team:
-    team0_player0: Player
-    team0_player1: Player
-    team1_player0: Player
-    team1_player1: Player
+	winner0: str
+	winner1: str
+	team0_player0: Player
+	team0_player1: Player
+	team1_player0: Player
+	team1_player1: Player
 
-    def __init__(self, team0_player0, team0_player1, team1_player0, team1_player1):
-        self.team0_player0 = team0_player0
-        self.team0_player1 = team0_player1
-        self.team1_player0 = team1_player0
-        self.team1_player1 = team1_player1
+	def __init__(self):
+		self.winner0 = ""
+		self.winner1 = ""
 
-# 게임 방을 만들기 전에 임시로 사용하는 클래스
-# class Room:
-#     room_name: str
-#     status: str
-#     player0: Player
-#     player1: Player
-#     player_number: int
+	def setTeam(self, team0_player0, team0_player1, team1_player0, team1_player1):
+		self.team0_player0 = Player(team0_player0['name'], team0_player0['rating'], Bar(1024 / 50, 768 / 2 - 768 / 14))
+		self.team0_player1 = Player(team0_player1['name'], team0_player1['rating'], Bar(1024 / 50, 768 / 2 + 768 / 14))
+		self.team1_player0 = Player(team1_player0['name'], team1_player0['rating'], Bar(1024 / 50 * 48 + 3, 768 / 2 + 768 / 14))
+		self.team1_player1 = Player(team1_player1['name'], team1_player1['rating'], Bar(1024 / 50 * 48 + 3, 768 / 2 - 768 / 14))
 
-#     def __init__(self):
-#         self.room_name = ""
-#         self.status = "waiting"
-#         self.player_number = 1
+	def matchTeam(self, player0, player1, player2, player3):
+		players = [player0, player1, player2, player3]
+		# 플레이어들의 레이팅을 오름차순으로 정렬
+		players.sort(ket=lambda x: x['rating'])
+		self.setTeam(players[0], players[3], players[1], players[2])
 
-#     def setPlayer(self, player0, player1):
-#         self.player0 = Player(player0['info'], player0['name'], None, "not_ready")
-#         self.player1 = Player(player1['info'], player1['name'], None, "not_ready")
-    
+	def setWinnerTeam(self, winner0, winner1):
+		self.winner0 = winner0
+		self.winner1 = winner1
+
+class Room:
+	winner: str
+	player0: Player
+	player1: Player
+
+	def __init__(self):
+		self.winner = ""
+
+	def setPlayer(self, player0, player1):
+		self.player0 = Player(player0['name'], player0['rating'], Bar(1024 / 50, 768 / 2 - 768 / 14))
+		self.player1 = Player(player1['name'], player1['rating'], Bar(1024 / 50 * 48 + 3, 768 / 2 - 768 / 14))
+	
+	def setWinner(self, winner):
+		self.winner = winner
