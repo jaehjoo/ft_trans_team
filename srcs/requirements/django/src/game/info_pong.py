@@ -127,6 +127,17 @@ class Room:
 		self.player1bar = Bar(self.window.width / 60, self.window.height / 7, self.window.width / 50 * 48 + 3, self.window.height / 2 - self.window.height / 14)
 		self.ball = Ball(self.window.width / 2, self.window.height / 2, 3, 3, self.window.width / 100)
 		self.score = Score()
+	
+	def __init__(self, mode):
+		if mode == "two":
+			self.winner = ""
+			self.winner2 = ""
+			self.window = Window(1024, 768, 1024 / 50, {1024 / 80, 768})
+			self.player0bar = Bar(self.window.width / 60, self.window.height / 7, self.window.width / 50, self.window.height / 4 - self.window.height / 14)
+			self.player1bar = Bar(self.window.width / 60, self.window.height / 7, self.window.width / 50, self.window.height / 4 * 3 - self.window.height / 14)
+			self.player2bar = Bar(self.window.width / 60, self.window.height / 7, self.window.width / 50 * 48 + 3, self.window.height / 4 - self.window.height / 14)
+			self.player3bar = Bar(self.window.width / 60, self.window.height / 7, self.window.width / 50 * 48 + 3, self.window.height / 4 * 3 - self.window.height / 14)
+
 
 	def setPlayer(self, player0, player1):
 		self.player0 = Player(player0['name'], player0['rating'])
@@ -163,6 +174,8 @@ class Room:
 	def update(self):
 		self.player0bar.update()
 		self.player1bar.update()
+		self.player2bar.update()
+		self.player3bar.update()
 		self.ball.update()
 		self.checkWallCollision()
 		self.checkBarCollision()
@@ -174,18 +187,32 @@ class Room:
 			self.ball.velocityY *= -1
 		if self.player0bar.y < self.window.border:
 			self.player0bar.y = self.window.border
-		if self.player0bar.y > self.window.height - self.window.border - self.player0bar.height:
-			self.player0bar.y = self.window.height - self.window.border - self.player0bar.height
-		if self.player1bar.y < self.window.border:
-			self.player1bar.y = self.window.border
+		if self.player0bar.y > self.window.height / 2 - self.player0bar.height:
+			self.player0bar.y = self.window.height / 2 - self.player0bar.height
+		if self.player1bar.y < self.window.height / 2 - self.player1bar.height:
+			self.player1bar.y = self.window.height / 2 - self.player1bar.height
 		if self.player1bar.y > self.window.height - self.window.border - self.player1bar.height:
 			self.player1bar.y = self.window.height - self.window.border - self.player1bar.height
+		if self.player2bar.y < self.window.border:
+			self.player2bar.y = self.window.border
+		if self.player2bar.y > self.window.height / 2 - self.player2bar.height:
+			self.player2bar.y = self.window.height / 2 - self.player2bar.height
+		if self.player3bar.y < self.window.height / 2 - self.player3bar.height:
+			self.player3bar.y = self.window.height / 2 - self.player3bar.height
+		if self.player3bar.y > self.window.height - self.window.border - self.player3bar.height:
+			self.player3bar.y = self.window.height - self.window.border - self.player3bar.height
 
 	def checkBarCollision(self):
 		if self.ball.ballX - self.ball.radius < self.player0bar.x + 10 and self.ball.ballY + self.ball.velocityY >= self.player0bar.y and self.ball.ballY + self.ball.velocityY <= self.player0bar.y + self.player0bar.height:
 			self.ball.velocityX *= -1.1
 			self.ball.velocityY *= 1.1
-		if self.ball.ballX + self.ball.radius > self.player1bar.x + self.player1bar.width - 10 and self.ball.ballY + self.ball.velocityY >= self.player1bar.y and self.ball.ballY + self.ball.velocityY <= self.player1bar.y + self.player1bar.height:
+		if self.ball.ballX - self.ball.radius < self.player1bar.x + 10 and self.ball.ballY + self.ball.velocityY >= self.player1bar.y and self.ball.ballY + self.ball.velocityY <= self.player1bar.y + self.player1bar.height:
+			self.ball.velocityX *= -1.1
+			self.ball.velocityY *= 1.1
+		if self.ball.ballX + self.ball.radius > self.player2bar.x + self.player2bar.width - 10 and self.ball.ballY + self.ball.velocityY >= self.player2bar.y and self.ball.ballY + self.ball.velocityY <= self.player2bar.y + self.player2bar.height:
+			self.ball.velocityX *= -1.1
+			self.ball.velocityY *= 1.1
+		if self.ball.ballX + self.ball.radius > self.player3bar.x + self.player3bar.width - 10 and self.ball.ballY + self.ball.velocityY >= self.player3bar.y and self.ball.ballY + self.ball.velocityY <= self.player3bar.y + self.player3bar.height:
 			self.ball.velocityX *= -1.1
 			self.ball.velocityY *= 1.1
 
@@ -194,7 +221,7 @@ class Room:
 			self.ball.serve += 1
 			self.ball.init()
 			self.score.TWO += 1
-		elif self.ball.ballX > self.player1bar.x + self.player1bar.width:
+		elif self.ball.ballX > self.player2bar.x + self.player2bar.width:
 			self.ball.serve += 1
 			self.ball.init()
 			self.score.ONE += 1
@@ -204,6 +231,8 @@ class Room:
 			self.score.WIN = self.score.ONE + 2
 		elif self.score.ONE > self.score.TWO and self.score.ONE == self.score.WIN:
 			self.winner = self.player0.name
+			self.winner2 = self.player1.name
 		elif self.score.TWO > self.score.TWO and self.score.TWO == self.score.WIN:
-			self.winner = self.player1.name
+			self.winner = self.player2.name
+			self.winner2 = self.player3.name
 
