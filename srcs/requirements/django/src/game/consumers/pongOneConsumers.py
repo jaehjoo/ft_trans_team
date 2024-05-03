@@ -39,7 +39,10 @@ class PongOneConsumers(AsyncWebsocketConsumer):
                 "name" : self.user_name,
             }
         }))
-        asyncio.wait(self.join_matching(), 10)
+        try:
+            asyncio.wait(self.join_matching(), 10)
+        except asyncio.TimeoutError:
+            await self.close()
 
     async def disconnect(self, close_code):
         try:
@@ -128,6 +131,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
                 await self.create_room()
                 await self.channel_layer.group_add(self.game_group_name, self.channel_name)
                 await self.channel_layer.group_discard("game_queue", self.channel_name)
+                flag = True
             else:
                 if name != "not":
                     self.game_group_name = name
@@ -147,6 +151,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
                                 }
                             }
                         )
+                        flag = True
                     else:
                         self.room_depart()
                         self.rating_differece += 200
