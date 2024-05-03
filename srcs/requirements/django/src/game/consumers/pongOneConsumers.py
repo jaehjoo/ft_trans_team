@@ -20,7 +20,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
     # 웹소켓에서 연결 요청이 들어오면 받고 상대방 매칭 시도
     async def connect(self):
         self.game_group_name = ""
-        self.rating_differece = 100
+        self.rating_difference = 100
         self.create_time = datetime.now()
         query_string = parse_qs(self.scope['query_string'].decode())
         access_token = query_string.get('access', None)[0]
@@ -59,7 +59,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
                     self.game_group_name, {
                         'type' : 'game.message',
                         'data' : {
-                            'mode' : 'normal.termintaion',
+                            'mode' : 'normal.termination',
                         }
                     }
                 )
@@ -316,7 +316,3 @@ class PongOneConsumers(AsyncWebsocketConsumer):
             player1record.win += 1
         player0record.save()
         player1record.save()
-
-# class PongTwoConsumers(AsyncWebsocketConsumer):
-
-# class PongTournamentConsumers(AsyncWebsocketConsumer):
