@@ -3,7 +3,7 @@ from users.models import User, UserKey, UserAvatar, UserRecordPongGame, UserReco
 
 def generate_42(request):
 	code = request.GET.get('code')
-	uri = os.environ.get('SERVER_ADDRESS')
+	uri = "https://localhost"
 	uri = uri + "/shallwe"
 	if code:
 		data = {

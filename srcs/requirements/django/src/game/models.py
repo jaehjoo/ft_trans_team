@@ -7,7 +7,7 @@ class GameRoom(models.Model):
 	room_name = models.CharField(default="", max_length=100, unique=True) # group_name
 	mode = models.CharField(default="") # "pingpong", "fighting"
 	status = models.CharField(max_length=20, default="") # "waiting", "playing", "end"
-	players = ArrayField(models.CharField(max_length=100, blank=True), size=4, default=list(lambda: [""]*4))
+	# players = ArrayField(models.CharField(max_length=100, blank=True), size=4, default=list(lambda: [""]*4))
 	player0 = models.CharField(default="", max_length=100)
 	player0rating = models.IntegerField(default=0)
 	player0displayName = models.CharField(default="", max_length=100)

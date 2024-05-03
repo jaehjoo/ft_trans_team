@@ -40,7 +40,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
             }
         }))
         try:
-            asyncio.wait(self.join_matching(), 10)
+            await asyncio.wait_for(self.join_matching(), 10)
         except asyncio.TimeoutError:
             await self.close()
 
@@ -288,7 +288,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
     @database_sync_to_async
     def rating_check(self, group_name):
         is_room = GameRoom.objects.get(room_name=group_name)
-        if is_room.player0rating > self.rating + self.rating_differece or is_room.player0rating < self.rating - self.rating_differece:
+        if is_room.player0rating > self.rating + self.rating_difference or is_room.player0rating < self.rating - self.rating_difference:
             return False
         return True
     

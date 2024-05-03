@@ -41,7 +41,7 @@ class fightingConsumers(AsyncWebsocketConsumer):
                 "display_name" : self.display_name,
             }
         }))
-        asyncio.wait(self.join_matching(), 10)
+        await asyncio.wait_for(self.join_matching(), 10)
 
     async def disconnect(self, close_code):
         try:
