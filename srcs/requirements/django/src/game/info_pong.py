@@ -104,7 +104,6 @@ class Ball:
 			self.velocityY *= -1
 			self.serve = 0
 
-
 class Room:
 	winner: str
 	window: Window
@@ -123,6 +122,9 @@ class Room:
 		self.player1bar = Bar(self.window.width / 60, self.window.height / 7, self.window.width / 50 * 48 + 3, self.window.height / 2 - self.window.height / 14)
 		self.ball = Ball(self.window.width / 2, self.window.height / 2, 3, 3, self.window.width / 100)
 		self.score = Score()
+
+	def setTeam(self, team):
+		self.team = team
 
 	def setPlayer(self, player0, player1):
 		self.player0 = Player(player0['name'], player0['rating'])
