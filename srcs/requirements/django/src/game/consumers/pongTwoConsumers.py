@@ -38,7 +38,7 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
             }
             }))
         try:
-            asyncio.wait(self.join_matching(), 10)
+            await asyncio.wait_for(self.join_matching(), 10)
         except asyncio.TimeoutError:
             await self.close()
 

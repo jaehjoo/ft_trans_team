@@ -1,6 +1,6 @@
 from django.urls import path
 from game.consumers import fightConsumers
-from srcs.requirements.django.src.game.consumers import pongOneConsumers, pongTwoConsumers, pongTournamentConsumers
+from game.consumers import pongOneConsumers, pongTwoConsumers, pongTournamentConsumers
 
 websocket_urlpatterns = [
 	path("ws/game/pongonebyone", pongOneConsumers.PongOneConsumers.as_asgi()),

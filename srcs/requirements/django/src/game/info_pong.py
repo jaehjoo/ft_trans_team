@@ -106,11 +106,16 @@ class Ball:
 
 class Room:
 	winner: str
+	winner2: str
 	window: Window
 	player0: Player
 	player1: Player
+	player2: Player
+	player3: Player
 	player0bar: Bar
 	player1bar: Bar
+	player2bar: Bar
+	player3bar: Bar
 	ball: Ball
 	score: Score
 	frameTime: int
@@ -122,9 +127,6 @@ class Room:
 		self.player1bar = Bar(self.window.width / 60, self.window.height / 7, self.window.width / 50 * 48 + 3, self.window.height / 2 - self.window.height / 14)
 		self.ball = Ball(self.window.width / 2, self.window.height / 2, 3, 3, self.window.width / 100)
 		self.score = Score()
-
-	def setTeam(self, team):
-		self.team = team
 
 	def setPlayer(self, player0, player1):
 		self.player0 = Player(player0['name'], player0['rating'])
