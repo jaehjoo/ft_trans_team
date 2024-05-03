@@ -257,10 +257,11 @@ export class Player {
 	handleAttack1State() {
 		if (this.owner != this.player)
 			return ;
-		if (control.isAttack())
-			this.handleAttack1Reset();
+		// if (control.isAttack())
+		// 	this.handleAttack1Reset();
 		if (!this.isAnimationCompleted())
 			return;
+		this.attackStruck = false;
 		this.changeState(FighterState.IDLE);
 	}
 
@@ -273,10 +274,11 @@ export class Player {
 	handleAttack2State() {
 		if (this.owner != this.player)
 			return ;
-		if (control.isMiddleAttack())
-			this.handleAttack2Reset();
+		// if (control.isMiddleAttack())
+		// 	this.handleAttack2Reset();
 		if (!this.isAnimationCompleted())
 			return;
+		this.attackStruck = false;
 		this.changeState(FighterState.IDLE);
 	}
 
@@ -470,6 +472,6 @@ export class Player {
 		);
 		context.setTransform(1, 0, 0, 1, 0, 0);
 
-		this.drawDebug(context);
+		// this.drawDebug(context);
 	}
 }

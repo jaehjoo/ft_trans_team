@@ -26,7 +26,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'localhost'
+    "10.14.4.5"
 ]
 
 
@@ -109,7 +109,7 @@ LOGGING = {
 
 # CORS, CSRF
 CSRF_TRUSTED_ORIGINS = [
-    "https://localhost"
+    "https://10.14.4.5"
 ]
 
 CORS_ORIGIN_ALLOW_ALL = False
@@ -117,11 +117,11 @@ CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
-    "https://localhost"
+    "https://10.14.4.5"
 ]
 
 CORS_ORIGIN_WHITELIST = [
-    "https://localhost"
+    "https://10.14.4.5"
 ]
 
 CORS_ALLOW_HEADERS = (
