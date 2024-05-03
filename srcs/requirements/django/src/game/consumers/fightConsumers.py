@@ -1,4 +1,4 @@
-import json, logging
+import json, logging, asyncio
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.layers import get_channel_layer
@@ -41,7 +41,7 @@ class fightingConsumers(AsyncWebsocketConsumer):
                 "display_name" : self.display_name,
             }
         }))
-        await self.join_matching()
+        asyncio.wait(self.join_matching(), 10)
 
     async def disconnect(self, close_code):
         try:
@@ -74,7 +74,7 @@ class fightingConsumers(AsyncWebsocketConsumer):
                     }
                 )
                 await self.channel_layer.group_discard(self.game_group_name, self.channel_name)
-        StopConsumer()
+        self.close()
 
     async def receive(self, text_data):
         data = json.loads(text_data)
@@ -155,38 +155,40 @@ class fightingConsumers(AsyncWebsocketConsumer):
            await self.disconnect(1001)
 
     async def join_matching(self):
-        count = await self.get_room_cnt()
-        name = await self.get_room_name()
-        if count == 0 or name == "not":
-            await self.create_room()
-            await self.channel_layer.group_add(self.game_group_name, self.channel_name)
-            await self.channel_layer.group_discard("game_queue", self.channel_name)
-        else:
-            if name != "not":
-                if await self.rating_check(name):
-                    self.game_group_name = name
-                    await self.channel_layer.group_add(self.game_group_name, self.channel_name)
-                    await self.channel_layer.group_discard("game_queue", self.channel_name)
-                    await self.set_player(1)
-                    player = await self.get_player()
-                    await self.channel_layer.group_send(
-						self.game_group_name, {
-							"type" : 'game.message',
-							"data" : {
-								"mode" : "set.game",
-								"player0" : player["player0"],
-                                "player0display" : player["player0display"],
-								"player1" : player["player1"],
-                                "player1display" : player["player1display"],
-								"group" : self.game_group_name,
-							}
-						}
-					)
+        flag = False
+        while flag == False:
+            count = await self.get_room_cnt()
+            name = await self.get_room_name()
+            if count == 0 or name == "not":
+                await self.create_room()
+                await self.channel_layer.group_add(self.game_group_name, self.channel_name)
+                await self.channel_layer.group_discard("game_queue", self.channel_name)
+                flag = True
             else:
-                if await self.matching_timeout():
-                    await self.close()
-                self.rating_difference += 200
-                await self.join_matching()
+                if name != "not":
+                    self.game_group_name = name
+                    if await self.rating_check(name):
+                        await self.channel_layer.group_add(self.game_group_name, self.channel_name)
+                        await self.channel_layer.group_discard("game_queue", self.channel_name)
+                        await self.set_player(1)
+                        player = await self.get_player()
+                        await self.channel_layer.group_send(
+                            self.game_group_name, {
+                                "type" : 'game.message',
+                                "data" : {
+                                    "mode" : "set.game",
+                                    "player0" : player["player0"],
+                                    "player0display" : player["player0display"],
+                                    "player1" : player["player1"],
+                                    "player1display" : player["player1display"],
+                                    "group" : self.game_group_name,
+                                }
+                            }
+                        )
+                        flag = True
+                    else:
+                        self.group_depart()
+                    self.rating_difference += 200
     
     async def get_room(self):
         return getattr(self.RoomList, self.game_group_name, None)
@@ -217,12 +219,6 @@ class fightingConsumers(AsyncWebsocketConsumer):
                 }
             }
         )
-
-    async def matching_timeout(self):
-        difference = self.create_time - datetime.now()
-        if difference.seconds > 10:
-            return False
-        return True
 
     async def get_group_member_count(group_name):
         channel_layer = get_channel_layer()
@@ -256,6 +252,13 @@ class fightingConsumers(AsyncWebsocketConsumer):
             is_room.cnt = 0
         is_room.save()
         return cnt
+    
+    @database_sync_to_async
+    def group_depart(self):
+        is_room = GameRoom.objects.get(room_name=self.game_group_name)
+        is_room.status = "waiting"
+        is_room.save()
+        self.game_group_name = ""
 
     @database_sync_to_async
     def get_room_cnt(self):

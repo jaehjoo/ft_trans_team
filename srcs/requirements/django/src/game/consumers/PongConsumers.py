@@ -39,7 +39,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
                 "name" : self.user_name,
             }
         }))
-        await self.join_matching()
+        asyncio.wait(self.join_matching(), 10)
 
     async def disconnect(self, close_code):
         try:
@@ -76,7 +76,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
                     }
                 )
                 await self.channel_layer.group_discard(self.game_group_name, self.channel_name)
-        raise StopConsumer()
+        self.close()
 
     async def receive(self, text_data):
         data = json.loads(text_data)
@@ -119,38 +119,37 @@ class PongOneConsumers(AsyncWebsocketConsumer):
 
     # 매칭 시도
     async def join_matching(self):
-        count = await self.get_room_cnt()
-        name = await self.get_room_name()
-        # 방이 하나도 안 만들어졌거나 전부 게임중이면 방을 새로 판다. 방이 있으면 해당 방에 참여
-        if count == 0 or name == "not":
-            await self.create_room()
-            await self.channel_layer.group_add(self.game_group_name, self.channel_name)
-            await self.channel_layer.group_discard("game_queue", self.channel_name)
-        else:
-            if name != "not":
-                self.game_group_name = name
-                if await self.rating_check(name):
-                    await self.channel_layer.group_add(self.game_group_name, self.channel_name)
-                    await self.channel_layer.group_discard("game_queue", self.channel_name)
-                    await self.set_player(1)
-                    player = await self.get_player()
-                    await self.channel_layer.group_send(
-                        self.game_group_name, {
-                            "type" : 'game.message',
-                            "data" : {
-                                "mode" : "set.game",
-                                "player0" : player["player0"],
-                                "player1" : player["player1"],
-                                "group" : self.game_group_name,
+        flag = False
+        while flag == False:
+            count = await self.get_room_cnt()
+            name = await self.get_room_name()
+            # 방이 하나도 안 만들어졌거나 전부 게임중이면 방을 새로 판다. 방이 있으면 해당 방에 참여
+            if count == 0 or name == "not":
+                await self.create_room()
+                await self.channel_layer.group_add(self.game_group_name, self.channel_name)
+                await self.channel_layer.group_discard("game_queue", self.channel_name)
+            else:
+                if name != "not":
+                    self.game_group_name = name
+                    if await self.rating_check(name):
+                        await self.channel_layer.group_add(self.game_group_name, self.channel_name)
+                        await self.channel_layer.group_discard("game_queue", self.channel_name)
+                        await self.set_player(1)
+                        player = await self.get_player()
+                        await self.channel_layer.group_send(
+                            self.game_group_name, {
+                                "type" : 'game.message',
+                                "data" : {
+                                    "mode" : "set.game",
+                                    "player0" : player["player0"],
+                                    "player1" : player["player1"],
+                                    "group" : self.game_group_name,
+                                }
                             }
-                        }
-                    )
-                else:
-                    await self.room_depart()
-                    if self.matching_timeout():
-                        await self.close()
-                    self.rating_differece += 200
-                    await self.join_matching()
+                        )
+                    else:
+                        self.room_depart()
+                        self.rating_differece += 200
 
     # 본인이 속한 방을 불러온다. 없으면 None
     async def get_room(self):
@@ -291,8 +290,6 @@ class PongOneConsumers(AsyncWebsocketConsumer):
     @database_sync_to_async
     def room_depart(self):
         is_room = GameRoom.objects.get(room_name=self.game_group_name)
-        is_room.player1 = ""
-        is_room.cnt += 1
         is_room.status = "waiting"
         is_room.save()
         self.game_group_name = ""
