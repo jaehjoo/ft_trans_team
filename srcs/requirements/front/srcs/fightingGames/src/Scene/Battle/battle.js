@@ -23,7 +23,7 @@ export class BattleScene {
 		this.next = "result";
 		this.overays = [
 			new StatusBar(),
-			new FpsCounter(),
+			// new FpsCounter(),
 		]
 	}
 

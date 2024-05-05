@@ -125,6 +125,10 @@ export class Player {
 		this.velocity.y = 0;
 	}
 
+	resetFloor() {
+		this.position.y = PlayerInfo[2].floor;
+	}
+
 	getDirection() {
 		if (this.position.x + this.boxes.push.x + this.boxes.push.width
 			<= this.opponent.position.x + this.opponent.boxes.push.x) {
@@ -170,6 +174,7 @@ export class Player {
 
 	handleIdleInit() {
 		this.resetVelocities();
+		this.resetFloor();
 		this.attackStruck = false;
 	}
 
@@ -257,10 +262,9 @@ export class Player {
 	handleAttack1State() {
 		if (this.owner != this.player)
 			return ;
-		if (control.isAttack())
-			this.handleAttack1Reset();
 		if (!this.isAnimationCompleted())
 			return;
+		this.attackStruck = false;
 		this.changeState(FighterState.IDLE);
 	}
 
@@ -273,10 +277,9 @@ export class Player {
 	handleAttack2State() {
 		if (this.owner != this.player)
 			return ;
-		if (control.isMiddleAttack())
-			this.handleAttack2Reset();
 		if (!this.isAnimationCompleted())
 			return;
+		this.attackStruck = false;
 		this.changeState(FighterState.IDLE);
 	}
 
@@ -470,6 +473,6 @@ export class Player {
 		);
 		context.setTransform(1, 0, 0, 1, 0, 0);
 
-		this.drawDebug(context);
+		// this.drawDebug(context);
 	}
 }

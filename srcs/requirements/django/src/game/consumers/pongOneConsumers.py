@@ -29,7 +29,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
         if access_token == None or self.user_name == None:
             await self.close()
         
-        self.rating =  await self.get_rating(self.user_name)
+        self.rating = await self.get_rating(self.user_name)
         await self.channel_layer.group_add("game_queue", self.channel_name)
         await self.accept()
         await self.send(text_data=json.dumps({
@@ -90,7 +90,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
             cnt = await self.db_cnt()
             room = await self.get_room()
             if cnt == 1 and room == None:
-                setattr(self.RoomList, self.game_group_name, Room())
+                setattr(self.RoomList, self.game_group_name, Room("one"))
                 room = await self.get_room()
                 room.setPlayer({"name": msg_data['player0'], "rating": 0}, {"name": msg_data['player1'], "rating": 0})
             if cnt == 2 and room != None:
@@ -106,7 +106,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
                         }
                     }
                 )
-                await asyncio.create_task(self.game_update_task())
+                asyncio.create_task(self.game_update_task())
         # 각 플레이어들의 탁구채 위치 정보. 정보를 받으면 최신화
         if msg_type == 'bar.info':
             room = await self.get_room()
@@ -184,8 +184,8 @@ class PongOneConsumers(AsyncWebsocketConsumer):
             player0rating = rating_calculator(is_room.player0.rating, is_room.player1.rating, 0)
             player1rating = rating_calculator(is_room.player1.rating, is_room.player0.rating, 1)
         else:
-            player0rating = rating_calculator(is_room.player0.rating, is_room.player1.rating, 0)
-            player1rating = rating_calculator(is_room.player1.rating, is_room.player0.rating, 1)
+            player0rating = rating_calculator(is_room.player0.rating, is_room.player1.rating, 1)
+            player1rating = rating_calculator(is_room.player1.rating, is_room.player0.rating, 0)
         await self.set_rating([is_room.player0.name, player0rating], [is_room.player1.name, player1rating], is_room.winner)
 
     async def game_update_task(self):
@@ -205,6 +205,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
                         }
                     }
                 )
+                break
             else:
                 await self.channel_layer.group_send(
                     self.game_group_name, {

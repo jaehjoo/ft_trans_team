@@ -25,8 +25,10 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+ADDRESS = "https://" + os.environ.get('SERVER_ADDRESS')
+
 ALLOWED_HOSTS = [
-    'transcendence.kgnj.kr'
+    os.environ.get('SERVER_ADDRESS')
 ]
 
 
@@ -109,7 +111,7 @@ LOGGING = {
 
 # CORS, CSRF
 CSRF_TRUSTED_ORIGINS = [
-    "https://transcendence.kgnj.kr"
+    ADDRESS,
 ]
 
 CORS_ORIGIN_ALLOW_ALL = False
@@ -117,11 +119,11 @@ CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
-    "https://transcendence.kgnj.kr"
+    ADDRESS,
 ]
 
 CORS_ORIGIN_WHITELIST = [
-    "https://transcendence.kgnj.kr"
+    ADDRESS,
 ]
 
 CORS_ALLOW_HEADERS = (

@@ -35,7 +35,7 @@ def send_sms(request, value):
         user = User.objects.get(username=name)
     except User.DoesNotExist:
         return False
-    if len(value) is not 11:
+    if len(value) != 11:
         return False
     user.phone_number = value
     user.save()
@@ -75,7 +75,7 @@ def send_otp(request):
     except User.DoesNotExist:
         return False
     key = UserKey.objects.get(me=user)
-    if key.auth2fa is 3:
+    if key.auth2fa == 3:
         secret_key = key.otp_secret
     else:
         secret_key = random_key(32)
@@ -95,9 +95,9 @@ def check_code_2fa(request):
         try:
             user = User.objects.get(username=usr_name)
             key = UserKey.objects.get(me=user)
-            if key.auth2fa is 3:
+            if key.auth2fa == 3:
                 result = otp.valid_totp(code, key.otp_secret)           
-            elif key.auth2fa is not 0:
+            elif key.auth2fa != 0:
                 result = (code == key.twofactorkey)
             else:
                 result = False

@@ -41,7 +41,10 @@ class fightingConsumers(AsyncWebsocketConsumer):
                 "display_name" : self.display_name,
             }
         }))
-        asyncio.wait(self.join_matching(), 10)
+        try:
+            await asyncio.wait_for(self.join_matching(), 10)
+        except asyncio.exceptions.TimeoutError:
+            self.close()
 
     async def disconnect(self, close_code):
         try:
@@ -237,8 +240,8 @@ class fightingConsumers(AsyncWebsocketConsumer):
             player0rating = rating_calculator(is_room.player0.rating, is_room.player1.rating, 0)
             player1rating = rating_calculator(is_room.player1.rating, is_room.player0.rating, 1)
         else:
-            player0rating = rating_calculator(is_room.player0.rating, is_room.player1.rating, 0)
-            player1rating = rating_calculator(is_room.player1.rating, is_room.player0.rating, 1)
+            player0rating = rating_calculator(is_room.player0.rating, is_room.player1.rating, 1)
+            player1rating = rating_calculator(is_room.player1.rating, is_room.player0.rating, 0)
         await self.set_rating([is_room.player0.name, player0rating], [is_room.player1.name, player1rating], is_room.winner)
 
     @database_sync_to_async
@@ -331,8 +334,8 @@ class fightingConsumers(AsyncWebsocketConsumer):
             player0record.win += 1
             player1record.lose += 1
         else:
-            player0record.win += 1
-            player1record.lose += 1
+            player1record.win += 1
+            player0record.lose += 1
         player0record.save()
         player1record.save()
 

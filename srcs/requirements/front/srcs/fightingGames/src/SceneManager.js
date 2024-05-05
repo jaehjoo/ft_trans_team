@@ -18,6 +18,9 @@ export class SceneManager {
 	checkScene(time) {
 		if (this.currentScene.FINAL) {
 			this.FINAL = true;
+			window.addEventListener("click", function() {
+				window.location.href = "/login";
+			}, {once : true})
 			return ;
 		}
 		if (this.currentScene.START == true

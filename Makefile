@@ -22,9 +22,6 @@ clean:
 	@if [ -n "$$(docker images -qa)" ]; then \
 		docker rmi $$(docker images -qa); \
 	fi
-	@if [ -n "$$(docker network ls | grep $(NETWORK))" ]; then \
-	 	docker network rm $$(docker network ls | grep $(NETWORK) | awk 'NF=1 {print $$0}'); \
-	fi
 	@if [ -n "$$(docker volume ls -q)" ]; then \
 	 	docker volume rm $$(docker volume ls -q); \
 	fi

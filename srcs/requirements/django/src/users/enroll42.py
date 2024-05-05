@@ -1,9 +1,11 @@
-import requests, json, os
+import requests, json, os, logging
 from users.models import User, UserKey, UserAvatar, UserRecordPongGame, UserRecordFightingGame
+
+logger = logging.getLogger(__name__)
 
 def generate_42(request):
 	code = request.GET.get('code')
-	uri = os.environ.get('SERVER_ADDRESS')
+	uri = "https://" + os.environ.get('SERVER_ADDRESS')
 	uri = uri + "/shallwe"
 	if code:
 		data = {
@@ -14,6 +16,7 @@ def generate_42(request):
 			'redirect_uri' : uri
 		}
 		data_42 = requests.post('https://api.intra.42.fr/oauth/token', data=data)
+		logger.error(data_42.json())
 		try:
 			access_token = data_42.json()["access_token"]
 		except KeyError:
