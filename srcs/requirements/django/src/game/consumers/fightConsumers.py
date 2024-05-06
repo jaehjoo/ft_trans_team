@@ -223,7 +223,7 @@ class fightingConsumers(AsyncWebsocketConsumer):
             }
         )
 
-    async def get_group_member_count(group_name):
+    async def get_group_member_count(self, group_name):
         channel_layer = get_channel_layer()
         group_info = await channel_layer.group_layer.group_status(group_name)
         if group_info:

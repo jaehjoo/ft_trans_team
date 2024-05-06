@@ -61,9 +61,15 @@ export const App = () => {
     return `${LobbyLayout(TournamentLobby)}`;
   } else if (window.location.pathname === "/game/result") {
     return `${LobbyLayout(GameResult)}`;
-  } else if (window.location.pathname === "/pingpong") {
+  } else if (window.location.pathname === "/pingpong/onebyone") {
     document.body.innerHTML = "";
-    PingPong();
+    PingPong("one");
+  } else if (window.location.pathname === "/pingpong/twobytwo") {
+    document.body.innerHTML = "";
+    PingPong("team");
+  } else if (window.Location.pathname === "/pingpong/tournament") {
+    document.body.innerHTML = "";
+    PingPong("tournament");
   } else if (window.location.pathname === "/fighting") {
     document.body.innerHTML = "";
     Fighting();

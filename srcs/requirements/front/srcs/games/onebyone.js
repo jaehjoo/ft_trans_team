@@ -11,7 +11,7 @@ const GameViewport = {
   HEIGHT: 768,
 };
 
-export const StartCanvas = () => {
+export const StartCanvasOne = () => {
   const canvasEl = document.querySelector("canvas");
   const context = canvasEl.getContext("2d");
 
@@ -47,9 +47,13 @@ export const StartCanvas = () => {
     context.clearRect(0, 0, GameViewport.WIDTH, GameViewport.HEIGHT);
     if (flag.START == false) {
       scene[0].draw(context);
-    } else if (flag.STOP == true) {
+    } else if (flag.STOP == true)
+    {
       scene[1].draw(context);
-      ws.close("Session End");
+      ws.close();
+      window.addEventListener("click", function() {
+        window.location.href = "/login";
+      }, {once : true})
     }
   }
 
@@ -90,6 +94,10 @@ export const StartCanvas = () => {
 
       } else if (textData.data.mode == "game.complete") {
         flag.STOP = true;
+        if (textData.data['winner'] == yourName)
+          scene[1].win = 1;
+        else
+          scene[1].win = 2;
       } else if (textData.data.mode == "abnormal.termination") {
         ws.send(
           JSON.stringify({
@@ -100,6 +108,7 @@ export const StartCanvas = () => {
           })
         );
         ws.close();
+        window.location.href = "/login";
       }
     };
   }
@@ -168,4 +177,4 @@ export const StartCanvas = () => {
     )
   }
 }
-export default StartCanvas;
+export default StartCanvasOne;

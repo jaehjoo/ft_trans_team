@@ -16,7 +16,6 @@ def generate_42(request):
 			'redirect_uri' : uri
 		}
 		data_42 = requests.post('https://api.intra.42.fr/oauth/token', data=data)
-		logger.error(data_42.json())
 		try:
 			access_token = data_42.json()["access_token"]
 		except KeyError:

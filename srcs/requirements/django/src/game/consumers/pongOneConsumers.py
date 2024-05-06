@@ -166,7 +166,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
             return False
         return True
     
-    async def get_group_member_count(group_name):
+    async def get_group_member_count(self, group_name):
         channel_layer = get_channel_layer()
         group_info = await channel_layer.group_layer.group_status(group_name)
         if group_info:
@@ -200,7 +200,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
                     self.game_group_name, {
                         "type" : "game.message",
                         "data" : {
-                            "mode" : "game.compelete",
+                            "mode" : "game.complete",
                             "winner" : room.winner,
                         }
                     }

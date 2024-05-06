@@ -1,4 +1,6 @@
-import StartCanvas from "./index.js";
+import { StartCanvasOne } from "./onebyone.js";
+import { StartCanvasTeam } from "./twobytwo.js";
+import { StartCanvasTournament } from "./tournament.js";
 
 const addCanvas = async () => {
   const canvas = document.createElement("canvas");
@@ -9,11 +11,15 @@ const addCanvas = async () => {
   return "done";
 };
 
-const PingPong = () => {
+const PingPong = (str) => {
   addCanvas().then((res) => {
-    StartCanvas();
+    if (str === "one")
+      StartCanvasOne();
+    else if (str === "team")
+      StartCanvasTeam();
+    else if (str === "tournament")
+      StartCanvasTournament();
   });
-  // StartCanvas();
 };
 
 export default PingPong;
