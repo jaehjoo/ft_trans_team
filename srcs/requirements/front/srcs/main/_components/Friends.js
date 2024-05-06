@@ -20,6 +20,9 @@ const Friends = () => {
   const [friends, setFriends] = useState([]);
   if (!flag) {
     fetchFriends().then((data) => {
+      if (data.friendsList === undefined) {
+        return;
+      }
       setFriends(data.friendsList);
     });
     flag = true;
