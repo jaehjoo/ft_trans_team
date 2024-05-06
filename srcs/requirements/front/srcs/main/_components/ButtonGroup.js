@@ -18,23 +18,6 @@ const ButtonGroup = () => {
   //   hair : 1
   // }
 
-  // const data = {
-  //   friend_name: "jjh",
-  //   mode: "add",
-  //   access: localStorage.getItem("access_token"),
-  // };
-
-  // const playButton = async () => {
-  //   const res = await fetch(`/api/friends`, {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       "X-CSRFToken": localStorage.getItem("csrf_token"),
-  //     },
-  //     body: JSON.stringify(data),
-  //   });
-  // };
-
   const myPageButton = () => {
     console.log(
       "myPage button clicked!",
