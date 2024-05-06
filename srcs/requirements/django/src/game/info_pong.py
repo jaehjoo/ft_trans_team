@@ -141,6 +141,12 @@ class Room:
 	def setPlayer(self, player0, player1):
 		self.player0 = Player(player0['name'], player0['rating'])
 		self.player1 = Player(player1['name'], player1['rating'])
+
+	def setPlayer(self, player0, player1, player2, player3):
+		self.player0 = Player(player0['name'], player0['rating'])
+		self.player1 = Player(player1['name'], player1['rating'])
+		self.player2 = Player(player2['name'], player2['rating'])
+		self.player3 = Player(player3['name'], player3['rating'])
 	
 	def setBarLocation(self, x1, y1, x2, y2):
 		self.player0bar.set_bar(x1, y1)
