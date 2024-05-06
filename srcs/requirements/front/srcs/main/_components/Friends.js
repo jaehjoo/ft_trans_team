@@ -1,4 +1,5 @@
 import Sidebar from "../../../components/ui/Sidebar.js";
+import { useState } from "../../../MyReact.js";
 
 const fetchFriends = async () => {
   const access = localStorage.getItem("access_token") || "null";
@@ -9,14 +10,23 @@ const fetchFriends = async () => {
     },
   });
   const data = await response.json();
+
   return data;
 };
 
+let flag = false;
+
 const Friends = () => {
-  fetchFriends();
+  const [friends, setFriends] = useState([]);
+  if (!flag) {
+    fetchFriends().then((data) => {
+      setFriends(data.friendsList);
+    });
+    flag = true;
+  }
 
   return /*html*/ `
-    ${Sidebar("Friends List", ["Alice", "Bob", "Charlie"])}
+    ${Sidebar(friends)}
 `;
 };
 

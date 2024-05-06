@@ -18,22 +18,22 @@ const ButtonGroup = () => {
   //   hair : 1
   // }
 
-  const data = {
-    friend_name: "jjh",
-    mode: "del",
-    access: localStorage.getItem("access_token"),
-  };
+  // const data = {
+  //   friend_name: "jjh",
+  //   mode: "add",
+  //   access: localStorage.getItem("access_token"),
+  // };
 
-  const playButton = async () => {
-    const res = await fetch(`/api/friends`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": localStorage.getItem("csrf_token"),
-      },
-      body: JSON.stringify(data),
-    });
-  };
+  // const playButton = async () => {
+  //   const res = await fetch(`/api/friends`, {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       "X-CSRFToken": localStorage.getItem("csrf_token"),
+  //     },
+  //     body: JSON.stringify(data),
+  //   });
+  // };
 
   const myPageButton = () => {
     console.log(
@@ -53,14 +53,12 @@ const ButtonGroup = () => {
     window.location.pathname = "/login";
   };
 
-  window.playButton = playButton;
   window.myPageButton = myPageButton;
   window.signOutButton = signOutButton;
 
   return /*html*/ `
   <div class="d-flex flex-column w-100 justify-content-between align-items-center gap-4">
   ${GameModal()}
-  <button onclick="playButton()" class="btn btn-primary w-75">Play</button>
   <button onclick="myPageButton()" class="btn btn-primary w-75">My Page</button>
   <button onclick="signOutButton()" class="btn btn-light w-75" style="border : 0.5px solid gray;">Sign out</button>
 </div>

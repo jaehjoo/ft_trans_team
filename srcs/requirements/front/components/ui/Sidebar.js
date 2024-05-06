@@ -1,14 +1,15 @@
-const Friend = (friend) => {
+const Friend = (friend, connect) => {
   return /*html*/ `
   <div class="d-flex justify-content-between p-2">
     <div>${friend}</div>
-    <button class="btn btn-primary">Chat</button>
+    <div>${connect ? "Online" : "Offline"}</div>
   </div>`;
 };
 
-const Sidebar = (text, Friends) => {
+const Sidebar = (friends) => {
+  console.log(friends);
   const FriendsButtonHanddler = () => {
-    console.log(Friends, "you should remove event listener here");
+    console.log("you should remove event listener here");
   };
 
   const handleSubmitSearch = (event) => {
@@ -138,7 +139,7 @@ const Sidebar = (text, Friends) => {
   window.handleSubmitSearch = handleSubmitSearch;
 
   return /*html*/ `
-  <button onclick="FriendsButtonHanddler()" style="font-size: 15px; height : 35px; margin-top: 5px;" class="btn btn-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">${text}</button>
+  <button onclick="FriendsButtonHanddler()" style="font-size: 15px; height : 35px; margin-top: 5px;" class="btn btn-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">Friends List</button>
 
 <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
   <div class="offcanvas-header d-flex gap-4">
@@ -153,7 +154,9 @@ const Sidebar = (text, Friends) => {
   </div>
   <hr></hr>
   <div class="offcanvas-body d-flex flex-column gap-4">
-    ${Friends.map(Friend).join("")}
+  ${Object.values(friends).map((friend) => {
+    return Friend(friend.name, friend.connect);
+  })}
   </div>
 </div>`;
 };
