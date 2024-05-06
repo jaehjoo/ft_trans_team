@@ -87,7 +87,7 @@ export const StartCanvasTournament = () => {
         );
       } else if (textData.data.mode == "game.start") {
         flag.START = true;
-		flag.STOP = false;
+		    flag.STOP = false;
         entities[2].update(textData.data['ball']['x'], textData.data['ball']['y'])
         entities[3].update(textData.data['player0']['x'], textData.data['player0']['y'])
         entities[4].update(textData.data['player1']['x'], textData.data['player1']['y'])
@@ -98,17 +98,17 @@ export const StartCanvasTournament = () => {
         entities[1].update(textData.data['score']['ONE'], textData.data['score']['TWO'])
       } else if (textData.data.mode == "match.game.complete") {
         flag.STOP = true;
-		if (textData.data['status'] == "match1") {
-			scene[1].match1Winner = textData.data['winner'];
-		} else if (textData.data['status'] == "match2") {
-			scene[1].match2Winner = textData.data['winner'];
-		}
-		if ((entities[3].name == yourName || entities[4].name == yourName)
-			&& textData.data['winner'] != yourName) {
-			flag.FINAL = true;
-		}
-	  }	else if (textData.data.mode == "game.complete") {
-		flag.FINAL = true;
+  		  if (textData.data['status'] == "match1") {
+			  scene[1].match1Winner = textData.data['winner'];
+        } else if (textData.data['status'] == "match2") {
+          scene[1].match2Winner = textData.data['winner'];
+        }
+        if ((entities[3].name == yourName || entities[4].name == yourName)
+          && textData.data['winner'] != yourName) {
+          flag.FINAL = true;
+        }
+      }	else if (textData.data.mode == "game.complete") {
+        flag.FINAL = true;
         scene[1].match3Winner = textData.data['winner'];
       } else if (textData.data.mode == "abnormal.termination") {
         ws.send(
@@ -122,7 +122,7 @@ export const StartCanvasTournament = () => {
         ws.close();
         window.location.href = "/login";
       }
-    };
+    }
   }
 
   function start(time) {
@@ -163,7 +163,7 @@ export const StartCanvasTournament = () => {
           }
         })
       )
-    }
+  }
 
   function keyUpHandler(event) {
     let player;
@@ -189,4 +189,5 @@ export const StartCanvasTournament = () => {
     )
   }
 }
+
 export default StartCanvasTournament;

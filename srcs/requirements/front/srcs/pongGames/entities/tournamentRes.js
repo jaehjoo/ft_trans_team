@@ -1,4 +1,4 @@
-export class Result {
+export class TournamentResult {
 	constructor(view) {
 	  this.screen = {
 		WIDTH: view.WIDTH,
