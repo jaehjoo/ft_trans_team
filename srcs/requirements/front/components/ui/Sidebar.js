@@ -18,7 +18,7 @@ const fetchAddUser = async (name) => {
     localStorage.clear();
     window.location.pathname = "/login";
   } else {
-    window.location.pathname = "/main";
+    // window.location.pathname = "/main";
   }
 };
 
@@ -139,9 +139,9 @@ const Sidebar = (friends) => {
           }
         });
 
-        if (!flag) return;
-
-        fetchAddUser(checked.value);
+        if (!flag) {
+          fetchAddUser(checked.value);
+        }
         rootBody.removeChild(bg);
       });
 
