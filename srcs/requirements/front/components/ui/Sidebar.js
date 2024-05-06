@@ -18,7 +18,6 @@ const fetchAddUser = async (name) => {
     localStorage.clear();
     window.location.pathname = "/login";
   } else {
-    // refresh
     window.location.pathname = "/main";
   }
 };
@@ -36,11 +35,41 @@ const fetchUsers = async () => {
   return data;
 };
 
+// 친구삭제 로직입니다 ! console.log 여기에 찍어보시면 됩니다.
+const fetchDeleteUser = async (name) => {
+  const data = {
+    friend_name: name,
+    mode: "del",
+    access: localStorage.getItem("access_token"),
+  };
+
+  const response = await fetch(`/api/friends`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": localStorage.getItem("csrf_token"),
+    },
+    body: JSON.stringify(data),
+  });
+  const res = await response.json();
+
+  if (res.success !== "Y") {
+    localStorage.clear();
+    window.location.pathname = "/login";
+  } else {
+    window.location.pathname = "/main";
+  }
+};
+
 const Friend = (friend, connect) => {
+  const name = friend;
   return /*html*/ `
   <div class="d-flex justify-content-between p-2">
     <div>${friend}</div>
+    <div class="d-flex justify-content-center align-items-center gap-4">
     <div>${connect ? "Online" : "Offline"}</div>
+    <button onclick="fetchDeleteUser('${name}')" class="btn btn-danger">Delete</button>
+    </div>
   </div>`;
 };
 
@@ -142,6 +171,7 @@ const Sidebar = (friends) => {
   };
 
   window.handleSubmitSearch = handleSubmitSearch;
+  window.fetchDeleteUser = fetchDeleteUser;
 
   return /*html*/ `
   <button  style="font-size: 15px; height : 35px; margin-top: 5px;" class="btn btn-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">Friends List</button>
