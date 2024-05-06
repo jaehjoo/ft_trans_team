@@ -18,7 +18,7 @@ const fetchAddUser = async (name) => {
     localStorage.clear();
     window.location.pathname = "/login";
   } else {
-    // window.location.pathname = "/main";
+    window.location.pathname = "/main";
   }
 };
 
@@ -77,8 +77,8 @@ const Sidebar = (friends) => {
   const handleSubmitSearch = (event) => {
     event.preventDefault();
     fetchUsers().then((data) => {
-      const friends = Object.values(data.userList);
-      friends.shift();
+      const getFriends = Object.values(data.userList);
+      getFriends.shift();
 
       const offcanvas = document.querySelector("#offcanvasRight");
       offcanvas.querySelector(".btn-close").click();
@@ -108,7 +108,7 @@ const Sidebar = (friends) => {
       form.style.gap = "10px";
       form.style.padding = "20px";
 
-      friends.forEach((friend) => {
+      getFriends.forEach((friend) => {
         const label = document.createElement("label");
         label.textContent = friend.name;
         label.style.display = "flex";
@@ -133,7 +133,8 @@ const Sidebar = (friends) => {
         if (!checked) return;
 
         let flag = false;
-        friends.forEach((friend) => {
+        const existFriends = Object.values(friends);
+        existFriends.forEach((friend) => {
           if (friend.name === checked.value) {
             flag = true;
           }
