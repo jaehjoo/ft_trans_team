@@ -88,8 +88,6 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
             cnt = await self.db_cnt()
             room = await self.get_room()
             if cnt == 1 and room == None:
-                setattr(self.RoomList, self.game_group_name, Room("two"))
-                room = await self.get_room()
                 room.setPlayer({"name": msg_data["player0"], "rating": 0}, {"name": msg_data["player1"], "rating": 0}, {"name": msg_data["player2"], "rating": 0}, {"name": msg_data["player3"], "rating": 0})
             if cnt == 4 and room != None:
                 await self.channel_layer.group_send(
@@ -276,7 +274,7 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
                 if all(player != "" for player in is_room.players):
                     is_room.status = "playing"
 
-                    setattr(self.RoomList, is_room.room_name, Room())
+                    setattr(self.RoomList, is_room.room_name, Room("two"))
                     room = getattr(self.RoomList, is_room.room_name)
                     room.setPlayer({"name": is_room.player0, "rating": 0}, {"name": is_room.player1, "rating": 0}, {"name": is_room.player2, "rating": 0}, {"name": is_room.player3, "rating": 0})
                 is_room.save()
