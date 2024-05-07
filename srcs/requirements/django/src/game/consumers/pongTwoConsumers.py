@@ -94,7 +94,7 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
                     self.game_group_name, {
                         "type" : "game.message",
                         "data" : {
-                            "mode" : "set.game",
+                            "mode" : "game.start",
                             "player0" : {"x" : room.player0bar.x, "y" : room.player0bar.y},
                             "player1" : {"x" : room.player1bar.x, "y" : room.player1bar.y},
                             "player2" : {"x" : room.player2bar.x, "y" : room.player2bar.y},
@@ -137,7 +137,7 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
                 self.game_group_name, {
                     "type" : "game.message",
                     "data" : {
-                        "mode" : "game.start",
+                        "mode" : "set.game",
                         "player0" : room.player0,
                         "player1" : room.player1,
                         "player2" : room.player2,
