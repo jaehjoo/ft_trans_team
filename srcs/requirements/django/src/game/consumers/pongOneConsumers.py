@@ -240,7 +240,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
     def get_room_cnt(self):
         return GameRoom.objects.count()
     
-    # 방을 만든다. 방 이름은 "pong_one_" + 랜덤 생성 아스키 코드 6자리
+    # 방을 만든다. 방 이름은 "방장의 이름" + 랜덤 생성 아스키 코드 6자리
     @database_sync_to_async
     def create_room(self):
         self.game_group_name = self.user_name + random_key(6)
@@ -254,7 +254,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
         for room in room_all:
             if room.status == "waiting":
                 room.player1 = self.user_name
-                room.status = "full"
+                room.status = "playing"
                 room.save()
                 return room.room_name
         return "not"
