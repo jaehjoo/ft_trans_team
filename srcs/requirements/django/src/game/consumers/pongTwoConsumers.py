@@ -124,12 +124,13 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
 
     async def join_matching(self):
         count = await self.get_room_cnt()
-        room = await self.enter_room()
+        name = await self.enter_room()
         # 방이 없거나 대기 중인 방이 없을 때
-        if count == 0 or room == "not":
+        if count == 0 or name == "not":
             await self.create_room()
             await self.channel_layer.group_add(self.game_group_name, self.channel_name)
             await self.channel_layer.group_discard("game_queue_twobytwo", self.channel_name)
+        self.game_group_name = name
         room = await self.get_db_room()
         if room.status == "playing":
             await self.matchPlayers(room, room.players[0], room.players[1], room.players[2], room.players[3])

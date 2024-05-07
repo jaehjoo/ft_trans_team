@@ -119,39 +119,14 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
 
     # 매칭 시도
     async def join_matching(self):
-        flag = False
-        while flag == False:
             count = await self.get_room_cnt()
-            name = await self.get_room_name()
-            # 방이 하나도 안 만들어졌거나 전부 게임중이면 방을 새로 판다. 방이 있으면 해당 방에 참여
-            if count == 0 or name == "not":
+            room = await self.enter_room()
+
+            if count == 0 or room == "not":
                 await self.create_room()
-                await self.channel_layer.group_add(self.game_group_name, self.channel_name)
-                await self.channel_layer.group_discard("game_queue", self.channel_name)
-                flag = True
-            else:
-                if name != "not":
-                    self.game_group_name = name
-                    if await self.rating_check(name):
-                        await self.channel_layer.group_add(self.game_group_name, self.channel_name)
-                        await self.channel_layer.group_discard("game_queue", self.channel_name)
-                        await self.set_player(1)
-                        player = await self.get_player()
-                        await self.channel_layer.group_send(
-                            self.game_group_name, {
-                                "type" : 'game.message',
-                                "data" : {
-                                    "mode" : "set.game",
-                                    "player0" : player["player0"],
-                                    "player1" : player["player1"],
-                                    "group" : self.game_group_name,
-                                }
-                            }
-                        )
-                        flag = True
-                    else:
-                        self.room_depart()
-                        self.rating_differece += 200
+                await self.channel_layer.group_send(self.game_group_name, self.channel_name)
+                await self.channel_layer.group_send("game_queue_tournament", self.channel_name)
+            
 
     # 본인이 속한 방을 불러온다. 없으면 None
     async def get_room(self):
