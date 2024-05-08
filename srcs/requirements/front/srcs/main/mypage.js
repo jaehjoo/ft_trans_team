@@ -78,6 +78,28 @@ const MyPage = () => {
     }
   };
 
+  const changeComponent = (component, value) => {
+    switch (component) {
+      case "hair":
+        setHair(value);
+        break;
+      case "eye":
+        setEye(value);
+        break;
+      case "face":
+        setFace(value);
+        break;
+      case "body":
+        setBody(value);
+        break;
+      case "lip":
+        setLip(value);
+        break;
+      default:
+        break;
+    }
+  };
+
   const deleteAccount = async () => {
     const data = {
       access: localStorage.getItem("access_token"),
@@ -97,6 +119,7 @@ const MyPage = () => {
   window.goHome = goHome;
   window.changeAvatar = changeAvatar;
   window.deleteAccount = deleteAccount;
+  window.changeComponent = changeComponent;
 
   const pongWin = data ? data.ponggame_record.win : 0;
   const pongLose = data ? data.ponggame_record.lose : 0;
@@ -130,76 +153,76 @@ const MyPage = () => {
 
     <p>hair</p>
     <div class="d-flex gap-2">
-      <input type="radio" name="hair" value="0" ${
-        hair === 0 ? "checked" : ""
-      }>0</input>
-      <input type="radio" name="hair" value="1" ${
-        hair === 1 ? "checked" : ""
-      }>1</input>
-      <input type="radio" name="hair" value="2" ${
-        hair === 2 ? "checked" : ""
-      }>2</input>
-      <input type="radio" name="hair" value="3" ${
-        hair === 3 ? "checked" : ""
-      }>3</input>
+      <input onclick="changeComponent('${`hair`}', 0)" type="radio" name="hair" value="0" ${
+            hair === 0 ? "checked" : ""
+          }>0</input>
+      <input onclick="changeComponent('${`hair`}', 1)" type="radio" name="hair" value="1" ${
+            hair === 1 ? "checked" : ""
+          }>1</input>
+      <input onclick="changeComponent('${`hair`}', 2)" type="radio" name="hair" value="2" ${
+            hair === 2 ? "checked" : ""
+          }>2</input>
+      <input onclick="changeComponent('${`hair`}', 3)" type="radio" name="hair" value="3" ${
+            hair === 3 ? "checked" : ""
+          }>3</input>
     </div>
 
     <p>eye</p>
     <div class="d-flex gap-2">
-      <input type="radio" name="eye" value="0" ${
-        eye === 0 ? "checked" : ""
-      }>0</input>
-      <input type="radio" name="eye" value="1" ${
-        eye === 1 ? "checked" : ""
-      }>1</input>
-      <input type="radio" name="eye" value="2" ${
-        eye === 2 ? "checked" : ""
-      }>2</input>
-      <input type="radio" name="eye" value="3" ${
-        eye === 3 ? "checked" : ""
-      }>3</input>
+      <input onclick="changeComponent('${`eye`}', 0)" type="radio" name="eye" value="0" ${
+            eye === 0 ? "checked" : ""
+          }>0</input>
+      <input onclick="changeComponent('${`eye`}', 1)" type="radio" name="eye" value="1" ${
+            eye === 1 ? "checked" : ""
+          }>1</input>
+      <input onclick="changeComponent('${`eye`}', 2)" type="radio" name="eye" value="2" ${
+            eye === 2 ? "checked" : ""
+          }>2</input>
+      <input onclick="changeComponent('${`eye`}', 3)" type="radio" name="eye" value="3" ${
+            eye === 3 ? "checked" : ""
+          }>3</input>
     </div>
 
     <p>lip</p>
     <div class="d-flex gap-2">
-      <input type="radio" name="lip" value="0" ${
-        lip === 0 ? "checked" : ""
-      }>0</input>
-      <input type="radio" name="lip" value="1" ${
-        lip === 1 ? "checked" : ""
-      }>1</input>
-      <input type="radio" name="lip" value="2" ${
-        lip === 2 ? "checked" : ""
-      }>2</input>
-      <input type="radio" name="lip" value="3" ${
-        lip === 3 ? "checked" : ""
-      }>3</input>
+      <input onclick="changeComponent('${`lip`}', 0)" type="radio" name="lip" value="0" ${
+            lip === 0 ? "checked" : ""
+          }>0</input>
+      <input onclick="changeComponent('${`lip`}', 1)" type="radio" name="lip" value="1" ${
+            lip === 1 ? "checked" : ""
+          }>1</input>
+      <input onclick="changeComponent('${`lip`}', 2)" type="radio" name="lip" value="2" ${
+            lip === 2 ? "checked" : ""
+          }>2</input>
+      <input onclick="changeComponent('${`lip`}', 3)" type="radio" name="lip" value="3" ${
+            lip === 3 ? "checked" : ""
+          }>3</input>
     </div>
 
     <p>face</p>
     <div class="d-flex gap-2">
-      <input type="radio" name="face" value="0" ${
-        face === 0 ? "checked" : ""
-      }>0</input>
-      <input type="radio" name="face" value="1" ${
-        face === 1 ? "checked" : ""
-      }>1</input>
-      <input type="radio" name="face" value="2" ${
-        face === 2 ? "checked" : ""
-      }>2</input>
+      <input onclick="changeComponent('${`face`}', 0)" type="radio" name="face" value="0" ${
+            face === 0 ? "checked" : ""
+          }>0</input>
+      <input onclick="changeComponent('${`face`}', 1)" type="radio" name="face" value="1" ${
+            face === 1 ? "checked" : ""
+          }>1</input>
+      <input onclick="changeComponent('${`face`}', 2)" type="radio" name="face" value="2" ${
+            face === 2 ? "checked" : ""
+          }>2</input>
     </div>
 
     <p>body</p>
     <div class="d-flex gap-2">
-      <input type="radio" name="body" value="0" ${
-        body === 0 ? "checked" : ""
-      }>0</input>
-      <input type="radio" name="body" value="1" ${
-        body === 1 ? "checked" : ""
-      }>1</input>
-      <input type="radio" name="body" value="2" ${
-        body === 2 ? "checked" : ""
-      }>2</input>
+      <input onclick="changeComponent('${`body`}', 0)" type="radio" name="body" value="0" ${
+            body === 0 ? "checked" : ""
+          }>0</input>
+      <input onclick="changeComponent('${`body`}', 1)" type="radio" name="body" value="1" ${
+            body === 1 ? "checked" : ""
+          }>1</input>
+      <input onclick="changeComponent('${`body`}', 2)" type="radio" name="body" value="2" ${
+            body === 2 ? "checked" : ""
+          }>2</input>
     </div>
 
     <div>
