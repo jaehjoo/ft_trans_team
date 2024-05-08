@@ -97,8 +97,15 @@ const MyPage = () => {
   const fightingPercent =
     fightingTotal === 0 ? 0 : Math.floor((fightingWin / fightingTotal) * 100);
 
+  const hair = data ? data.avatar.hair : 0;
+  const eye = data ? data.avatar.eye : 0;
+  const face = data ? data.avatar.face : 0;
+  const body = data ? data.avatar.body : 0;
+  const lip = data ? data.avatar.lip : 0;
+
   return /*html*/ `
-  <div class="w-100 p-4 d-flex flex-column gap-2">
+  <div class="w-100 p-4 d-flex gap-2">
+  <div>
     <h1>${data ? data.user.displayname : ""} 님</h1>
     <div class="d-flex flex-column gap-2 w-100 p-4 rounded" style="background-color: #E6E7E8;">
     <h5>대전 기록</h5>
@@ -116,26 +123,40 @@ const MyPage = () => {
       Delete Account
     </button>
 
-<!-- Modal -->
-<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-<div class="modal-dialog modal-dialog-centered">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h1 class="modal-title fs-5" id="staticBackdropLabel">Are you Sure ?</h1>
-      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-    </div>
-    <div class="modal-body">
-      <p>Are you sure you want to delete your account?</p>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      <button type="button" class="btn btn-danger" onclick="deleteAccount()">Delete</button>
+
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="staticBackdropLabel">Are you Sure ?</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to delete your account?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-danger" onclick="deleteAccount()">Delete</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
-</div>
 
   </div>
+
+  <div class="w-50 d-flex flex-column justify-content-center align-items-center position-relative">
+    <p>아바타</p>
+    <img src=${`../../img/avatar/face/${face}.png`} alt="avatar" class="img-fluid w-25">
+    <img class="w-25 img-fluid" src=${`../../img/avatar/body/${body}.png`} alt="avatar" >
+    <img class="position-absolute img-fluid" src=${`../../img/avatar/hair/${hair}.png`} alt="avatar" style="top : 10rem; width : 25%;">
+    <img class="position-absolute img-fluid" src=${`../../img/avatar/eye/${eye}.png`} alt="avatar" style="top : 12rem; width : 25%;">
+    <img class="position-absolute img-fluid" src=${`../../img/avatar/lip/${lip}.png`} alt="avatar" style="top : 13rem;">
+  </div>
+
+</div>
+
+
   `;
 };
 
