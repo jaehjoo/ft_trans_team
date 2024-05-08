@@ -276,7 +276,7 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
                     is_room.status = "playing"
 
                     setattr(self.RoomList, is_room.room_name, Room("two"))
-                    room = getattr(self.RoomList, is_room.room_name)
+                    room = getattr(self.RoomList, is_room.room_name, None)
                     room.setPlayer({"name": is_room.player0, "rating": 0}, {"name": is_room.player1, "rating": 0}, {"name": is_room.player2, "rating": 0}, {"name": is_room.player3, "rating": 0})
                 is_room.save()
                 return is_room.room_name

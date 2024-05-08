@@ -106,6 +106,7 @@ class Ball:
 
 class Room:
 	mode: str
+	match: str
 	winner: str
 	winner2: str
 	window: Window
