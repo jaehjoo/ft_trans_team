@@ -10,6 +10,7 @@ import TournamentLobby from "./lobby/Tournament.js";
 import GameResult from "./lobby/result.js";
 import PingPong from "./pongGames/pingpong.js";
 import Fighting from "./fightingGames/fighting.js";
+import MypageLayout from "./main/MypageLayout.js";
 
 export const URL = "https://transcendence.kgnj.kr";
 
@@ -35,7 +36,7 @@ export const App = () => {
               window.location.href = `/2fa`;
             } else {
               console.log(data);
-              window.location.href = URL;
+              // window.location.href = URL;
             }
           });
         })
@@ -44,7 +45,7 @@ export const App = () => {
           localStorage.removeItem("access_token");
           localStorage.removeItem("refresh_token");
           localStorage.removeItem("csrf_token");
-          window.location.href = URL;
+          // window.location.href = URL;
         });
     }
 
@@ -54,7 +55,7 @@ export const App = () => {
   } else if (window.location.pathname === "/main") {
     return `${MainLayout(MainPage)}`;
   } else if (window.location.pathname === "/mypage") {
-    return `${MainLayout(MyPage)}`;
+    return `${MypageLayout(MyPage)}`;
   } else if (window.location.pathname === "/game/1v1") {
     return `${LobbyLayout(OneVersusOne)}`;
   } else if (window.location.pathname === "/game/tournament") {

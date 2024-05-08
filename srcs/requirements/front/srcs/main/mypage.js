@@ -44,12 +44,16 @@ const myPageFetch = async () => {
   return data;
 };
 
+let flag = false;
+
 const MyPage = () => {
-  const [name, setName] = useState(myName);
-  myPageFetch();
-  const oneTotal = data.record.OneByOne.win + data.record.OneByOne.lose;
-  const TournamentTotal =
-    data.record.Tournament.win + data.record.Tournament.lose;
+  const [data, setData] = useState(null);
+  if (!flag) {
+    myPageFetch().then((data) => {
+      setData(data);
+      flag = true;
+    });
+  }
 
   const goHome = () => {
     window.location.pathname = "/main";
@@ -79,37 +83,30 @@ const MyPage = () => {
   window.changeAvatar = changeAvatar;
   window.deleteAccount = deleteAccount;
 
+  const pongWin = data ? data.ponggame_record.win : 0;
+  const pongLose = data ? data.ponggame_record.lose : 0;
+  const pongTotal = pongWin + pongLose;
+  const pongRating = data ? data.ponggame_record.rating : 0;
+  const pongPercent =
+    pongTotal === 0 ? 0 : Math.floor((pongWin / pongTotal) * 100);
+
+  const fightingWin = data ? data.fightinggame_record.win : 0;
+  const fightingLose = data ? data.fightinggame_record.lose : 0;
+  const fightingTotal = fightingWin + fightingLose;
+  const fightingRating = data ? data.fightinggame_record.rating : 0;
+  const fightingPercent =
+    fightingTotal === 0 ? 0 : Math.floor((fightingWin / fightingTotal) * 100);
+
   return /*html*/ `
   <div class="w-100 p-4 d-flex flex-column gap-2">
-    <h1>${data.name} 님</h1>
+    <h1>${data ? data.user.displayname : ""} 님</h1>
     <div class="d-flex flex-column gap-2 w-100 p-4 rounded" style="background-color: #E6E7E8;">
     <h5>대전 기록</h5>
-    <p>[ 1 vs 1 ] ${oneTotal} 경기 ${data.record.OneByOne.win}승 ${
-    data.record.OneByOne.lose
-  }패 (${Math.floor((data.record.OneByOne.win / oneTotal) * 100)}%)</p>
-    <p>[ Tournament ] ${TournamentTotal} 경기 ${data.record.Tournament.win}승 ${
-    data.record.Tournament.lose
-  }패 
-    (${Math.floor((data.record.Tournament.win / TournamentTotal) * 100)}%)</p>
+    <p>[ PingPong ] ${pongTotal} 경기 ${pongWin}승 ${pongLose}패 (${pongPercent}%) Rating : ${pongRating}</p>
+    <p>[ Fighting ] ${fightingTotal} 경기 ${fightingWin}승 ${fightingLose}패 
+    (${fightingPercent}%) Rating : ${fightingRating}</p>
 
-      <div>
-        <h5>최근 3 경기</h5>
-        ${data.recent
-          .map((e, idx) => {
-            return /*html*/ `
-          <div key=${idx} class="d-flex flex-column">
-          <p style="margin-bottom : 0;">${e.date}</p>
-            <div class="d-flex gap-1">
-              <p>vs ${e.partner}</p>
-              <p style="${e.result === "win" ? "color: blue;" : "color: red;"}">
-              ${e.result === "win" ? "Win" : "Lose"}</p>
-            </div>
-          </div>
-          `;
-          })
-          .join("")}
-      </div>
-    </div>
+      
 
     <button onclick="changeAvatar()" class="btn btn-primary">아바타 변경</button>
     <button onclick="goHome()" class="btn btn-secondary">Go Home</button>
