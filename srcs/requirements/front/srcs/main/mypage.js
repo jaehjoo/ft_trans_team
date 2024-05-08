@@ -48,9 +48,21 @@ let flag = false;
 
 const MyPage = () => {
   const [data, setData] = useState(null);
+
+  const [hair, setHair] = useState(0);
+  const [eye, setEye] = useState(0);
+  const [face, setFace] = useState(0);
+  const [body, setBody] = useState(0);
+  const [lip, setLip] = useState(0);
+
   if (!flag) {
     myPageFetch().then((data) => {
       setData(data);
+      setHair(data.avatar.hair);
+      setEye(data.avatar.eye);
+      setFace(data.avatar.face);
+      setBody(data.avatar.body);
+      setLip(data.avatar.lip);
       flag = true;
     });
   }
@@ -97,15 +109,9 @@ const MyPage = () => {
   const fightingPercent =
     fightingTotal === 0 ? 0 : Math.floor((fightingWin / fightingTotal) * 100);
 
-  const hair = data ? data.avatar.hair : 0;
-  const eye = data ? data.avatar.eye : 0;
-  const face = data ? data.avatar.face : 0;
-  const body = data ? data.avatar.body : 0;
-  const lip = data ? data.avatar.lip : 0;
-
   return /*html*/ `
-  <div class="w-100 p-4 d-flex gap-2">
-  <div>
+  <div class="w-100 p-4 d-flex gap-2 justify-content-center">
+  <div class="w-50">
     <h1>${data ? data.user.displayname : ""} 님</h1>
     <div class="d-flex flex-column gap-2 w-100 p-4 rounded" style="background-color: #E6E7E8;">
     <h5>대전 기록</h5>
@@ -145,13 +151,15 @@ const MyPage = () => {
 
   </div>
 
-  <div class="w-50 d-flex flex-column justify-content-center align-items-center position-relative">
+  <div class="w-50 d-flex flex-column justify-content-center align-items-center">
     <p>아바타</p>
+    <div class="position-relative d-flex flex-column align-items-center">
     <img src=${`../../img/avatar/face/${face}.png`} alt="avatar" class="img-fluid w-25">
     <img class="w-25 img-fluid" src=${`../../img/avatar/body/${body}.png`} alt="avatar" >
-    <img class="position-absolute img-fluid" src=${`../../img/avatar/hair/${hair}.png`} alt="avatar" style="top : 10rem; width : 25%;">
-    <img class="position-absolute img-fluid" src=${`../../img/avatar/eye/${eye}.png`} alt="avatar" style="top : 12rem; width : 25%;">
-    <img class="position-absolute img-fluid" src=${`../../img/avatar/lip/${lip}.png`} alt="avatar" style="top : 13rem;">
+    <img class="position-absolute img-fluid" src=${`../../img/avatar/hair/${hair}.png`} alt="avatar" style="top : -0.3rem; width : 25%;">
+    <img class="position-absolute img-fluid" src=${`../../img/avatar/eye/${eye}.png`} alt="avatar" style="top : 2rem; width : 25%;">
+    <img class="position-absolute img-fluid" src=${`../../img/avatar/lip/${lip}.png`} alt="avatar" style="top : 4rem; width : 7%;">
+    </div>
   </div>
 
 </div>
