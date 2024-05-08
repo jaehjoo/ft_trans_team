@@ -1,23 +1,6 @@
 import GameModal from "./GameModal.js";
 
-// ccess : access_token, user : { 변경하고 싶은 값을 GET과 동일한 key값으로 value만 변경해서 넣어주세요 }, avatar : { 변경하고 싶은 값을 GET과 동일한 key값으로 value만 변경해서 넣어주세요 }
-
 const ButtonGroup = () => {
-  // const data = {
-  //   access: localStorage.getItem("access_token"),
-  //   avatar: {
-  //     hair: 1,
-  //   },
-  // };
-
-  // user: {
-  //   displayname: "kcw",
-  // },
-
-  // avatar : {
-  //   hair : 1
-  // }
-
   const myPageButton = () => {
     console.log(
       "myPage button clicked!",

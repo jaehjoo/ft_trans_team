@@ -1,38 +1,5 @@
 import { useState } from "../../MyReact.js";
 
-const data = {
-  name: "dkham",
-  record: {
-    OneByOne: {
-      win: 2,
-      lose: 3,
-    },
-    Tournament: {
-      win: 1,
-      lose: 3,
-    },
-  },
-  recent: [
-    {
-      date: "2021-09-01",
-      result: "win",
-      partner: "chanwoki",
-    },
-    {
-      date: "2021-09-02",
-      result: "lose",
-      partner: "chanwoki",
-    },
-    {
-      date: "2021-09-03",
-      result: "win",
-      partner: "chanwoki",
-    },
-  ],
-};
-
-let myName = "";
-
 const myPageFetch = async () => {
   const access = localStorage.getItem("access_token") || "null";
   const response = await fetch(`/api/info?access=${access}`, {
@@ -42,6 +9,25 @@ const myPageFetch = async () => {
   const data = await response.json();
   console.log(data);
   return data;
+};
+
+const avatarChange = async (data) => {
+  try {
+    const response = await fetch(`/api/info`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": localStorage.getItem("csrf_token"),
+      },
+      body: JSON.stringify(data),
+    });
+
+    window.location.pathname = "/mypage";
+  } catch (e) {
+    console.log(e);
+    localStorage.clear();
+    window.location.pathname = "/login";
+  }
 };
 
 let flag = false;
@@ -54,6 +40,8 @@ const MyPage = () => {
   const [face, setFace] = useState(0);
   const [body, setBody] = useState(0);
   const [lip, setLip] = useState(0);
+
+  const [form, setForm] = useState(false);
 
   if (!flag) {
     myPageFetch().then((data) => {
@@ -71,8 +59,23 @@ const MyPage = () => {
     window.location.pathname = "/main";
   };
 
-  const changeAvatar = () => {
-    alert("아바타 변경");
+  const changeAvatar = (event) => {
+    event.preventDefault();
+    setForm(!form);
+
+    if (form) {
+      const data = {
+        access: localStorage.getItem("access_token"),
+        avatar: {
+          hair: event.target.hair.value,
+          eye: event.target.eye.value,
+          face: event.target.face.value,
+          body: event.target.body.value,
+          lip: event.target.lip.value,
+        },
+      };
+      avatarChange(data);
+    }
   };
 
   const deleteAccount = async () => {
@@ -120,8 +123,95 @@ const MyPage = () => {
     (${fightingPercent}%) Rating : ${fightingRating}</p>
 
       
+    ${
+      form
+        ? /*html*/ `
+    <form class="d-flex flex-column gap-2 justify-content-center align-items-center mt-2 mb-2" onsubmit="changeAvatar(event)">
 
-    <button onclick="changeAvatar()" class="btn btn-primary">아바타 변경</button>
+    <p>hair</p>
+    <div class="d-flex gap-2">
+      <input type="radio" name="hair" value="0" ${
+        hair === 0 ? "checked" : ""
+      }>0</input>
+      <input type="radio" name="hair" value="1" ${
+        hair === 1 ? "checked" : ""
+      }>1</input>
+      <input type="radio" name="hair" value="2" ${
+        hair === 2 ? "checked" : ""
+      }>2</input>
+      <input type="radio" name="hair" value="3" ${
+        hair === 3 ? "checked" : ""
+      }>3</input>
+    </div>
+
+    <p>eye</p>
+    <div class="d-flex gap-2">
+      <input type="radio" name="eye" value="0" ${
+        eye === 0 ? "checked" : ""
+      }>0</input>
+      <input type="radio" name="eye" value="1" ${
+        eye === 1 ? "checked" : ""
+      }>1</input>
+      <input type="radio" name="eye" value="2" ${
+        eye === 2 ? "checked" : ""
+      }>2</input>
+      <input type="radio" name="eye" value="3" ${
+        eye === 3 ? "checked" : ""
+      }>3</input>
+    </div>
+
+    <p>lip</p>
+    <div class="d-flex gap-2">
+      <input type="radio" name="lip" value="0" ${
+        lip === 0 ? "checked" : ""
+      }>0</input>
+      <input type="radio" name="lip" value="1" ${
+        lip === 1 ? "checked" : ""
+      }>1</input>
+      <input type="radio" name="lip" value="2" ${
+        lip === 2 ? "checked" : ""
+      }>2</input>
+      <input type="radio" name="lip" value="3" ${
+        lip === 3 ? "checked" : ""
+      }>3</input>
+    </div>
+
+    <p>face</p>
+    <div class="d-flex gap-2">
+      <input type="radio" name="face" value="0" ${
+        face === 0 ? "checked" : ""
+      }>0</input>
+      <input type="radio" name="face" value="1" ${
+        face === 1 ? "checked" : ""
+      }>1</input>
+      <input type="radio" name="face" value="2" ${
+        face === 2 ? "checked" : ""
+      }>2</input>
+    </div>
+
+    <p>body</p>
+    <div class="d-flex gap-2">
+      <input type="radio" name="body" value="0" ${
+        body === 0 ? "checked" : ""
+      }>0</input>
+      <input type="radio" name="body" value="1" ${
+        body === 1 ? "checked" : ""
+      }>1</input>
+      <input type="radio" name="body" value="2" ${
+        body === 2 ? "checked" : ""
+      }>2</input>
+    </div>
+
+    <div>
+      <button type="submit" class="btn btn-primary">change !!</button>
+    </div>
+  </form>
+    `
+        : ""
+    }
+
+
+    <button onclick="changeAvatar(event)" class="btn btn-primary">아바타 변경</button>
     <button onclick="goHome()" class="btn btn-secondary">Go Home</button>
     
 
