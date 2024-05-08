@@ -2,8 +2,22 @@ import { useState } from "../../../MyReact.js";
 
 const ModalContent = () => {
   const handleClick = (text) => {
-    console.log(text, "you should remove event listener here");
-    window.location.href = `/game/${text}`;
+    switch (text) {
+      case "1v1":
+        window.location.href = "/pingpong/onebyone";
+        break;
+      case "2v2":
+        window.location.href = "/pingpong/twobytwo";
+        break;
+      case "tournament":
+        window.location.href = "/pingpong/tournament";
+        break;
+      case "fighting":
+        window.location.href = "/fighting";
+        break;
+      default:
+        break;
+    }
   };
 
   window.modalHandleClick = handleClick;
@@ -20,6 +34,7 @@ const ModalContent = () => {
         <button type="button" class="btn btn-primary w-100" onclick="modalHandleClick('1v1')">1 VS 1</button>
         <button type="button" class="btn btn-primary w-100" onclick="modalHandleClick('2v2')">2 VS 2</button>
         <button type="button" class="btn btn-primary w-100" onclick="modalHandleClick('tournament')">Tournament</button>
+        <button type="button" class="btn btn-primary w-100" onclick="modalHandleClick('fighting')">Fighting Game</button>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

@@ -16,7 +16,11 @@ export const URL = "https://transcendence.kgnj.kr";
 
 export const App = () => {
   if (window.location.pathname === "/") {
-    window.location.pathname = "/login";
+    if (localStorage.getItem("access_token") === null) {
+      window.location.pathname = "/login";
+    } else {
+      window.location.pathname = "/main";
+    }
   }
 
   if (window.location.pathname === "/login") {
@@ -56,10 +60,6 @@ export const App = () => {
     return `${MainLayout(MainPage)}`;
   } else if (window.location.pathname === "/mypage") {
     return `${MypageLayout(MyPage)}`;
-  } else if (window.location.pathname === "/game/1v1") {
-    return `${LobbyLayout(OneVersusOne)}`;
-  } else if (window.location.pathname === "/game/tournament") {
-    return `${LobbyLayout(TournamentLobby)}`;
   } else if (window.location.pathname === "/game/result") {
     return `${LobbyLayout(GameResult)}`;
   } else if (window.location.pathname === "/pingpong/onebyone") {
