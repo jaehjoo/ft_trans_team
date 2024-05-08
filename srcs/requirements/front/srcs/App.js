@@ -5,8 +5,6 @@ import FaPage from "./login/2fa.js";
 import MainPage from "./main/main.js";
 import LobbyLayout from "./lobby/layout.js";
 import MyPage from "./main/mypage.js";
-import OneVersusOne from "./lobby/1vs1.js";
-import TournamentLobby from "./lobby/Tournament.js";
 import GameResult from "./lobby/result.js";
 import PingPong from "./pongGames/pingpong.js";
 import Fighting from "./fightingGames/fighting.js";

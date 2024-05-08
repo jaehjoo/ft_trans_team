@@ -5,10 +5,16 @@ import Friends from "./_components/Friends.js";
 const mainFetch = async () => {
   const access = localStorage.getItem("access_token") || "null";
   const refresh = localStorage.getItem("refresh_token") || "null";
-  const response = await fetch(`/api/main?access=${access}&refresh=${refresh}`);
-  const data = await response.json();
-
-  return data;
+  try {
+    const response = await fetch(
+      `/api/main?access=${access}&refresh=${refresh}`
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    localStorage.clear();
+    window.location.href = "/";
+  }
 };
 
 let name = "";
