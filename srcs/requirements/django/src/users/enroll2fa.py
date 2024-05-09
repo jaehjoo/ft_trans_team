@@ -60,10 +60,10 @@ def send_email(request):
         return False
     email = user.email
     code = random_key(6)
-    subject = "transcendence.kgnj.kr 2fa 코드"							# 타이틀
-    to = [email]					# 수신할 이메일 주소
-    from_email = "wnwoduq@naver.com"			# 발신할 이메일 주소
-    message = "아래 코드를 입력해주세요\n" + code					# 본문 내용
+    subject = "transcendence.kgnj.kr 2fa 코드"
+    to = [email]
+    from_email = "wnwoduq@naver.com"
+    message = "아래 코드를 입력해주세요\n" + code
     EmailMessage(subject=subject, body=message, to=to, from_email=from_email).send()
     enroll_key(name, code, 1, "")
     return True

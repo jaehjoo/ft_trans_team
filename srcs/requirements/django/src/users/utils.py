@@ -1,4 +1,5 @@
 import string, random, json, logging
+from django.http import JsonResponse
 from users.jwt import decode_access
 
 logger = logging.getLogger(__name__)
@@ -10,7 +11,7 @@ def refresh_get_exp(request):
 		access = json.loads(request.body).get('refresh', None)
 	else:
 		access = None
-	if access is None:
+	if access == None:
 		return None
 	payload = decode_access(access)
 	name = payload.get('exp', None)
@@ -23,7 +24,7 @@ def refresh_get_name(request):
 		access = json.loads(request.body).get('refresh', None)
 	else:
 		access = None
-	if access is None:
+	if access == None:
 		return None
 	payload = decode_access(access)
 	name = payload.get('user', None)
@@ -36,7 +37,7 @@ def access_get_exp(request):
 		access = json.loads(request.body).get('access', None)
 	else:
 		access = None
-	if access is None:
+	if access == None:
 		return None
 	payload = decode_access(access)
 	name = payload.get('exp', None)
@@ -50,14 +51,14 @@ def access_get_name(request):
 		access = json.loads(request.body).get('access', None)
 	else:
 		access = None
-	if access is None:
+	if access == None:
 		return None
 	payload = decode_access(access)
 	name = payload.get('user', None)
 	return name
 
 def access_token_get_name(access):
-	if access is None:
+	if access == None:
 		return None
 	payload = decode_access(access)
 	name = payload.get('user', None)
@@ -78,3 +79,56 @@ def random_key(digits):
 	ascii_str = string.ascii_letters
 	res = "".join(random.choices(ascii_str,k=len))
 	return res
+
+def jsonMessage(success, message, content):
+	return JsonResponse(
+		{
+			'success' : success,
+			'message' : message,
+			'content' : content,
+		}
+	)
+
+def jsonAvatarMessage(user, avatar, ponggame_record, fightinggame_record):
+	return JsonResponse(
+				{
+					'user' : {
+						'displayname' : user.display_name,
+						'email' : user.email,
+					},
+					'avatar' : {
+						'hair' : avatar.hair,
+						'eye' : avatar.eye,
+						'lip' : avatar.lip,
+						'face' : avatar.face,
+						'body' : avatar.body,
+					},
+					'ponggame_record' : {
+						'win' : ponggame_record.win,
+						'lose' : ponggame_record.lose,
+						'rating' : ponggame_record.rating
+					},
+					'fightinggame_record' : {
+						'win' : fightinggame_record.win,
+						'lose' : fightinggame_record.lose,
+						'rating' : fightinggame_record.rating
+					}
+				}
+			)
+
+def jsonUserMessage(user, avatar):
+	return JsonResponse(
+		{
+			'user' : {
+				'displayname' : user.display_name,
+				'email' : user.email,
+			},
+			'avatar' : {
+				'hair' : avatar.hair,
+				'eye' : avatar.eye,
+				'lip' : avatar.lip,
+				'face' : avatar.face,
+				'body' : avatar.body,
+			},
+		}
+	)

@@ -4,7 +4,7 @@ from django.middleware.csrf import get_token
 from datetime import datetime
 from users.models import User, UserAvatar, UserKey, UserRecordFriends, UserRecordPongGame, UserRecordFightingGame
 from users import jwt, enroll42, enroll2fa
-from users.utils import access_get_name, access_get_exp, refresh_get_exp, refresh_get_name
+from users.utils import access_get_name, access_get_exp, refresh_get_exp, refresh_get_name, jsonMessage, jsonAvatarMessage, jsonUserMessage
 from users.changevalue import change_user_value, change_avatar_value
 
 logger = logging.getLogger(__name__)
@@ -43,12 +43,7 @@ def auth_42(request):
 # GET : 들어온 jwt 토큰 및 42 인가 코드 확인
 def login(request):
 	if request.method == 'POST':
-		return JsonResponse(
-			{
-				'success' : 'N',
-				'message' : 'fail.login.nopost',
-			}
-		)
+		return jsonMessage("N", "fail.login.nopost", None)
 	name = auth_token(request, 'access')
 	if name:
 		user = User.objects.get(username=name)
@@ -56,35 +51,12 @@ def login(request):
 		has2fa = key.auth2fa
 		if has2fa:
 			csrftoken = get_token(request)
-			return JsonResponse(
-				{
-					'success' : 'Y',
-					'message' : 'success.login.already',
-					'content' : {
-						'csrftoken' : csrftoken,
-						'name' : name
-					}
-				}
-			)
+			return jsonMessage("Y", "success.login.already", {'csrftoken' : csrftoken, 'name' : name})
 	user = auth_42(request)
 	if user:
 		csrftoken = get_token(request)
-		return JsonResponse(
-			{
-				'success' : 'Y',
-				'content' : {
-					'access' : jwt.generate_access(user),
-					'refresh' : jwt.generate_refresh(user),
-					'csrftoken' : csrftoken,
-				}
-			}
-		)
-	return JsonResponse(
-		{
-			'success' : 'N',
-			'meesage' : 'fail.auth.42',
-		}
-	)
+		return jsonMessage("Y", None, {"access" : jwt.generate_access(user), "refresh" : jwt.generate_refresh(user), "csrftoken" : csrftoken})
+	return jsonMessage("N", "fail.auth.42", None)
 
 # 가장 처음 불러올 api
 # GET : 로그인 여부 확인하고 답장 보냄 
@@ -97,74 +69,32 @@ def main(request):
 			key = UserKey.objects.get(me=user)
 			has2fa = key.auth2fa
 			if has2fa:
-				return JsonResponse( 
-					{
-						"success" : "Y",
-						"content" : {
-							"name" : access
-						}
-					}
-				)
+				return jsonMessage("Y", None, {"name" : access})
 		elif refresh:
 			user_obj = User.objects.get(username=refresh.get('name'))
 			if user_obj:
-				return JsonResponse(
-					{
-						"success" : "N",
-						'message' : 'fail.auth.access',
-						"content" : {
-							'access' : jwt.generate_access(user_obj)
-						}
-					}
-				)
-	return JsonResponse(
-		{
-			"success" : "N",
-			"message" : "fail.auth.all",
-		}
-	)
+				return jsonMessage("N", "fail.auth.access", {"access" : jwt.generate_access(user_obj)})
+	return jsonMessage("N", "fail.auth.all", None)
 
 # 2차 인증 시도
 # POST : 토큰 값과 선택한 2차 인증을 확인하고 코드를 전송
 def TwoFactor(request):
 	if request.method == 'GET':
-		return JsonResponse(
-			{
-				'success' : 'N',
-				'message' : 'fail.auth.2fa',
-			}
-		)
+		return jsonMessage("N", "fail.auth.2fa", None)
 	content = json.loads(request.body)
 	if content.get('email', None):
 		if enroll2fa.send_email(request):
-			return JsonResponse(
-				{
-					'success' : 'Y',
-				}
-			)
+			return jsonMessage("Y", None, None)
 	elif content.get('sms', None):
 		sms = content.get('sms')
 		data = enroll2fa.send_sms(request, sms)
 		if data:
-			return JsonResponse(
-				{
-					'success' : 'Y',
-				}
-			)
+			return jsonMessage("Y", None, None)
 	elif content.get('otp', None):
 		data = enroll2fa.send_otp(request)
 		if data:
-			return JsonResponse(
-				{
-					'success' : 'Y',
-				}
-			)
-	return JsonResponse(
-		{
-			'success' : "N",
-			'message' : 'fail.response.2fa',
-		}
-	)
+			return jsonMessage("Y", None, None)
+	return jsonMessage("N", "fail.response.2fa", None)
 
 # 2차 인증 코드 확인
 # POST : 받은 코드를 확인해서 성공 여부 반환
@@ -172,73 +102,29 @@ def inputTwoFactor(request):
 	if request.method == 'POST':
 		return enroll2fa.check_code_2fa(request)
 	else:
-		JsonResponse(
-			{
-				'success' : 'N',
-				'message' : 'fail.auth.2fa',
-			}
-		)
+		jsonMessage("N", "fail.auth.2fa", None)
 
 # 사용자 정보를 출력
 # GET : 사용자 정보 전달
 # POST : 사용자 정보 변경(user : {user_parameter}, avatar : {avatar_parameter})
 def info(request):
 	name = access_get_name(request)
-	if name is None:
-		return JsonResponse(
-			{
-				'success' : 'N',
-				'message' : 'fail.info',
-			}
-		)
+	if name == None:
+		return jsonMessage("N", "fail.info", None)
 	user = User.objects.get(username=name)
 	key = UserKey.objects.get(me=user)
 	has2fa = key.auth2fa
 	if has2fa == 0:
-		return JsonResponse(
-			{
-				'success' : 'N',
-				'message' : 'fail.nhave.2fa'
-			}
-		)
+		return jsonMessage("N", "fail.nhave.2fa", None)
 	if request.method == 'GET':
 		try:
 			user = User.objects.get(username=name)
 			avatar = UserAvatar.objects.get(me=user)
 			ponggame_record = UserRecordPongGame.objects.get(me=user)
 			fightinggame_record = UserRecordFightingGame.objects.get(me=user)
-			return JsonResponse(
-				{
-					'user' : {
-						'displayname' : user.display_name,
-						'email' : user.email,
-					},
-					'avatar' : {
-						'hair' : avatar.hair,
-						'eye' : avatar.eye,
-						'lip' : avatar.lip,
-						'face' : avatar.face,
-						'body' : avatar.body,
-					},
-					'ponggame_record' : {
-						'win' : ponggame_record.win,
-						'lose' : ponggame_record.lose,
-						'rating' : ponggame_record.rating
-					},
-					'fightinggame_record' : {
-						'win' : fightinggame_record.win,
-						'lose' : fightinggame_record.lose,
-						'rating' : fightinggame_record.rating
-					}
-				}
-			)
+			return jsonAvatarMessage(user, avatar, ponggame_record, fightinggame_record)
 		except User.DoesNotExist:
-			return JsonResponse(
-				{
-					'success' : 'N',
-					'message' : 'fail.search.user',
-				}
-			)
+			return jsonMessage("N", "fail.search.user", None)
 	elif request.method == 'POST':
 		try:
 			user = User.objects.get(username=name)
@@ -247,67 +133,28 @@ def info(request):
 			user_val = change_user_value(user, change_value.get('user', None))
 			ava_val = change_avatar_value(avatar, change_value.get('avatar', None))
 			if user_val or ava_val:
-				return JsonResponse(
-					{
-						'user' : {
-							'displayname' : user.display_name,
-							'email' : user.email,
-						},
-						'avatar' : {
-							'hair' : avatar.hair,
-							'eye' : avatar.eye,
-							'lip' : avatar.lip,
-							'face' : avatar.face,
-							'body' : avatar.body,
-						},
-					}
-				)
+				return jsonUserMessage(user, avatar)
 		except User.DoesNotExist:
-			return JsonResponse(
-				{
-					'success' : 'N',
-					'message' : 'fail.search.user',				
-				}
-			)
-	return JsonResponse(
-		{
-			'success' : 'N',
-			'message' : 'fail.user',			
-		}
-	)		
+			return jsonMessage("N", "fail.search.user", None)
+	return jsonMessage("N", "fail.user", None)
 
 # 친구 정보를 출력
 # GET : 친구 정보를 전송
 # POST : mode is add(친구를 추가) or del(친구 삭제)
 def friends(request):
 	name = access_get_name(request)
-	if name is None:
-		return JsonResponse(
-			{
-				'success' : 'N',
-				'message' : 'fail.get.friends',
-			}
-		)
+	if name == None:
+		return jsonMessage("N", "fail.get.friends", None)
 	user = User.objects.get(username=name)
 	key = UserKey.objects.get(me=user)
 	has2fa = key.auth2fa
 	if has2fa == 0:
-		return JsonResponse(
-			{
-				'success' : 'N',
-				'message' : 'fail.nhave.2fa'
-			}
-		)
+		return jsonMessage("N", "fail.nhave.2fa", None)
 	if request.method == 'GET':
 		try:
 			user = User.objects.get(username=name)
 		except User.DoesNotExist:
-			return JsonResponse(
-				{
-					'success' : 'N',
-					'message' : 'fail.user.dosenotexist',
-				}
-			)
+			return jsonMessage("N", "fail.user.doexnotexist", None)
 		friends_dict = {}
 		user_friends = user.friends.all()
 		tmp_idx = 0
@@ -329,22 +176,12 @@ def friends(request):
 			logger.error(total)
 			return JsonResponse(total)
 		else:
-			return JsonResponse(
-				{
-					'success' : 'Y',
-					'message' : 'fail.friends.None',
-				}
-			)
+			return jsonMessage("Y", "fail.frineds.None", None)
 	elif request.method == 'POST':
 		try:
 			user = User.objects.get(username=name)
 		except User.DoesNotExist:
-			return JsonResponse(
-				{
-					'success' : 'N',
-					'message' : 'fail.user.doesnotexist',
-				}
-			)
+			return jsonMessage("N", "fail.user.doexnotexist", None)
 		mode = json.loads(request.body).get('mode', None)
 		if mode == 'add':
 			friend_name = json.loads(request.body).get('friend_name')
@@ -352,64 +189,32 @@ def friends(request):
 				friend = User.objects.get(username=friend_name)
 				user_add_friend = UserRecordFriends(me=user, friends=friend)
 				user_add_friend.save()
-				return JsonResponse(
-					{
-						'success' : 'Y',
-					}
-				)
+				return jsonMessage("Y", None, None)
 			except User.DoesNotExist:
-				return JsonResponse(
-					{
-						'success' : 'N',
-						'message' : 'fail.find.friend',
-					}
-				)
+				return jsonMessage("N", "fail.find.friend", None)
 		elif mode == 'del':
 			friend_name = json.loads(request.body).get('friend_name')
 			try:
 				friend = User.objects.get(username=friend_name)
 				user_del_friend = UserRecordFriends.objects.get(friends=friend)
 				user_del_friend.delete()
-				return JsonResponse(
-					{
-						'success' : 'Y',
-					}
-				)
+				return jsonMessage("Y", None, None)
 			except User.DoesNotExist:
-				return JsonResponse(
-					{
-						'success' : 'Y',
-					}
-				)
+				return jsonMessage("Y", None, None)
 	else:
-		return JsonResponse(
-			{
-				'success' : 'N',
-				'message' : 'fail.request.method',
-			}
-		)
+		return jsonMessage("N", "fail.request.method", None)
 
 # 사용자 명단을 알려준다
 # GET : 사용자 명단 전달
 def userlist(request):
 	name = access_get_name(request)
-	if name is None:
-		return JsonResponse(
-			{
-				'success' : 'N',
-				'message' : 'fail.list.notUser'
-			}
-		)
+	if name == None:
+		return jsonMessage("N", "fail.list.notUser", None)
 	user = User.objects.get(username=name)
 	key = UserKey.objects.get(me=user)
 	has2fa = key.auth2fa
 	if has2fa == 0:
-		return JsonResponse(
-			{
-				'success' : 'N',
-				'message' : 'fail.nhave.2fa'
-			}
-		)
+		return jsonMessage("N", "fail.nhave.2fa", None)
 	if request.method == 'GET':
 		userList = {}
 		u_list = User.objects.all()
@@ -424,92 +229,49 @@ def userlist(request):
 		total = {'userList': userList}
 		return JsonResponse(total)
 	else:
-		return JsonResponse(
-			{
-				'success' : 'N',
-				'message' : 'fail.request.method',
-			}
-		)
-
+		return jsonMessage("N", "fail.request.method", None)
 
 # 사용자 접속 종료
 # POST : 사용자 접속 종료
 def logout(request):
 	name = access_get_name(request)
-	if name is None:
-		return JsonResponse(
-			{
-				'success' : 'N',
-				'message' : 'fail.logout.notAccess',
-			}
-		)
+	if name == None:
+		return jsonMessage("N", "fail.logout.notAccess", None)
 	user = User.objects.get(username=name)
 	key = UserKey.objects.get(me=user)
 	has2fa = key.auth2fa
 	if has2fa == 0:
-		return JsonResponse(
-			{
-				'success' : 'N',
-				'message' : 'fail.nhave.2fa'
-			}
-		)
+		return jsonMessage("N", "fail.nhave.2fa", None)
 	if request.method == 'POST':
 		try:
 			is_user = User.objects.get(username=name)
 			is_user.connect = False
 			is_key = UserKey.objects.get(me=is_user)
 			is_key.auth42 = 0
+			is_key.auth2fa = 0
 			is_user.save()
 			is_key.save()
-			return JsonResponse(
-				{
-					'success' : 'Y'
-				}
-			)
+			return jsonMessage("Y", None, None)
 		except User.DoesNotExist:
 			is_user = None
-	return JsonResponse(
-		{
-			'success' : 'N',
-			'message' : 'fail.logout.notUser',
-		}
-	)
+	return jsonMessage("N", "fail.logout.notUser", None)
 
 # 사용자 정보를 영구 제거
 # POST : 제거
 def delete(request):
 	name = access_get_name(request)
-	if name is None:
-		return JsonResponse(
-			{
-				'success' : 'N',
-				'message' : 'fail.delete.notAccess',
-			}
-		)
+	if name == None:
+		return jsonMessage("N", "fail.delete.nptAccess", None)
 	user = User.objects.get(username=name)
 	key = UserKey.objects.get(me=user)
 	has2fa = key.auth2fa
 	if has2fa == 0:
-		return JsonResponse(
-			{
-				'success' : 'N',
-				'message' : 'fail.nhave.2fa'
-			}
-		)
+		return jsonMessage("N", "fail.nhave.2fa", None)
 	if request.method == 'POST':
 		try:
 			is_user = User.objects.get(username=name)
 			is_user.delete()
-			return JsonResponse(
-				{
-					'success' : 'Y',
-				}
-			)
+			return jsonMessage("Y", None, None)
 		except User.DoesNotExist:
 			is_user = None
-	return JsonResponse(
-		{
-			'success' : 'N',
-			'message' : 'fail.delete.notUser',
-		}
-	)
+	return jsonMessage("N", "fail.delete.notUser", None)
