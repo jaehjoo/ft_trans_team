@@ -106,7 +106,7 @@ class Ball:
 
 class Room:
 	mode: str
-	match: str
+	status: str
 	winner: str
 	winner2: str
 	window: Window
@@ -143,11 +143,24 @@ class Room:
 		self.player0 = Player(player0['name'], player0['rating'])
 		self.player1 = Player(player1['name'], player1['rating'])
 
-	def setPlayer(self, player0, player1, player2, player3):
-		self.player0 = Player(player0['name'], player0['rating'])
-		self.player1 = Player(player1['name'], player1['rating'])
-		self.player2 = Player(player2['name'], player2['rating'])
-		self.player3 = Player(player3['name'], player3['rating'])
+	def setPlayer(self, player0, player1, player2, player3, mode):
+
+		players = [player0, player1, player2, player3]
+
+		players_with_rating = [(player, player['rating']) for player in players]
+
+		sorted_players = sorted(players_with_rating, key=lambda x: x[1])
+
+		if mode == "two":
+			self.player0 = Player(sorted_players[0][0]['name'], sorted_players[0][0]['rating'])
+			self.player1 = Player(sorted_players[3][0]['name'], sorted_players[3][0]['rating'])
+			self.player2 = Player(sorted_players[1][0]['name'], sorted_players[1][0]['rating'])
+			self.player3 = Player(sorted_players[2][0]['name'], sorted_players[2][0]['rating'])
+		elif mode == "tournament":
+			self.player0 = Player(sorted_players[0][0]['name'], sorted_players[0][0]['rating'])
+			self.player1 = Player(sorted_players[1][0]['name'], sorted_players[1][0]['rating'])
+			self.player2 = Player(sorted_players[2][0]['name'], sorted_players[2][0]['rating'])
+			self.player3 = Player(sorted_players[3][0]['name'], sorted_players[3][0]['rating'])
 	
 	def setBarLocation(self, x1, y1, x2, y2):
 		self.player0bar.set_bar(x1, y1)
@@ -293,7 +306,22 @@ class Room:
 				self.winner = self.player2.name
 				self.winner2 = self.player3.name
 		else:
-			if self.score.ONE > self.score.TWO and self.score.ONE == self.score.WIN:
-				self.winner = self.player0.name
-			elif self.score.TWO > self.score.TWO and self.score.TWO == self.score.WIN:
-				self.winner = self.player1.name
+			if self.status == "match1":
+				if self.score.ONE > self.score.TWO and self.score.ONE == self.score.WIN:
+					self.winner = self.player0.name
+				elif self.score.TWO > self.score.TWO and self.score.TWO == self.score.WIN:
+					self.winner = self.player1.name
+			elif self.status == "match2":
+				self.player0 = self.player2
+				self.player1 = self.player3
+				if self.score.ONE > self.score.TWO and self.score.ONE == self.score.WIN:
+					self.winner = self.player0.name
+				elif self.score.TWO > self.score.TWO and self.score.TWO == self.score.WIN:
+					self.winner = self.player1.name
+			elif self.status == "match3":
+				self.player0 = self.winner
+				self.player1 = self.winner2
+				if self.score.ONE > self.score.TWO and self.score.ONE == self.score.WIN:
+					self.winner = self.player0.name
+				elif self.score.TWO > self.score.TWO and self.score.TWO == self.score.WIN:
+					self.winner = self.player1.name

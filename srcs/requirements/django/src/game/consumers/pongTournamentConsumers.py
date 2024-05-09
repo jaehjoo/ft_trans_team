@@ -83,18 +83,15 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
         data = json.loads(text_data)
         msg_type = data.get('type')
         msg_data = data.get('data', [])
-        # 연결 후에 웹소켓에서 플레이어 정보를 보낸다
+
         if msg_type == "set.game":
             cnt = await self.db_cnt()
             room = await self.get_room()
-            if cnt == 1 and room == None:
-                setattr(self.RoomList, self.game_group_name, Room("one"))
-                room = await self.get_room()
-                room.setPlayer({"name": msg_data['player0'], "rating": 0}, {"name": msg_data['player1'], "rating": 0})
-            if cnt == 2 and room != None:
+            # 첫 번째 매치
+            if cnt == 4 and room != None and room.winner == "":
                 await self.channel_layer.group_send(
                     self.game_group_name, {
-                        "type" : 'game.message',
+                        "type" : "game.message",
                         "data" : {
                             "mode" : "game.start",
                             "player0" : {"x" : room.player0bar.x, "y" : room.player0bar.y},
@@ -105,18 +102,49 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
                     }
                 )
                 asyncio.create_task(self.game_update_task())
-        # 각 플레이어들의 탁구채 위치 정보. 정보를 받으면 최신화
-        if msg_type == 'bar.info':
-            room = await self.get_room()
-            if msg_data['name'] == room.player0.name:
-                room.player0bar.up = msg_data['up']
-                room.player0bar.down = msg_data['down']
+                if msg_type == 'bar.info':
+                    room = await self.get_room()
+                    if msg_data['name'] == room.player0.name:
+                        room.player0bar.up = msg_data['up']
+                        room.player0bar.down = msg_data['down']
+                    else:
+                        room.player1bar.up = msg_data['up']
+                        room.player1bar.down = msg_data['down']
+
+                if msg_type == "game.clear":
+                    self.disconnect(1000)
+
+    async def game_update_task(self):
+        await asyncio.sleep(2.1)
+        room = getattr(self.RoomList, self.game_group_name)
+
+        while True:
+            await asyncio.sleep(0.01)
+            room.update()
+            if room.winner != "":
+                await self.channel_layer.group_send(
+                    self.game_group_name, {
+                        "type" : "game.message",
+                        "data" : {
+                            "mode" : "game.complete",
+                            "winner" : room.winner,
+                        }
+                    }
+                )
+                break
             else:
-                room.player1bar.up = msg_data['up']
-                room.player1bar.down = msg_data['down']
-        # 게임이 전부 끝나면 종료한다
-        if msg_type == "game.clear":
-            self.disconnect(1000)
+                await self.channel_layer.group_send(
+                    self.game_group_name, {
+                        "type" : 'game.message',
+                        "data" : {
+                            "mode" : "info.update",
+                            "player0" : {"x" : room.player0bar.x, "y" : room.player0bar.y},
+                            "player1" : {"x" : room.player1bar.x, "y" : room.player1bar.y},
+                            "ball" : {"x" : room.ball.ballX, "y" : room.ball.ballY},
+                            "score" : {"ONE" : room.score.ONE, "TWO" : room.score.TWO},
+                        }
+                    }
+                )
 
     # 매칭 시도
     async def join_matching(self):
@@ -128,7 +156,24 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
                 await self.channel_layer.group_send(self.game_group_name, self.channel_name)
                 await self.channel_layer.group_send("game_queue_tournament", self.channel_name)
             self.game_group_name = name
-            room = await self.get_room()
+            room = await self.get_db_room()
+            if room.status == "playing":
+                await self.matchPlayers(room, room.players[0], room.players[1], room.players[2], room.players[3])
+                await self.channel_layer.group_send(
+                    self.game_group_name, {
+                        "type" : "game.message",
+                        "data" : {
+                            "mode" : "set.game",
+                            "status" : "match1",
+                            "player0" : room.player0,
+                            "player1" : room.player1,
+                            "player2" : room.player2,
+                            "player3" : room.player3,
+                            "group" : self.game_group_name
+                        }
+                    }
+                )
+
 
     @database_sync_to_async
     def get_db_room(self):
@@ -222,7 +267,7 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
         is_room = GameRoom.objects.get(room_name=self.game_group_name)
         cnt = is_room.cnt
         cnt += 1
-        if cnt < 2:
+        if cnt < 4:
             is_room.cnt = cnt
         else:
             is_room.cnt = 0
@@ -241,20 +286,6 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
         players = [""] * 4
         players[0] = self.user_name
         is_room = GameRoom(room_name=self.game_group_name, mode="pingpong", status="waiting", players = players)
-        is_room.save()
-    
-    # 데이터 베이스 게임 방에 플레이어를 넣는다
-    @database_sync_to_async
-    def set_player(self, player_num):
-        is_room = GameRoom.objects.get(room_name=self.game_group_name)
-        if player_num == 0:
-            is_room.player0 = self.user_name
-        elif player_num == 1:
-            is_room.player1 = self.user_name
-        elif player_num == 2:
-            is_room.player2 = self.user_name
-        elif player_num == 3:
-            is_room.player3 = self.user_name
         is_room.save()
     
     # 게임방에 속한 플레이어들을 불러온다
@@ -280,19 +311,10 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
 
                     setattr(self.RoomList, is_room.room_name, Room("two"))
                     room = getattr(self.RoomList, is_room.room_name, None)
-                    room.setPlayer({"name": is_room.players[0], "rating": self.get_rating(is_room.players[0])}, {"name": is_room.players[1], "rating": self.get_rating(is_room.players[1])}, {"name": is_room.players[2], "rating": self.get_rating(is_room.players[2])}, {"name": is_room.players[3], "rating": self.get_rating(is_room.players[3])})
-                
-                    # 레이팅을 기준으로 오름차순으로 정렬
-                    self.matchSet(room)
-
+                    room.setPlayer({"name": is_room.players[0], "rating": self.get_rating(is_room.players[0])}, {"name": is_room.players[1], "rating": self.get_rating(is_room.players[1])}, {"name": is_room.players[2], "rating": self.get_rating(is_room.players[2])}, {"name": is_room.players[3], "rating": self.get_rating(is_room.players[3])}, "tournament")
                 is_room.save()
                 return is_room.room_name
             return "not"
-
-    def matchSet(self, room):
-        players = [room.player0, room.player1, room.player0, room.player1]
-
-        players_with_ratings = [(player, self.get_rating(player)) for player in players]
 
     @database_sync_to_async
     def db_delete(self):

@@ -87,8 +87,6 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
         if msg_type == "set.game":
             cnt = await self.db_cnt()
             room = await self.get_room()
-            if cnt == 1 and room == None:
-                room.setPlayer({"name": msg_data["player0"], "rating": 0}, {"name": msg_data["player1"], "rating": 0}, {"name": msg_data["player2"], "rating": 0}, {"name": msg_data["player3"], "rating": 0})
             if cnt == 4 and room != None:
                 await self.channel_layer.group_send(
                     self.game_group_name, {
@@ -148,25 +146,28 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
                 }
             )
         
+    # 들어갈 수 있는 방을 검색하고 들어간 방의 이름을 알려준다
     @database_sync_to_async
-    def get_db_room(self):
-        return GameRoom.objects.get(room_name=self.game_group_name)
+    async def enter_room(self):
+        with transaction.atomic():
+            is_room = GameRoom.objects.filter(status="waiting").first()
+            if is_room:
+                for i in range(len(is_room.players)):
+                    if not is_room.players[i]:
+                        is_room.players[i] = self.user_name
+                        await self.channel_layer.group_add(is_room.room_name, self.channel_name)
+                        await self.channel_layer.group_discard("game_queue_twobytwo", self.channel_name)
+                        break
 
-    @database_sync_to_async
-    def matchPlayers(self, room, player0, player1, player2, player3):
-        players = [player0, player1, player2, player3]
+                if all(player != "" for player in is_room.players):
+                    is_room.status = "playing"
 
-        players_with_ratings = [(player, self.get_rating(player)) for player in players]
-        
-        # 레이팅을 기준으로 오름차순으로 정렬
-        sorted_players = sorted(players_with_ratings, key=lambda x: x[1])
-        
-        # 정렬된 데이터를 GameRoom 인스턴스의 해당 필드에 할당
-        room.player0, room.player0rating = sorted_players[0][0], sorted_players[0][1]
-        room.player1, room.player1rating = sorted_players[1][0], sorted_players[1][1]
-        room.player2, room.player2rating = sorted_players[2][0], sorted_players[2][1]
-        room.player3, room.player3rating = sorted_players[3][0], sorted_players[3][1]
-        room.save()
+                    setattr(self.RoomList, is_room.room_name, Room("two"))
+                    room = getattr(self.RoomList, is_room.room_name, None)
+                    room.setPlayer({"name": is_room.player0, "rating": 0}, {"name": is_room.player1, "rating": 0}, {"name": is_room.player2, "rating": 0}, {"name": is_room.player3, "rating": 0}, "two")
+                is_room.save()
+                return is_room.room_name
+            return "not"
     
     async def get_room(self):
         return getattr(self.RoomList, self.game_group_name, None)
@@ -245,6 +246,26 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
         is_room.save()
         return cnt
     
+    @database_sync_to_async
+    def get_db_room(self):
+        return GameRoom.objects.get(room_name=self.game_group_name)
+
+    @database_sync_to_async
+    def matchPlayers(self, room, player0, player1, player2, player3):
+        players = [player0, player1, player2, player3]
+
+        players_with_ratings = [(player, self.get_rating(player)) for player in players]
+        
+        # 레이팅을 기준으로 오름차순으로 정렬
+        sorted_players = sorted(players_with_ratings, key=lambda x: x[1])
+        
+        # 정렬된 데이터를 GameRoom 인스턴스의 해당 필드에 할당
+        room.player0, room.player0rating = sorted_players[0][0], sorted_players[0][1]
+        room.player1, room.player1rating = sorted_players[3][0], sorted_players[3][1]
+        room.player2, room.player2rating = sorted_players[1][0], sorted_players[1][1]
+        room.player3, room.player3rating = sorted_players[2][0], sorted_players[2][1]
+        room.save()
+
     # 게임방이 얼마나 있는 지 확인할 때 사용
     @database_sync_to_async
     def get_room_cnt(self):
@@ -259,28 +280,6 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
         is_room = GameRoom(room_name=self.game_group_name, mode="pingpong", status="waiting", players = players)
         is_room.save()
 
-    # 들어갈 수 있는 방을 검색하고 들어간 방의 이름을 알려준다
-    @database_sync_to_async
-    async def enter_room(self):
-        with transaction.atomic():
-            is_room = GameRoom.objects.filter(status="waiting").first()
-            if is_room:
-                for i in range(len(is_room.players)):
-                    if not is_room.players[i]:
-                        is_room.players[i] = self.user_name
-                        await self.channel_layer.group_add(is_room.room_name, self.channel_name)
-                        await self.channel_layer.group_discard("game_queue_twobytwo", self.channel_name)
-                        break
-
-                if all(player != "" for player in is_room.players):
-                    is_room.status = "playing"
-
-                    setattr(self.RoomList, is_room.room_name, Room("two"))
-                    room = getattr(self.RoomList, is_room.room_name, None)
-                    room.setPlayer({"name": is_room.player0, "rating": 0}, {"name": is_room.player1, "rating": 0}, {"name": is_room.player2, "rating": 0}, {"name": is_room.player3, "rating": 0})
-                is_room.save()
-                return is_room.room_name
-            return "not"
 
     @database_sync_to_async
     def db_delete(self):
