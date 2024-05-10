@@ -147,10 +147,9 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
             )
         
     # 들어갈 수 있는 방을 검색하고 들어간 방의 이름을 알려준다
-    @database_sync_to_async
     async def enter_room(self):
         with transaction.atomic():
-            is_room = GameRoom.objects.filter(status="waiting").first()
+            is_room = await database_sync_to_async(GameRoom.objects.filter(status="waiting").first())
             if is_room:
                 for i in range(len(is_room.players)):
                     if not is_room.players[i]:
@@ -165,7 +164,7 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
                     setattr(self.RoomList, is_room.room_name, Room("two"))
                     room = getattr(self.RoomList, is_room.room_name, None)
                     room.setPlayer({"name": is_room.player0, "rating": 0}, {"name": is_room.player1, "rating": 0}, {"name": is_room.player2, "rating": 0}, {"name": is_room.player3, "rating": 0}, "two")
-                is_room.save()
+                await database_sync_to_async(is_room.save())
                 return is_room.room_name
             return "not"
     
