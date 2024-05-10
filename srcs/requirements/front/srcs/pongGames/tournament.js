@@ -101,7 +101,7 @@ export const StartCanvasTournament = () => {
   		  if (textData.data['status'] == "match1") {
 			  scene[1].match1Winner = textData.data['winner'];
         } else if (textData.data['status'] == "match2") {
-          scene[1].match2Winner = textData.data['winner'];
+          scene[1].match2Winner = textData.data['winner2'];
         }
         if ((entities[3].name == yourName || entities[4].name == yourName)
           && textData.data['winner'] != yourName) {

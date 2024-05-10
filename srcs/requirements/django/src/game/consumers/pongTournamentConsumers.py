@@ -89,6 +89,11 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
             room = await self.get_room()
             # 첫 번째 매치
             if cnt == 4 and room != None and room.winner == "":
+                room.status = "match1"
+            elif cnt == 4 and room != None and room.winner != "" and room.winner2 == "":
+                room.status = "match2"
+            elif cnt == 4 and room != None and room.winner2 != "":
+                room.status = "match3"
                 await self.channel_layer.group_send(
                     self.game_group_name, {
                         "type" : "game.message",
@@ -126,7 +131,7 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
                     self.game_group_name, {
                         "type" : "game.message",
                         "data" : {
-                            "mode" : "game.complete",
+                            "mode" : "match.game.complete",
                             "winner" : room.winner,
                         }
                     }
@@ -312,6 +317,7 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
                     setattr(self.RoomList, is_room.room_name, Room("two"))
                     room = getattr(self.RoomList, is_room.room_name, None)
                     room.setPlayer({"name": is_room.players[0], "rating": self.get_rating(is_room.players[0])}, {"name": is_room.players[1], "rating": self.get_rating(is_room.players[1])}, {"name": is_room.players[2], "rating": self.get_rating(is_room.players[2])}, {"name": is_room.players[3], "rating": self.get_rating(is_room.players[3])}, "tournament")
+                    room.status = "match1"
                 is_room.save()
                 return is_room.room_name
             return "not"
