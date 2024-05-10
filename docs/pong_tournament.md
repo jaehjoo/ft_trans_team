@@ -15,6 +15,13 @@ scene[1].match2Winner = textData.data['winner2'];
 ## pongTournamentConsumers.py/"enter_room 함수"
 - 토너먼트 게임 방에 플레이어 4명이 다 차게되면 RoomList에 해당 Room 객체를 넣고 Room 객체 메서드의 setPlayer를 호출해 각 유저의 레이팅을 오름차순으로 정렬해 player0과 player1은 "match1", player2와 player3은 "match2"로 경기가 구성되도록 유도했습니다.
 
+## pongTournamnetConsumers.py/"join_matching 함수"
+- room.winner와 room.winner2의 값 할당 여부를 기준으로 player0과 player1에 들어가는 유저를 다르게 설정했습니다.
+
+## pongTournamentConsumers.py/"game_update_task 함수"
+- 경기가 match1이거나 match3일 때는 "winner" : room.winner를,
+match2일 때는 "winner" : room.winner2를 전달했습니다.
+
 ## 막힌 부분/"receive"
 - 1. msg_type == "set_game"이면 모든 플레이어가 준비가 됐다는 뜻이므로 while loop를 통해 match3까지 세 번 반복하며, 게임이 끝나면 room.status (예시 "match1", "match2", "match3")를 다음 경기로 바꿔주어야 하는지
 

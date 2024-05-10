@@ -164,20 +164,45 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
             room = await self.get_db_room()
             if room.status == "playing":
                 await self.matchPlayers(room, room.players[0], room.players[1], room.players[2], room.players[3])
-                await self.channel_layer.group_send(
-                    self.game_group_name, {
-                        "type" : "game.message",
-                        "data" : {
-                            "mode" : "set.game",
-                            "status" : "match1",
-                            "player0" : room.player0,
-                            "player1" : room.player1,
-                            "player2" : room.player2,
-                            "player3" : room.player3,
-                            "group" : self.game_group_name
+                if room.winner == "":
+                    await self.channel_layer.group_send(
+                        self.game_group_name, {
+                            "type" : "game.message",
+                            "data" : {
+                                "mode" : "set.game",
+                                "status" : "match1",
+                                "player0" : room.player0,
+                                "player1" : room.player1,
+                                "group" : self.game_group_name
+                            }
                         }
-                    }
-                )
+                    )
+                elif room.winner != "" and room.winner2 == "":
+                    await self.channel_layer.group_send(
+                        self.game_group_name, {
+                            "type" : "game.message",
+                            "data" : {
+                                "mode" : "set.game",
+                                "status" : "match2",
+                                "player0" : room.player2,
+                                "player1" : room.player3,
+                                "group" : self.game_group_name
+                            }
+                        }
+                    )
+                elif room.winner2 != "":
+                    await self.channel_layer.group_send(
+                        self.game_group_name, {
+                            "type" : "game.message",
+                            "data" : {
+                                "mode" : "set.game",
+                                "status" : "match3",
+                                "player0" : room.winner,
+                                "player1" : room.winner2,
+                                "group" : self.game_group_name
+                            }
+                        }
+                    )
 
 
     @database_sync_to_async
@@ -239,7 +264,7 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
         while True:
             await asyncio.sleep(0.01)
             room.update()
-            if room.winner != "":
+            if room.winner != "" and room.winner2 != "" or room.winner != "":
                 await self.channel_layer.group_send(
                     self.game_group_name, {
                         "type" : "game.message",
@@ -250,6 +275,15 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
                     }
                 )
                 break
+            elif room.winner2 != "":
+                await self.channel_layer.group_send(
+                    self.game_group_name, {
+                        "type" : "game.message",
+                        "data" : {
+                            "mode" : "game.complete",
+                            "winner" : room.winner2,
+                        }
+                    }
             else:
                 await self.channel_layer.group_send(
                     self.game_group_name, {
