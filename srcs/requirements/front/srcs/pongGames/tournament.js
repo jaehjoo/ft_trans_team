@@ -101,11 +101,23 @@ export const StartCanvasTournament = () => {
   		  if (textData.data['status'] == "match1") {
 			  scene[1].match1Winner = textData.data['winner'];
         } else if (textData.data['status'] == "match2") {
-          scene[1].match2Winner = textData.data['winner2'];
+          scene[1].match2Winner = textData.data['winner'];
+        } else if (textData.data['status'] == "match3") {
+          scene[1].match3Winner = textData.data['winner'];
         }
-        if ((entities[3].name == yourName || entities[4].name == yourName)
-          && textData.data['winner'] != yourName) {
-          flag.FINAL = true;
+        if (entities[3].name == yourName || entities[4].name == yourName) {
+          if (textData.data['winner'] != yourName)
+            flag.FINAL = true;
+          else if (textData.data['status'] == "match1" || textData.data['status'] == "match2") {
+            ws.send(
+              JSON.stringify({
+                type: "next.game",
+                data: {
+                  name: yourName,
+                },
+              })
+            )
+          }
         }
       }	else if (textData.data.mode == "game.complete") {
         flag.FINAL = true;
