@@ -87,7 +87,7 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
         if msg_type == "set.game":
             cnt = await self.db_cnt()
             room = await self.get_room()
-            # 첫 번째 매치
+
             if cnt == 4 and room != None and room.winner == "":
                 room.status = "match1"
             elif cnt == 4 and room != None and room.winner != "" and room.winner2 == "":
@@ -132,6 +132,7 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
                         "type" : "game.message",
                         "data" : {
                             "mode" : "match.game.complete",
+                            "status"  : room.status,
                             "winner" : room.winner,
                         }
                     }
@@ -284,6 +285,7 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
                             "winner" : room.winner2,
                         }
                     }
+                )
             else:
                 await self.channel_layer.group_send(
                     self.game_group_name, {
@@ -366,21 +368,6 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
         is_user = User.objects.get(username=name)
         record = UserRecordPongGame.objects.get(me=is_user)
         return record.rating
-    
-    @database_sync_to_async
-    def rating_check(self, group_name):
-        is_room = GameRoom.objects.get(room_name=group_name)
-        if is_room.player0rating > self.rating + self.rating_difference or is_room.player0rating < self.rating - self.rating_difference:
-            return False
-        return True
-    
-    @database_sync_to_async
-    def room_depart(self):
-        is_room = GameRoom.objects.get(room_name=self.game_group_name)
-        is_room.status = "waiting"
-        is_room.save()
-        self.game_group_name = ""
-
     
     @database_sync_to_async
     def set_rating(self, player0Info, player1Info, winner):
