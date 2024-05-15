@@ -79,7 +79,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
                     }
                 )
                 await self.channel_layer.group_discard(self.game_group_name, self.channel_name)
-        self.close()
+        await self.close()
 
     async def receive(self, text_data):
         data = json.loads(text_data)
@@ -107,6 +107,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
                     }
                 )
                 asyncio.create_task(self.game_update_task())
+                
         # 각 플레이어들의 탁구채 위치 정보. 정보를 받으면 최신화
         if msg_type == 'bar.info':
             class_room = await self.get_class_room()

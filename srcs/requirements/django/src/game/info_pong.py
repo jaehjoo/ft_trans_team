@@ -138,12 +138,11 @@ class Room:
 			self.player0bar = Bar(self.window.width / 60, self.window.height / 7, self.window.width / 50, self.window.height / 2 - self.window.height / 14)
 			self.player1bar = Bar(self.window.width / 60, self.window.height / 7, self.window.width / 50 * 48 + 3, self.window.height / 2 - self.window.height / 14)	
 
-
 	def setPlayerOneByOne(self, player0, player1):
 		self.player0 = Player(player0['name'], player0['rating'])
 		self.player1 = Player(player1['name'], player1['rating'])
 
-	def setPlayer(self, player0, player1, player2, player3, mode):
+	def setPlayersByMode(self, player0, player1, player2, player3, mode):
 
 		players = [player0, player1, player2, player3]
 
