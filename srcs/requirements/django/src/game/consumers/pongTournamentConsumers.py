@@ -335,10 +335,9 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
         is_room = GameRoom.objects.get(room_name=self.game_group_name)
         return {"player0": is_room.player0, "player1": is_room.player1}
     
-    @database_sync_to_async
     async def enter_room(self):
         with transaction.atomic():
-            is_room = GameRoom.objects.filter(status="waiting").first()
+            is_room = database_sync_to_async(GameRoom.objects.filter(status="waiting").first())
             if is_room:
                 for i in range(len(is_room.players)):
                     if not is_room.players[i]:
