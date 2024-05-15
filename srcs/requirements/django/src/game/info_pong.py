@@ -175,9 +175,6 @@ class Room:
 	def setScore(self, ONE, TWO):
 		self.score.setScore(ONE, TWO)
 	
-	def setWinner(self, winner):
-		self.winner = winner
-	
 	def setplayer0barState(self, state, value):
 		if state == "up":
 			self.player0bar.up = value
@@ -298,30 +295,15 @@ class Room:
 	def checkScore(self):
 		if self.score.ONE == self.score.TWO and self.score.ONE > 9:
 			self.score.WIN = self.score.ONE + 2
-		if self.mode == "two":
+		if self.mode == "one":
+			if self.score.ONE > self.score.TWO and self.score.ONE == self.score.WIN:
+				self.winner = self.player0.name
+			elif self.score.ONE < self.score.TWO and self.score.TWO == self.score.WIN:
+				self.winner = self.player1.name
+		elif self.mode == "two":
 			if self.score.ONE > self.score.TWO and self.score.ONE == self.score.WIN:
 				self.winner = self.player0.name
 				self.winner2 = self.player1.name
 			elif self.score.TWO > self.score.TWO and self.score.TWO == self.score.WIN:
 				self.winner = self.player2.name
 				self.winner2 = self.player3.name
-		else:
-			if self.status == "match1":
-				if self.score.ONE > self.score.TWO and self.score.ONE == self.score.WIN:
-					self.winner = self.player0.name
-				elif self.score.TWO > self.score.TWO and self.score.TWO == self.score.WIN:
-					self.winner = self.player1.name
-			elif self.status == "match2":
-				self.player0 = self.player2
-				self.player1 = self.player3
-				if self.score.ONE > self.score.TWO and self.score.ONE == self.score.WIN:
-					self.winner2 = self.player0.name
-				elif self.score.TWO > self.score.TWO and self.score.TWO == self.score.WIN:
-					self.winner2 = self.player1.name
-			elif self.status == "match3":
-				self.player0 = self.winner
-				self.player1 = self.winner2
-				if self.score.ONE > self.score.TWO and self.score.ONE == self.score.WIN:
-					self.winner = self.player0.name
-				elif self.score.TWO > self.score.TWO and self.score.TWO == self.score.WIN:
-					self.winner = self.player1.name
