@@ -20,6 +20,7 @@ export class BattleScene {
 		this.first = true;
 		this.START = true;
 		this.STOP = false;
+		this.FINAL = false;
 		this.next = "result";
 		this.overays = [
 			new StatusBar(),

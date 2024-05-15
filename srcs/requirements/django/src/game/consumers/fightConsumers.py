@@ -275,7 +275,7 @@ class fightingConsumers(AsyncWebsocketConsumer):
     @database_sync_to_async
     def create_room(self):
         self.game_group_name = self.user_name + random_key(6)
-        is_room = GameRoom(room_name=self.game_group_name, mode="fighting", status="waiting", player0=self.user_name, player0displayName=self.display_name)
+        is_room = GameRoom(room_name=self.game_group_name, status="waiting", player0=self.user_name, player0displayName=self.display_name)
         is_room.save()
     
     @database_sync_to_async

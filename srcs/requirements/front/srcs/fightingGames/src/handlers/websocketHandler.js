@@ -8,6 +8,6 @@ export function websocketTerminate(ws) {
 	}
 	ws.onclose = () => {
 		ws.close(1000, "Session End");
-		window.location.href = "/login";
+		window.location.href = "/main";
 	}
 }

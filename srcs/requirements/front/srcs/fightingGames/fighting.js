@@ -6,7 +6,6 @@ const addCanvas = async () => {
 	canvas.width = GameViewport.WIDTH;
 	canvas.hieght = GameViewport.HEIGHT;
 	canvas.style.height = "100%";
-	canvas.style.width = "100%";
 	const body = document.body;
 	body.appendChild(canvas);
 	return "done";

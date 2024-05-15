@@ -7,7 +7,6 @@ const addCanvas = async () => {
   canvas.width = 1024;
   canvas.height = 768;
   canvas.style.height = "100%";
-  canvas.style.width = "100%";
   const body = document.body;
   body.appendChild(canvas);
   return "done";

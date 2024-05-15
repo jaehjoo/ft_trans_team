@@ -10,6 +10,7 @@ export class SelectScene {
 		this.first = true;
 		this.START = true;
 		this.STOP = false;
+		this.FINAL = false;
 		this.next = "battle";
 		this.entities = [
 			new Stage(),

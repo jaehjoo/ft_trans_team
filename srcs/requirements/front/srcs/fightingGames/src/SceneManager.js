@@ -19,7 +19,7 @@ export class SceneManager {
 		if (this.currentScene.FINAL) {
 			this.FINAL = true;
 			window.addEventListener("click", function() {
-				window.location.href = "/login";
+				window.location.href = "/main";
 			}, {once : true})
 			return ;
 		}

@@ -39,7 +39,7 @@ export const StartCanvasTeam = () => {
 
   const access_token = localStorage.getItem('access_token')
   const ws = new WebSocket(
-    "wss://" + window.location.host + "/ws/game/pongonebyone?access=" + access_token
+    "wss://" + window.location.host + "/ws/game/pongtwobytwo?access=" + access_token
   );
 
   let yourName = "";

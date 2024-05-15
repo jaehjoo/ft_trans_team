@@ -145,16 +145,15 @@ def friends(request):
 	name = access_get_name(request)
 	if name == None:
 		return jsonMessage("N", "fail.get.friends", None)
-	user = User.objects.get(username=name)
+	try:
+		user = User.objects.get(username=name)
+	except User.DoesNotExist:
+		return jsonMessage("N", "fail.user.doexnotexist", None)
 	key = UserKey.objects.get(me=user)
 	has2fa = key.auth2fa
 	if has2fa == 0:
 		return jsonMessage("N", "fail.nhave.2fa", None)
 	if request.method == 'GET':
-		try:
-			user = User.objects.get(username=name)
-		except User.DoesNotExist:
-			return jsonMessage("N", "fail.user.doexnotexist", None)
 		friends_dict = {}
 		user_friends = user.friends.all()
 		tmp_idx = 0
@@ -178,10 +177,6 @@ def friends(request):
 		else:
 			return jsonMessage("Y", "fail.frineds.None", None)
 	elif request.method == 'POST':
-		try:
-			user = User.objects.get(username=name)
-		except User.DoesNotExist:
-			return jsonMessage("N", "fail.user.doexnotexist", None)
 		mode = json.loads(request.body).get('mode', None)
 		if mode == 'add':
 			friend_name = json.loads(request.body).get('friend_name')

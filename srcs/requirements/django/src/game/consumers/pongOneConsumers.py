@@ -92,7 +92,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
             if db_count == 1 and class_room == None:
                 setattr(self.RoomList, self.game_group_name, Room("one"))
                 class_room = await self.get_class_room()
-                class_room.setPlayer({"name": msg_data['player0'], "rating": 0}, {"name": msg_data['player1'], "rating": 0})
+                class_room.setPlayerOneByOne({"name": msg_data['player0'], "rating": 0}, {"name": msg_data['player1'], "rating": 0})
             if db_count == 2 and class_room != None:
                 await self.channel_layer.group_send(
                     self.game_group_name, {
@@ -244,7 +244,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
     @database_sync_to_async
     def create_db_room(self):
         self.game_group_name = self.user_name + random_key(6)
-        db_room = GameRoom(room_name=self.game_group_name, mode="pingpong", status="waiting", player0=self.user_name, player0rating=self.rating)
+        db_room = GameRoom(room_name=self.game_group_name, status="waiting", player0=self.user_name, player0rating=self.rating)
         db_room.save()
     
     # 들어갈 수 있는 방을 검색하고 들어간 방의 이름을 알려준다
