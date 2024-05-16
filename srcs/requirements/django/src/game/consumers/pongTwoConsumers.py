@@ -91,7 +91,7 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
                 # 2대2 매치 전용 '룸 클래스'를 만들어 '룸 클래스 리스트'에 넣습니다.
                 setattr(self.RoomList, self.game_group_name, Room("two"))
                 class_room = self.get_class_room()
-                class_room.setPlayersByMode({"name": msg_data['player0'], "rating": 0}, {"name": msg_data['player1'], "rating": 0}, {"name": msg_data['player2'], "rating": 0}, {"name": msg_data['player3'], "rating": 0}, "two")
+                class_room.setPlayersTwoByTwo({"name": msg_data['player0'], "rating": 0}, {"name": msg_data['player1'], "rating": 0}, {"name": msg_data['player2'], "rating": 0}, {"name": msg_data['player3'], "rating": 0})
             if db_count == 4 and class_room != None:
                 await self.channel_layer.group_send(
                     self.game_group_name, {
@@ -131,7 +131,7 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
         while flag == False:
             count = await self.get_db_room_cnt()
             room_name_in_db = await self.find_room_in_db()
-            # 방이 없거나 대기 중인 방이 없을 때
+            # 데이터베이스에 방이 없거나 "대기 중"인 방이 없을 때
             if count == 0 or room_name_in_db == "not":
                 await self.create_db_room()
                 await self.channel_layer.group_add(self.game_group_name, self.channel_name)
