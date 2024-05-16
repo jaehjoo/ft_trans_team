@@ -196,7 +196,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
             await asyncio.sleep(0.01)
             class_room.update()
             if class_room.winner != "":
-                self.calculate_rating()
+                await self.calculate_rating()
                 await self.channel_layer.group_send(
                     self.game_group_name, {
                         "type" : "game.message",

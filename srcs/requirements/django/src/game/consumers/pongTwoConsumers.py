@@ -223,7 +223,7 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
             await asyncio.sleep(0.01)
             class_room.update()
             if class_room.winner != "" and class_room.winner2 != "":
-                self.calculate_rating()
+                await self.calculate_rating()
                 await self.channel_layer.group_send(
                     self.game_group_name, {
                         "type" : "game.message",
@@ -280,8 +280,6 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
                 db_room.players[i] = self.user_name
         db_room.save()
 
-
-    @database_sync_to_async
     async def match_players(self, db_room):
         players = [db_room.players[0], db_room.players[1], db_room.players[2], db_room.players[3]]
 
@@ -292,14 +290,14 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
             players_with_ratings((player, rating))
         
         # 레이팅을 기준으로 오름차순으로 정렬
-        sorted_players = sorted(players_with_ratings, key=lambda x: x[1])
+        sorted_players = await sorted(players_with_ratings, key=lambda x: x[1])
         
         # 정렬된 데이터를 GameRoom 인스턴스의 해당 필드에 할당
         db_room.player0, db_room.player0rating = sorted_players[0][0], sorted_players[0][1]
         db_room.player1, db_room.player1rating = sorted_players[3][0], sorted_players[3][1]
         db_room.player2, db_room.player2rating = sorted_players[1][0], sorted_players[1][1]
         db_room.player3, db_room.player3rating = sorted_players[2][0], sorted_players[2][1]
-        db_room.save()
+        database_sync_to_async(db_room.save())
 
     # 게임방이 얼마나 있는 지 확인할 때 사용
     @database_sync_to_async
