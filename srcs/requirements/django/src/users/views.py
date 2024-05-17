@@ -87,12 +87,10 @@ def TwoFactor(request):
 			return jsonMessage("Y", None, None)
 	elif content.get('sms', None):
 		sms = content.get('sms')
-		data = enroll2fa.send_sms(request, sms)
-		if data:
+		if enroll2fa.send_sms(request, sms):
 			return jsonMessage("Y", None, None)
 	elif content.get('otp', None):
-		data = enroll2fa.send_otp(request)
-		if data:
+		if enroll2fa.send_otp(request):
 			return jsonMessage("Y", None, None)
 	return jsonMessage("N", "fail.response.2fa", None)
 

@@ -7,7 +7,7 @@ from sdk.api.message import Message
 from sdk.exceptions import CoolsmsException
 from users.models import User, UserKey
 from users.jwt import decode_access
-from users.utils import random_key, access_get_name
+from users.utils import random_key, access_get_name, jsonMessage
 
 logger = logging.getLogger(__name__)
 
@@ -104,21 +104,7 @@ def check_code_2fa(request):
             key.twofactorkey = ""
             key.save()
             if result:
-                return JsonResponse(
-                    {
-                        'success' : 'Y',
-                    }
-                )                
+                return jsonMessage("Y", None, None)
         except User.DoesNotExist:
-            return JsonResponse(
-                {
-                    'success' : 'N',
-                    'messsage' : 'fail.input2fa',
-                }
-            )
-    return JsonResponse(
-        {
-            'success' : 'N',
-            'messsage' : 'fail.input2fa',
-        }
-    )
+            return jsonMessage("N", "fail.input2fa", None)
+    return jsonMessage("N", "fail.input2fa", None)
