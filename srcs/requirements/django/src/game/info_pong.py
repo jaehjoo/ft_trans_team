@@ -134,7 +134,7 @@ class Room:
 			self.player1bar = Bar(self.window.width / 60, self.window.height / 7, self.window.width / 50, self.window.height / 4 * 3 - self.window.height / 14)
 			self.player2bar = Bar(self.window.width / 60, self.window.height / 7, self.window.width / 50 * 48 + 3, self.window.height / 4 - self.window.height / 14)
 			self.player3bar = Bar(self.window.width / 60, self.window.height / 7, self.window.width / 50 * 48 + 3, self.window.height / 4 * 3 - self.window.height / 14)
-		else:
+		elif self.mode == "one":
 			self.player0bar = Bar(self.window.width / 60, self.window.height / 7, self.window.width / 50, self.window.height / 2 - self.window.height / 14)
 			self.player1bar = Bar(self.window.width / 60, self.window.height / 7, self.window.width / 50 * 48 + 3, self.window.height / 2 - self.window.height / 14)	
 
@@ -142,7 +142,7 @@ class Room:
 		self.player0 = Player(player0['name'], player0['rating'])
 		self.player1 = Player(player1['name'], player1['rating'])
 
-	def setPlayersByMode(self, player0, player1, player2, player3, mode):
+	def setPlayersTwoByTwo(self, player0, player1, player2, player3):
 
 		players = [player0, player1, player2, player3]
 
@@ -150,17 +150,11 @@ class Room:
 
 		sorted_players = sorted(players_with_rating, key=lambda x: x[1])
 
-		if mode == "two":
-			self.player0 = Player(sorted_players[0][0]['name'], sorted_players[0][0]['rating'])
-			self.player1 = Player(sorted_players[3][0]['name'], sorted_players[3][0]['rating'])
-			self.player2 = Player(sorted_players[1][0]['name'], sorted_players[1][0]['rating'])
-			self.player3 = Player(sorted_players[2][0]['name'], sorted_players[2][0]['rating'])
-		elif mode == "tournament":
-			self.player0 = Player(sorted_players[0][0]['name'], sorted_players[0][0]['rating'])
-			self.player1 = Player(sorted_players[1][0]['name'], sorted_players[1][0]['rating'])
-			self.player2 = Player(sorted_players[2][0]['name'], sorted_players[2][0]['rating'])
-			self.player3 = Player(sorted_players[3][0]['name'], sorted_players[3][0]['rating'])
-	
+		self.player0 = Player(sorted_players[0][0]['name'], sorted_players[0][0]['rating'])
+		self.player1 = Player(sorted_players[3][0]['name'], sorted_players[3][0]['rating'])
+		self.player2 = Player(sorted_players[1][0]['name'], sorted_players[1][0]['rating'])
+		self.player3 = Player(sorted_players[2][0]['name'], sorted_players[2][0]['rating'])
+
 	def setBarLocation(self, x1, y1, x2, y2):
 		self.player0bar.set_bar(x1, y1)
 		self.player1bar.set_bar(x2, y2)
@@ -299,6 +293,11 @@ class Room:
 				self.winner = self.player0.name
 			elif self.score.ONE < self.score.TWO and self.score.TWO == self.score.WIN:
 				self.winner = self.player1.name
+		elif self.mode == "one" and self.status == "match2":
+			if self.score.ONE > self.score.TWO and self.score.ONE == self.score.WIN:
+				self.winner2 = self.player0.name
+			elif self.score.ONE < self.score.TWO and self.score.TWO == self.score.WIN:
+				self.winner2 = self.player1.name
 		elif self.mode == "two":
 			if self.score.ONE > self.score.TWO and self.score.ONE == self.score.WIN:
 				self.winner = self.player0.name
