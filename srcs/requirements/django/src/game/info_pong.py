@@ -106,7 +106,7 @@ class Ball:
 
 class Room:
 	mode: str
-	status: str
+	status: str # match1, match2, match3
 	winner: str
 	winner2: str
 	window: Window
@@ -288,16 +288,16 @@ class Room:
 	def checkScore(self):
 		if self.score.ONE == self.score.TWO and self.score.ONE > 9:
 			self.score.WIN = self.score.ONE + 2
-		if self.mode == "one":
-			if self.score.ONE > self.score.TWO and self.score.ONE == self.score.WIN:
-				self.winner = self.player0.name
-			elif self.score.ONE < self.score.TWO and self.score.TWO == self.score.WIN:
-				self.winner = self.player1.name
-		elif self.mode == "one" and self.status == "match2":
+		if self.mode == "one" and self.status == "match2":
 			if self.score.ONE > self.score.TWO and self.score.ONE == self.score.WIN:
 				self.winner2 = self.player0.name
 			elif self.score.ONE < self.score.TWO and self.score.TWO == self.score.WIN:
 				self.winner2 = self.player1.name
+		elif self.mode == "one":
+			if self.score.ONE > self.score.TWO and self.score.ONE == self.score.WIN:
+				self.winner = self.player0.name
+			elif self.score.ONE < self.score.TWO and self.score.TWO == self.score.WIN:
+				self.winner = self.player1.name
 		elif self.mode == "two":
 			if self.score.ONE > self.score.TWO and self.score.ONE == self.score.WIN:
 				self.winner = self.player0.name

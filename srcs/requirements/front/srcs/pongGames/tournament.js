@@ -114,6 +114,7 @@ export const StartCanvasTournament = () => {
                 type: "next.game",
                 data: {
                   name: yourName,
+                  status: textData.data['status']
                 },
               })
             )
