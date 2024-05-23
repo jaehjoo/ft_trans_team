@@ -10,6 +10,7 @@ const mainFetch = async () => {
       `/api/main?access=${access}&refresh=${refresh}`
     );
     const data = await response.json();
+    if (data.success === "N") throw new Error(data.message);
     return data;
   } catch (error) {
     localStorage.clear();
