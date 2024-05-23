@@ -12,6 +12,33 @@ import MypageLayout from "./main/MypageLayout.js";
 
 export const URL = "https://transcendence.kgnj.kr";
 
+const refreshHandler = (event) => {
+  if (
+    window.location.pathname === "/pingpong/onebyone" ||
+    window.location.pathname === "/pingpong/twobytwo" ||
+    window.location.pathname === "/pingpong/tournament" ||
+    window.location.pathname === "/fighting"
+  ) {
+    event.returnValue =
+      "이 페이지를 벗어나시겠습니까? 변경사항이 저장되지 않을 수 있습니다.";
+  }
+};
+
+window.onbeforeunload = refreshHandler;
+
+window.history.pushState(null, document.title, location.href);
+window.addEventListener("popstate", function (event) {
+  const path = window.location.pathname;
+  if (
+    path === "/pingpong/onebyone" ||
+    path === "/pingpong/twobytwo" ||
+    path === "/pingpong/tournament" ||
+    path === "/fighting"
+  ) {
+    window.history.pushState(null, document.title, location.href);
+  }
+});
+
 export const App = () => {
   if (window.location.pathname === "/") {
     if (localStorage.getItem("access_token") === null) {
@@ -30,15 +57,13 @@ export const App = () => {
       fetch(`/api/auth42?code=${code}`)
         .then((res) => {
           res.json().then((data) => {
-            console.log(data);
             if (data.success === "Y") {
               localStorage.setItem("access_token", data.content.access);
               localStorage.setItem("refresh_token", data.content.refresh);
               localStorage.setItem("csrf_token", data.content.csrftoken);
               window.location.href = `/2fa`;
             } else {
-              console.log(data);
-              // window.location.href = URL;
+              window.location.href = URL;
             }
           });
         })

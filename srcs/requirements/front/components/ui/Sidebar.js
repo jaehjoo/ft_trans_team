@@ -35,7 +35,6 @@ const fetchUsers = async () => {
   return data;
 };
 
-// 친구삭제 로직입니다 ! console.log 여기에 찍어보시면 됩니다.
 const fetchDeleteUser = async (name) => {
   const data = {
     friend_name: name,

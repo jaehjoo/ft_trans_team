@@ -2,11 +2,6 @@ import GameModal from "./GameModal.js";
 
 const ButtonGroup = () => {
   const myPageButton = () => {
-    console.log(
-      "myPage button clicked!",
-      "you should remove event listener here"
-    );
-
     window.location.pathname = "/mypage";
   };
 
@@ -22,7 +17,7 @@ const ButtonGroup = () => {
       }),
     });
     const data = await res.json();
-    console.log(data);
+
     localStorage.clear();
     window.location.pathname = "/login";
   };

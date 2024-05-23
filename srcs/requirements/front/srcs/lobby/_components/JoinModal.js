@@ -5,13 +5,10 @@ const JoinModal = (index, data) => {
 
   const JoinButtonHandler = (e) => {
     currentModal = e.target.parentNode.getAttribute("key");
-    console.log("JoinButtonHandler", currentModal);
   };
 
   const submitHandler = (idx) => (e) => {
     e.preventDefault();
-    console.log("submit", e.target[0].value);
-    console.log("Modal Index:", idx);
 
     if (data[currentModal].type === "one") window.location.href = "/game/1v1";
     else window.location.href = "/game/tournament";
