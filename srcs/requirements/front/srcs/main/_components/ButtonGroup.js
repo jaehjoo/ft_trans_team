@@ -10,12 +10,20 @@ const ButtonGroup = () => {
     window.location.pathname = "/mypage";
   };
 
-  const signOutButton = () => {
-    localStorage.removeItem("token"); // temp
-    console.log(
-      "Sign out button clicked!",
-      "you should remove event listener here"
-    );
+  const signOutButton = async () => {
+    const res = await fetch("/api/logout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": localStorage.getItem("csrf_token"),
+      },
+      body: JSON.stringify({
+        access: localStorage.getItem("access_token"),
+      }),
+    });
+    const data = await res.json();
+    console.log(data);
+    localStorage.clear();
     window.location.pathname = "/login";
   };
 
