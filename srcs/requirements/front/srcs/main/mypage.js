@@ -269,9 +269,9 @@ const MyPage = () => {
     <div class="position-relative d-flex flex-column align-items-center">
     <img src=${`../../img/avatar/face/${face}.png`} alt="avatar" class="img-fluid w-25">
     <img class="w-25 img-fluid" src=${`../../img/avatar/body/${body}.png`} alt="avatar" >
-    <img class="position-absolute img-fluid" src=${`../../img/avatar/hair/${hair}.png`} alt="avatar" style="top : -0.3rem; width : 25%;">
+    <img class="position-absolute img-fluid" src=${`../../img/avatar/hair/${hair}.png`} alt="avatar" style="top : -0.3rem; width : 40%;">
     <img class="position-absolute img-fluid" src=${`../../img/avatar/eye/${eye}.png`} alt="avatar" style="top : 2rem; width : 25%;">
-    <img class="position-absolute img-fluid" src=${`../../img/avatar/lip/${lip}.png`} alt="avatar" style="top : 4rem; width : 7%;">
+    <img class="position-absolute img-fluid" src=${`../../img/avatar/lip/${lip}.png`} alt="avatar" style="top : 2.5rem; width : 40%;">
     </div>
   </div>
 
