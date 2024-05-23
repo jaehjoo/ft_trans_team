@@ -38,7 +38,7 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
             }
             }))
         try:
-            asyncio.wait(self.join_matching(), 10)
+            await asyncio.wait_for(self.join_matching(), 10)
         except asyncio.TimeoutError:
             await self.close()
 
@@ -90,7 +90,7 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
             if db_count == 1 and class_room == None:
                 # 2대2 매치 전용 '룸 클래스'를 만들어 '룸 클래스 리스트'에 넣습니다.
                 setattr(self.RoomList, self.game_group_name, Room("two"))
-                class_room = self.get_class_room()
+                class_room = await self.get_class_room()
                 class_room.setPlayersTwoByTwo({"name": msg_data['player0'], "rating": 0}, {"name": msg_data['player1'], "rating": 0}, {"name": msg_data['player2'], "rating": 0}, {"name": msg_data['player3'], "rating": 0})
             if db_count == 4 and class_room != None:
                 await self.channel_layer.group_send(
@@ -139,11 +139,11 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
                 flag = True
             elif room_name_in_db:
                 self.game_group_name = room_name_in_db
-                db_room = self.get_db_room()
-                self.set_players(db_room)
+                db_room = await self.get_db_room()
+                await self.set_players(db_room)
                 await self.channel_layer.group_add(db_room.room_name, self.channel_name)
                 await self.channel_layer.group_discard("game_queue_twobytwo", self.channel_name)
-                if self.is_room_full(db_room) == True:
+                if await self.is_room_full(db_room) == True:
                     # 매치 메이킹 시스템으로 공정하게 팀을 나눕니다. (Team1 = player0, player1 // Team2 = player2, player3)
                     await self.match_players(db_room)
                     await self.channel_layer.group_send(
@@ -162,16 +162,15 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
                 flag = True
 
     async def find_room_in_db(self):
-        with transaction.atomic():
-            # 현재 상태가 "대기중"인 방이 있는지 탐색
-            db_room = self.get_waiting_db_room()
-            if db_room:
-                return db_room.room_name
-            return "not"
-        
+        db_room = await self.get_waiting_db_room()
+        if db_room:
+            return db_room.room_name
+        return "not"
+
     @database_sync_to_async
     def get_waiting_db_room(self):
-        return GameRoom.objects.filter(status="waiting").first()
+        with transaction.atomic():
+            return GameRoom.objects.filter(status="waiting").first()
 
     @database_sync_to_async
     def get_db_room(self):
@@ -275,7 +274,7 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
     @database_sync_to_async
     def set_players(self, db_room):
         # players의 크기는 4이며, 비어있는 위치에 현재 들어온 유저를 할당합니다.
-        for i in range(len(db_room.players)):
+        for i in range(4):
             if db_room.players[i] == "":
                 db_room.players[i] = self.user_name
         db_room.save()
@@ -287,17 +286,21 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
         
         for player in players:
             rating = await self.get_rating(player)
-            players_with_ratings((player, rating))
+            players_with_ratings.append((player, rating))
         
         # 레이팅을 기준으로 오름차순으로 정렬
-        sorted_players = await sorted(players_with_ratings, key=lambda x: x[1])
+        sorted_players = sorted(players_with_ratings, key=lambda x: x[1])
         
         # 정렬된 데이터를 GameRoom 인스턴스의 해당 필드에 할당
         db_room.player0, db_room.player0rating = sorted_players[0][0], sorted_players[0][1]
         db_room.player1, db_room.player1rating = sorted_players[3][0], sorted_players[3][1]
         db_room.player2, db_room.player2rating = sorted_players[1][0], sorted_players[1][1]
         db_room.player3, db_room.player3rating = sorted_players[2][0], sorted_players[2][1]
-        database_sync_to_async(db_room.save())
+        # database_sync_to_async 래퍼를 사용하여 db_room.save()를 비동기 함수로 변환
+        save_room = database_sync_to_async(db_room.save)
+
+        # 비동기 함수로 생성된 save_room()를 호출
+        await save_room()
 
     # 게임방이 얼마나 있는 지 확인할 때 사용
     @database_sync_to_async

@@ -91,6 +91,8 @@ export const StartCanvasTeam = () => {
         );
       } else if (textData.data.mode == "game.start") {
         flag.START = true;
+        document.addEventListener("keydown", keyDownHandler, false);
+        document.addEventListener("keyup", keyUpHandler, false);
         entities[2].update(textData.data['ball']['x'], textData.data['ball']['y'])
         entities[3].update(textData.data['player0']['x'], textData.data['player0']['y'])
         entities[4].update(textData.data['player1']['x'], textData.data['player1']['y'])
@@ -139,8 +141,6 @@ export const StartCanvasTeam = () => {
   }
 
   window.requestAnimationFrame(start);
-  document.addEventListener("keydown", keyDownHandler, false);
-  document.addEventListener("keyup", keyUpHandler, false);
 
   function keyDownHandler(event) {
     let player;
