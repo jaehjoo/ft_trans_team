@@ -89,7 +89,7 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
             class_room = await self.get_class_room()
             if db_count == 1 and class_room == None:
                 setattr(self.RoomList, self.game_group_name, Room("one"))
-                class_room = self.get_class_room()
+                class_room = await self.get_class_room()
                 class_room.setPlayersOneByOne({"name": msg_data['player0'], "rating": 0}, {"name": msg_data['player1'], "rating": 0})
                 class_room.status = "match1"
             if db_count == 4 and class_room != None:
@@ -246,8 +246,8 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
                 flag = True
             elif room_name_in_db:
                 self.game_group_name = room_name_in_db
-                db_room = self.get_db_room()
-                self.set_players(db_room)
+                db_room = await self.get_db_room()
+                await self.set_players(db_room)
                 await self.channel_layer.group_add(db_room.room_name, self.channel_name)
                 await self.channel_layer.group_discard("game_queue_tournament", self.channel_name)
                 if self.is_room_full(db_room) == True:
@@ -327,7 +327,7 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
     @database_sync_to_async
     def set_players(self, db_room):
         # players의 크기는 4이며, 비어있는 위치에 현재 들어온 유저를 할당합니다.
-        for i in range(len(db_room.players)):
+        for i in range(4):
             if db_room.players[i] == "":
                 db_room.players[i] = self.user_name
         db_room.save()
@@ -339,18 +339,21 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
         
         for player in players:
             rating = await self.get_rating(player)
-            players_with_ratings((player, rating))
+            players_with_ratings.append((player, rating))
         
         # 레이팅을 기준으로 오름차순으로 정렬
-        sorted_players = await sorted(players_with_ratings, key=lambda x: x[1])
+        sorted_players = sorted(players_with_ratings, key=lambda x: x[1])
         
         # 정렬된 데이터를 GameRoom 인스턴스의 해당 필드에 할당
         db_room.player0, db_room.player0rating = sorted_players[0][0], sorted_players[0][1]
         db_room.player1, db_room.player1rating = sorted_players[1][0], sorted_players[1][1]
         db_room.player2, db_room.player2rating = sorted_players[2][0], sorted_players[2][1]
         db_room.player3, db_room.player3rating = sorted_players[3][0], sorted_players[3][1]
-        database_sync_to_async(db_room.save())
 
+        save_room = database_sync_to_async(db_room.save)
+
+        await save_room()
+    
     @database_sync_to_async
     def get_db_room_cnt(self):
         return GameRoom.objects.count()
