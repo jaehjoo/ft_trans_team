@@ -87,13 +87,13 @@ class PongOneConsumers(AsyncWebsocketConsumer):
         msg_data = data.get('data', [])
         # 연결 후에 웹소켓에서 플레이어 정보를 보낸다
         if msg_type == "set.game":
-            db_count = await self.db_cnt()
+            num_players = await self.db_cnt()
             class_room = await self.get_class_room()
-            if db_count == 1 and class_room == None:
+            if num_players == 1 and class_room == None:
                 setattr(self.RoomList, self.game_group_name, Room("one"))
                 class_room = await self.get_class_room()
                 class_room.setPlayerOneByOne({"name": msg_data['player0'], "rating": 0}, {"name": msg_data['player1'], "rating": 0})
-            if db_count == 2 and class_room != None:
+            if num_players == 2 and class_room != None:
                 await self.channel_layer.group_send(
                     self.game_group_name, {
                         "type" : 'game.message',

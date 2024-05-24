@@ -85,14 +85,14 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
         msg_data = data.get('data', [])
 
         if msg_type == "set.game":
-            db_count = await self.db_cnt()
+            num_players = await self.db_cnt()
             class_room = await self.get_class_room()
-            if db_count == 1 and class_room == None:
+            if num_players == 1 and class_room == None:
                 setattr(self.RoomList, self.game_group_name, Room("one"))
                 class_room = await self.get_class_room()
                 class_room.setPlayersOneByOne({"name": msg_data['player0'], "rating": 0}, {"name": msg_data['player1'], "rating": 0})
                 class_room.status = "match1"
-            if db_count == 4 and class_room != None:
+            if num_players == 4 and class_room != None:
                 await self.channel_layer.group_send(
                     self.game_group_name, {
                         "type" : "game.message",
@@ -330,6 +330,7 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
         for i in range(4):
             if db_room.players[i] == "":
                 db_room.players[i] = self.user_name
+                break
         db_room.save()
 
     async def match_players(self, db_room):
@@ -361,8 +362,7 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
     @database_sync_to_async
     def create_db_room(self):
         self.game_group_name = self.user_name + random_key(6)
-        players = [""] * 4
-        players[0] = self.user_name
+        players = [self.user_name, "", "", ""]
         db_room = GameRoom(room_name=self.game_group_name, status="waiting", player0=self.user_name, players = players)
         db_room.save()
 

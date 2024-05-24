@@ -21,7 +21,7 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
     async def connect(self):
         self.game_group_name = ""
         self.create_time = datetime.now()
-        query_string = parse_qs(self.scope['query_string'].decode())
+        query_string = parse_qs(self.scope['query_string'].decode('utf-8'))
         access_token = query_string.get('access', None)[0]
         self.user_name = access_token_get_name(access_token)
 
@@ -85,14 +85,14 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
         msg_data = data.get("data", [])
 
         if msg_type == "set.game":
-            db_count = await self.db_cnt()
+            num_players = await self.db_cnt()
             class_room = await self.get_class_room()
-            if db_count == 1 and class_room == None:
+            if num_players == 1 and class_room == None:
                 # 2대2 매치 전용 '룸 클래스'를 만들어 '룸 클래스 리스트'에 넣습니다.
                 setattr(self.RoomList, self.game_group_name, Room("two"))
                 class_room = await self.get_class_room()
                 class_room.setPlayersTwoByTwo({"name": msg_data['player0'], "rating": 0}, {"name": msg_data['player1'], "rating": 0}, {"name": msg_data['player2'], "rating": 0}, {"name": msg_data['player3'], "rating": 0})
-            if db_count == 4 and class_room != None:
+            if num_players == 4 and class_room != None:
                 await self.channel_layer.group_send(
                     self.game_group_name, {
                         "type" : "game.message",
@@ -112,17 +112,18 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
         if msg_type == "bar.info":
             class_room = await self.get_class_room()
             if msg_data['name'] == class_room.player0.name:
-                class_room.player0bar.x = msg_data['up']
-                class_room.player0bar.y = msg_data['down']
+                class_room.player0bar.up = msg_data['up']
+                class_room.player0bar.down = msg_data['down']
             elif msg_data['name'] == class_room.player1.name:
-                class_room.player1bar.x = msg_data['up']
-                class_room.player1bar.y = msg_data['down']
+                class_room.player1bar.up = msg_data['up']
+                class_room.player1bar.down = msg_data['down']
             elif msg_data['name'] == class_room.player2.name:
-                class_room.player2bar.x = msg_data['up']
-                class_room.player2bar.y = msg_data['down']
+                class_room.player2bar.up = msg_data['up']
+                class_room.player2bar.down = msg_data['down']
             elif msg_data['name'] == class_room.player3.name:
-                class_room.player3bar.x = msg_data['up']
-                class_room.player3bar.y = msg_data['down']
+                class_room.player3bar.up = msg_data['up']
+                class_room.player3bar.down = msg_data['down']
+        
         if msg_type == "game.clear":
             self.disconnect(1000)
 
@@ -163,9 +164,10 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
 
     async def find_room_in_db(self):
         db_room = await self.get_waiting_db_room()
-        if db_room:
+        if db_room == None:
+            return "not"
+        else:
             return db_room.room_name
-        return "not"
 
     @database_sync_to_async
     def get_waiting_db_room(self):
@@ -277,6 +279,7 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
         for i in range(4):
             if db_room.players[i] == "":
                 db_room.players[i] = self.user_name
+                break
         db_room.save()
 
     async def match_players(self, db_room):
@@ -311,8 +314,7 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
     @database_sync_to_async
     def create_db_room(self):
         self.game_group_name = self.user_name + random_key(6)
-        players = [""] * 4
-        players[0] = self.user_name
+        players = [self.user_name, "", "", ""]
         db_room = GameRoom(room_name=self.game_group_name, status="waiting", player0=self.user_name, players = players)
         db_room.save()
 
