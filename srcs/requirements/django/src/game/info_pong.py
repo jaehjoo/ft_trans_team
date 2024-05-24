@@ -129,6 +129,7 @@ class Room:
 		self.ball = Ball(1024 / 2, 768 / 2, 3, 3, 1024 / 100)
 		self.score = Score()
 		self.mode = mode
+		self.status = "match1"
 		if self.mode == "two":
 			self.player0bar = Bar(self.window.width / 60, self.window.height / 7, self.window.width / 50, self.window.height / 4 - self.window.height / 14)
 			self.player1bar = Bar(self.window.width / 60, self.window.height / 7, self.window.width / 50, self.window.height / 4 * 3 - self.window.height / 14)
