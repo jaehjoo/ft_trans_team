@@ -225,16 +225,16 @@ class Room:
 				self.player0bar.y = self.window.border
 			if self.player0bar.y > self.window.height / 2 - self.player0bar.height:
 				self.player0bar.y = self.window.height / 2 - self.player0bar.height
-			if self.player1bar.y < self.window.height / 2 - self.player1bar.height:
-				self.player1bar.y = self.window.height / 2 - self.player1bar.height
+			if self.player1bar.y < self.window.height / 2:
+				self.player1bar.y = self.window.height / 2
 			if self.player1bar.y > self.window.height - self.window.border - self.player1bar.height:
 				self.player1bar.y = self.window.height - self.window.border - self.player1bar.height
 			if self.player2bar.y < self.window.border:
 				self.player2bar.y = self.window.border
 			if self.player2bar.y > self.window.height / 2 - self.player2bar.height:
 				self.player2bar.y = self.window.height / 2 - self.player2bar.height
-			if self.player3bar.y < self.window.height / 2 - self.player3bar.height:
-				self.player3bar.y = self.window.height / 2 - self.player3bar.height
+			if self.player3bar.y < self.window.height / 2:
+				self.player3bar.y = self.window.height / 2
 			if self.player3bar.y > self.window.height - self.window.border - self.player3bar.height:
 				self.player3bar.y = self.window.height - self.window.border - self.player3bar.height
 

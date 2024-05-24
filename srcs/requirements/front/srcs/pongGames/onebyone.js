@@ -91,7 +91,6 @@ export const StartCanvasOne = () => {
         entities[3].update(textData.data['player0']['x'], textData.data['player0']['y'])
         entities[4].update(textData.data['player1']['x'], textData.data['player1']['y'])
         entities[1].update(textData.data['score']['ONE'], textData.data['score']['TWO'])
-
       } else if (textData.data.mode == "game.complete") {
         flag.STOP = true;
         if (textData.data['winner'] == yourName)

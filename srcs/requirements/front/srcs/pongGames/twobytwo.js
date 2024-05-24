@@ -96,14 +96,14 @@ export const StartCanvasTeam = () => {
         entities[2].update(textData.data['ball']['x'], textData.data['ball']['y'])
         entities[3].update(textData.data['player0']['x'], textData.data['player0']['y'])
         entities[4].update(textData.data['player1']['x'], textData.data['player1']['y'])
-		entities[5].update(textData.data['player2']['x'], textData.data['player2']['y'])
-		entities[6].update[textData.data['player3']['x'], textData.data['player3']['y']]
+		    entities[5].update(textData.data['player2']['x'], textData.data['player2']['y'])
+		    entities[6].update(textData.data['player3']['x'], textData.data['player3']['y'])
       } else if (textData.data.mode == "info.update") {
         entities[2].update(textData.data['ball']['x'], textData.data['ball']['y'])
         entities[3].update(textData.data['player0']['x'], textData.data['player0']['y'])
         entities[4].update(textData.data['player1']['x'], textData.data['player1']['y'])
-		entities[5].update(textData.data['player2']['x'], textData.data['player2']['y'])
-		entities[6].update[textData.data['player3']['x'], textData.data['player3']['y']]
+		    entities[5].update(textData.data['player2']['x'], textData.data['player2']['y'])
+		    entities[6].update(textData.data['player3']['x'], textData.data['player3']['y'])
         entities[1].update(textData.data['score']['ONE'], textData.data['score']['TWO'])
 
       } else if (textData.data.mode == "game.complete") {

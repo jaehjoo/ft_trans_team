@@ -114,13 +114,13 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
             if msg_data['name'] == class_room.player0.name:
                 class_room.player0bar.up = msg_data['up']
                 class_room.player0bar.down = msg_data['down']
-            elif msg_data['name'] == class_room.player1.name:
+            if msg_data['name'] == class_room.player1.name:
                 class_room.player1bar.up = msg_data['up']
                 class_room.player1bar.down = msg_data['down']
-            elif msg_data['name'] == class_room.player2.name:
+            if msg_data['name'] == class_room.player2.name:
                 class_room.player2bar.up = msg_data['up']
                 class_room.player2bar.down = msg_data['down']
-            elif msg_data['name'] == class_room.player3.name:
+            if msg_data['name'] == class_room.player3.name:
                 class_room.player3bar.up = msg_data['up']
                 class_room.player3bar.down = msg_data['down']
         
