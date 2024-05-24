@@ -91,7 +91,7 @@ export const App = () => {
   } else if (window.location.pathname === "/pingpong/twobytwo") {
     document.body.innerHTML = "";
     PingPong("team");
-  } else if (window.Location.pathname === "/pingpong/tournament") {
+  } else if (window.location.pathname === "/pingpong/tournament") {
     document.body.innerHTML = "";
     PingPong("tournament");
   } else if (window.location.pathname === "/fighting") {

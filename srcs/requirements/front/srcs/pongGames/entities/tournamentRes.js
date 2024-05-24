@@ -5,7 +5,7 @@ export class TournamentResult {
 		HEIGHT: view.HEIGHT,
 		RESULT: new Image(),
 	  };
-	  RESULT.src = "../../games/tournament.png"
+	  this.screen.RESULT.src = "../../img/games/tournament.png"
 	  this.playerInfo = [];
 	  this.match1Winner = "";
 	  this.match2Winner = "";
