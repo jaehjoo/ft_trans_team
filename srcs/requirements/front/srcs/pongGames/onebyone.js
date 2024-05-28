@@ -51,9 +51,6 @@ export const StartCanvasOne = () => {
     {
       scene[1].draw(context);
       ws.close();
-      window.addEventListener("click", function() {
-        window.location.href = "/login";
-      }, {once : true})
     }
   }
 
@@ -83,6 +80,8 @@ export const StartCanvasOne = () => {
         );
       } else if (textData.data.mode == "game.start") {
         flag.START = true;
+        document.addEventListener("keydown", keyDownHandler, false);
+        document.addEventListener("keyup", keyUpHandler, false);
         entities[2].update(textData.data['ball']['x'], textData.data['ball']['y'])
         entities[3].update(textData.data['player0']['x'], textData.data['player0']['y'])
         entities[4].update(textData.data['player1']['x'], textData.data['player1']['y'])
@@ -93,11 +92,16 @@ export const StartCanvasOne = () => {
         entities[1].update(textData.data['score']['ONE'], textData.data['score']['TWO'])
       } else if (textData.data.mode == "game.complete") {
         flag.STOP = true;
+        document.removeEventListener("keydown", keyDownHandler, false);
+        document.removeEventListener("keyup", keyUpHandler, false);
         if (textData.data['winner'] == yourName)
           scene[1].win = 1;
         else
           scene[1].win = 2;
-      } else if (textData.data.mode == "abnormal.termination") {
+        window.addEventListener("click", function() {
+          window.location.href = "/main";
+        }, {once : true})
+      } else if (textData.data.mode == "abnormal.termination" || textData.data.mode == "normal.termination") {
         ws.send(
           JSON.stringify({
             type: "game.clear",
@@ -107,7 +111,7 @@ export const StartCanvasOne = () => {
           })
         );
         ws.close();
-        window.location.href = "/login";
+        window.location.href = "/main";
       }
     };
   }
@@ -125,8 +129,6 @@ export const StartCanvasOne = () => {
   }
 
   window.requestAnimationFrame(start);
-  document.addEventListener("keydown", keyDownHandler, false);
-  document.addEventListener("keyup", keyUpHandler, false);
 
   function keyDownHandler(event) {
     let player;

@@ -68,7 +68,7 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
         else:
             logger.error("websocket " + self.channel_name + ": abnormal termination")
             if self.game_group_name:
-                self.channel_layer.group_send(
+                await self.channel_layer.group_send(
                     self.game_group_name, {
                         "type" : "game.message",
                         "data" : {

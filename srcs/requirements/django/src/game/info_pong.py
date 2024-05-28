@@ -194,7 +194,7 @@ class Room:
 			self.player3bar.down = value
 
 	def getHitFactor(self, barMiddlePoint, barHarfHeight):
-		return ((barMiddlePoint - self.ball.ballY) / barHarfHeight) * 2
+		return ((barMiddlePoint - self.ball.ballY) / barHarfHeight) * 1.2
 	
 	def update(self):
 		self.player0bar.update()
@@ -210,7 +210,7 @@ class Room:
 
 	def checkWallCollision(self):
 		if (self.ball.ballY + self.ball.velocityY > self.window.height - self.window.border - self.ball.radius) or (self.ball.ballY + self.ball.velocityY < self.window.border + self.ball.radius):
-			self.ball.velocityY *= -1
+			self.ball.velocityY *= -1.2
 		if self.mode == "one":
 			if self.player0bar.y < self.window.border:
 				self.player0bar.y = self.window.border
@@ -242,28 +242,28 @@ class Room:
 		if self.mode == "one":
 			if self.ball.ballX - self.ball.radius < self.player0bar.x + 10 and self.ball.ballY + self.ball.velocityY >= self.player0bar.y and self.ball.ballY + self.ball.velocityY <= self.player0bar.y + self.player0bar.height:
 				dir = self.getHitFactor(self.player0bar.y + self.player0bar.height / 2, self.player0bar.height / 2)
-				self.ball.velocityX *= -1
+				self.ball.velocityX *= -1.2
 				self.ball.velocityY *= dir
 			if self.ball.ballX + self.ball.radius > self.player1bar.x + self.player1bar.width - 10 and self.ball.ballY + self.ball.velocityY >= self.player1bar.y and self.ball.ballY + self.ball.velocityY <= self.player1bar.y + self.player1bar.height:
 				dir = self.getHitFactor(self.player1bar.y + self.player1bar.height / 2, self.player1bar.height / 2)
-				self.ball.velocityX *= -1
+				self.ball.velocityX *= -1.2
 				self.ball.velocityY *= dir
 		if self.mode == "two":
 			if self.ball.ballX - self.ball.radius < self.player0bar.x + 10 and self.ball.ballY + self.ball.velocityY >= self.player0bar.y and self.ball.ballY + self.ball.velocityY <= self.player0bar.y + self.player0bar.height:
 				dir = self.getHitFactor(self.player0bar.y + self.player0bar.height / 2, self.player0bar.height / 2)
-				self.ball.velocityX *= -1
+				self.ball.velocityX *= -1.2
 				self.ball.velocityY *= dir
 			if self.ball.ballX - self.ball.radius < self.player1bar.x + 10 and self.ball.ballY + self.ball.velocityY >= self.player1bar.y and self.ball.ballY + self.ball.velocityY <= self.player1bar.y + self.player1bar.height:
 				dir = self.getHitFactor(self.player1bar.y + self.player1bar.height / 2, self.player1bar.height / 2)
-				self.ball.velocityX *= -1
+				self.ball.velocityX *= -1.2
 				self.ball.velocityY *= dir
 			if self.ball.ballX + self.ball.radius > self.player2bar.x + self.player2bar.width - 10 and self.ball.ballY + self.ball.velocityY >= self.player2bar.y and self.ball.ballY + self.ball.velocityY <= self.player2bar.y + self.player2bar.height:
 				dir = self.getHitFactor(self.player2bar.y + self.player2bar.height / 2, self.player2bar.height / 2)
-				self.ball.velocityX *= -1
+				self.ball.velocityX *= -1.2
 				self.ball.velocityY *= dir
 			if self.ball.ballX + self.ball.radius > self.player3bar.x + self.player3bar.width - 10 and self.ball.ballY + self.ball.velocityY >= self.player3bar.y and self.ball.ballY + self.ball.velocityY <= self.player3bar.y + self.player3bar.height:
 				dir = self.getHitFactor(self.player3bar.y + self.player3bar.height / 2, self.player3bar.height / 2)
-				self.ball.velocityX *= -1
+				self.ball.velocityX *= -1.2
 				self.ball.velocityY *= dir
 
 	def checkBoundary(self):

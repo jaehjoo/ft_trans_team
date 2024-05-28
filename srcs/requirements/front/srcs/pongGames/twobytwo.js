@@ -55,9 +55,6 @@ export const StartCanvasTeam = () => {
     {
       scene[1].draw(context);
       ws.close();
-      window.addEventListener("click", function() {
-        window.location.href = "/login";
-      }, {once : true})
     }
   }
 
@@ -108,23 +105,30 @@ export const StartCanvasTeam = () => {
 
       } else if (textData.data.mode == "game.complete") {
         flag.STOP = true;
+        document.removeEventListener("keydown", keyDownHandler, false);
+        document.removeEventListener("keyup", keyUpHandler, false);
         if (textData.data['winner'] == yourName
-			|| textData.data['winner2'] == yourName)
+			    || textData.data['winner2'] == yourName)
         	scene[1].win = 1;
         else
         	scene[1].win = 2;
+        window.addEventListener("click", function() {
+          window.location.href = "/main";
+        }, {once : true})
       } else if (textData.data.mode == "abnormal.termination") {
-			ws.send(
-				JSON.stringify({
-					type: "game.clear",
-					data: {
-						name: yourName,
-					},
-				})
-    		);
-			ws.close();
-			window.location.href = "/login";
-		}
+        document.removeEventListener("keydown", keyDownHandler, false);
+        document.removeEventListener("keyup", keyUpHandler, false);
+        ws.send(
+          JSON.stringify({
+            type: "game.clear",
+            data: {
+              name: yourName,
+            },
+          })
+          );
+        ws.close();
+        window.location.href = "/main";
+      }
     };
   }
 

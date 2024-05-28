@@ -88,6 +88,8 @@ export const StartCanvasTournament = () => {
       } else if (textData.data.mode == "game.start") {
         flag.START = true;
 		    flag.STOP = false;
+        document.addEventListener("keydown", keyDownHandler, false);
+        document.addEventListener("keyup", keyUpHandler, false);
         entities[2].update(textData.data['ball']['x'], textData.data['ball']['y'])
         entities[3].update(textData.data['player0']['x'], textData.data['player0']['y'])
         entities[4].update(textData.data['player1']['x'], textData.data['player1']['y'])
@@ -98,6 +100,8 @@ export const StartCanvasTournament = () => {
         entities[1].update(textData.data['score']['ONE'], textData.data['score']['TWO'])
       } else if (textData.data.mode == "match.game.complete") {
         flag.STOP = true;
+        document.removeEventListener("keydown", keyDownHandler, false);
+        document.removeEventListener("keyup", keyUpHandler, false);
   		  if (textData.data['status'] == "match1") {
 			  scene[1].match1Winner = textData.data['winner'];
         } else if (textData.data['status'] == "match2") {
@@ -124,6 +128,8 @@ export const StartCanvasTournament = () => {
         flag.FINAL = true;
         scene[1].match3Winner = textData.data['winner'];
       } else if (textData.data.mode == "abnormal.termination") {
+        document.removeEventListener("keydown", keyDownHandler, false);
+        document.removeEventListener("keyup", keyUpHandler, false);
         ws.send(
           JSON.stringify({
             type: "game.clear",
@@ -151,8 +157,6 @@ export const StartCanvasTournament = () => {
   }
 
   window.requestAnimationFrame(start);
-  document.addEventListener("keydown", keyDownHandler, false);
-  document.addEventListener("keyup", keyUpHandler, false);
 
   function keyDownHandler(event) {
     let player;

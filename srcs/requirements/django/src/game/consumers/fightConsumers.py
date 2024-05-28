@@ -44,7 +44,7 @@ class fightingConsumers(AsyncWebsocketConsumer):
         try:
             await asyncio.wait_for(self.join_matching(), 10)
         except asyncio.exceptions.TimeoutError:
-            self.close()
+            await self.close()
 
     async def disconnect(self, close_code):
         try:
@@ -60,7 +60,7 @@ class fightingConsumers(AsyncWebsocketConsumer):
                     self.game_group_name, {
                         'type' : 'game.message',
                         'data' : {
-                            'mode' : 'normal.termintaion',
+                            'mode' : 'normal.termination',
                         }
                     }
                 )
@@ -72,12 +72,12 @@ class fightingConsumers(AsyncWebsocketConsumer):
                     self.game_group_name, {
                         'type' : 'game.message',
                         'data' : {
-                            'mode' : 'abnormal.termintaion',
+                            'mode' : 'abnormal.termination',
                         }
                     }
                 )
                 await self.channel_layer.group_discard(self.game_group_name, self.channel_name)
-        self.close()
+        await self.close()
 
     async def receive(self, text_data):
         data = json.loads(text_data)
