@@ -21,7 +21,7 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
     async def connect(self):
         self.game_group_name = ""
         self.create_time = datetime.now()
-        query_string = parse_qs(self.scope['query_string'].decode('utf-8'))
+        query_string = parse_qs(self.scope['query_string'].decode())
         access_token = query_string.get('access', None)[0]
         self.user_name = access_token_get_name(access_token)
 
@@ -127,6 +127,42 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
         if msg_type == "game.clear":
             self.disconnect(1000)
 
+    async def game_update_task(self):
+        await asyncio.sleep(2.1)
+        class_room = getattr(self.RoomList, self.game_group_name)
+
+        while True:
+            await asyncio.sleep(0.01)
+            class_room.update()
+            if class_room.winner != "" and class_room.winner2 != "":
+                await self.calculate_rating()
+                await self.channel_layer.group_send(
+                    self.game_group_name, {
+                        "type" : "game.message",
+                        "data" : {
+                            "mode" : "game.compelete",
+                            "winner" : class_room.winner,
+                            "winner2" : class_room.winner2,
+                        }
+                    }
+                )
+                break
+            else:
+                await self.channel_layer.group_send(
+                    self.game_group_name, {
+                        "type" : 'game.message',
+                        "data" : {
+                            "mode" : "info.update",
+                            "player0" : {"x" : class_room.player0bar.x, "y" : class_room.player0bar.y},
+                            "player1" : {"x" : class_room.player1bar.x, "y" : class_room.player1bar.y},
+                            "player2" : {"x" : class_room.player2bar.x, "y" : class_room.player2bar.y},
+                            "player3" : {"x" : class_room.player3bar.x, "y" : class_room.player3bar.y},
+                            "ball" : {"x" : class_room.ball.ballX, "y" : class_room.ball.ballY},
+                            "score" : {"ONE" : class_room.score.ONE, "TWO" : class_room.score.TWO},
+                        }
+                    }
+                )
+
     async def join_matching(self):
         flag = False
         while flag == False:
@@ -197,60 +233,6 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
         
     async def game_message(self, event):
         await self.send(text_data=json.dumps(event))
-
-    async def calculate_rating(self):
-        class_room = getattr(self.RoomList, self.game_group_name, None)
-        if class_room.winner == class_room.player0.name and class_room.winner2 == class_room.player1.name:
-            player0rating = rating_calculator(class_room.player0.rating, class_room.player2.rating, 0)
-            player1rating = rating_calculator(class_room.player1.rating, class_room.player3.rating, 0)
-
-            player2rating = rating_calculator(class_room.player2.rating, class_room.player0.rating, 1)
-            player3rating = rating_calculator(class_room.player3.rating, class_room.player1.rating, 1)
-
-        elif class_room.winner == class_room.player2.name and class_room.winner2 == class_room.player3.name:
-            player2rating = rating_calculator(class_room.player2.rating, class_room.player0.rating, 0)
-            player3rating = rating_calculator(class_room.player3.rating, class_room.player1.rating, 0)
-
-            player0rating = rating_calculator(class_room.player0.rating, class_room.player2.rating, 1)
-            player1rating = rating_calculator(class_room.player1.rating, class_room.player3.rating, 1)
-
-        await self.set_rating([class_room.player0.name, player0rating], [class_room.player1.name, player1rating], [class_room.player2.name, player2rating], [class_room.player3.name, player3rating], class_room.winner, class_room.winner2)
-
-    async def game_update_task(self):
-        await asyncio.sleep(2.1)
-        class_room = getattr(self.RoomList, self.game_group_name)
-
-        while True:
-            await asyncio.sleep(0.01)
-            class_room.update()
-            if class_room.winner != "" and class_room.winner2 != "":
-                await self.calculate_rating()
-                await self.channel_layer.group_send(
-                    self.game_group_name, {
-                        "type" : "game.message",
-                        "data" : {
-                            "mode" : "game.compelete",
-                            "winner" : class_room.winner,
-                            "winner2" : class_room.winner2,
-                        }
-                    }
-                )
-                break
-            else:
-                await self.channel_layer.group_send(
-                    self.game_group_name, {
-                        "type" : 'game.message',
-                        "data" : {
-                            "mode" : "info.update",
-                            "player0" : {"x" : class_room.player0bar.x, "y" : class_room.player0bar.y},
-                            "player1" : {"x" : class_room.player1bar.x, "y" : class_room.player1bar.y},
-                            "player2" : {"x" : class_room.player2bar.x, "y" : class_room.player2bar.y},
-                            "player3" : {"x" : class_room.player3bar.x, "y" : class_room.player3bar.y},
-                            "ball" : {"x" : class_room.ball.ballX, "y" : class_room.ball.ballY},
-                            "score" : {"ONE" : class_room.score.ONE, "TWO" : class_room.score.TWO},
-                        }
-                    }
-                )
 
     # database를 이용하여 사람 수를 세거나 할 때 사용
     @database_sync_to_async
@@ -329,6 +311,24 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
         record = UserRecordPongGame.objects.get(me=is_user)
         return record.rating
   
+    async def calculate_rating(self):
+        class_room = getattr(self.RoomList, self.game_group_name, None)
+        if class_room.winner == class_room.player0.name and class_room.winner2 == class_room.player1.name:
+            player0rating = rating_calculator(class_room.player0.rating, class_room.player2.rating, 0)
+            player1rating = rating_calculator(class_room.player1.rating, class_room.player3.rating, 0)
+
+            player2rating = rating_calculator(class_room.player2.rating, class_room.player0.rating, 1)
+            player3rating = rating_calculator(class_room.player3.rating, class_room.player1.rating, 1)
+
+        elif class_room.winner == class_room.player2.name and class_room.winner2 == class_room.player3.name:
+            player2rating = rating_calculator(class_room.player2.rating, class_room.player0.rating, 0)
+            player3rating = rating_calculator(class_room.player3.rating, class_room.player1.rating, 0)
+
+            player0rating = rating_calculator(class_room.player0.rating, class_room.player2.rating, 1)
+            player1rating = rating_calculator(class_room.player1.rating, class_room.player3.rating, 1)
+
+        await self.set_rating([class_room.player0.name, player0rating], [class_room.player1.name, player1rating], [class_room.player2.name, player2rating], [class_room.player3.name, player3rating], class_room.winner, class_room.winner2)
+
     @database_sync_to_async
     def set_rating(self, player0Info, player1Info, player2Info, player3Info, winner, winner2):
         player0 = User.objects.get(username=player0Info[0])

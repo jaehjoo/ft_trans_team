@@ -109,6 +109,7 @@ class Room:
 	status: str # match1, match2, match3
 	winner: str
 	winner2: str
+	winner3 : str
 	window: Window
 	player0: Player
 	player1: Player
@@ -125,6 +126,7 @@ class Room:
 	def __init__(self, mode):
 		self.winner = ""
 		self.winner2 = ""
+		self.winner3 = ""
 		self.window = Window(1024, 768, 1024 / 50, {1024 / 80, 768})
 		self.ball = Ball(1024 / 2, 768 / 2, 3, 3, 1024 / 100)
 		self.score = Score()
@@ -138,6 +140,13 @@ class Room:
 		elif self.mode == "one":
 			self.player0bar = Bar(self.window.width / 60, self.window.height / 7, self.window.width / 50, self.window.height / 2 - self.window.height / 14)
 			self.player1bar = Bar(self.window.width / 60, self.window.height / 7, self.window.width / 50 * 48 + 3, self.window.height / 2 - self.window.height / 14)	
+
+	def setForNextMatch(self):
+		self.score = Score()
+		self.window = Window(1024, 768, 1024 / 50, {1024 / 80, 768})
+		self.ball = Ball(1024 / 2, 768 / 2, 3, 3, 1024 / 100)
+		self.player0bar = Bar(self.window.width / 60, self.window.height / 7, self.window.width / 50, self.window.height / 2 - self.window.height / 14)
+		self.player1bar = Bar(self.window.width / 60, self.window.height / 7, self.window.width / 50 * 48 + 3, self.window.height / 2 - self.window.height / 14)
 
 	def setPlayerOneByOne(self, player0, player1):
 		self.player0 = Player(player0['name'], player0['rating'])
@@ -289,16 +298,21 @@ class Room:
 	def checkScore(self):
 		if self.score.ONE == self.score.TWO and self.score.ONE > 9:
 			self.score.WIN = self.score.ONE + 2
-		if self.mode == "one" and self.status == "match2":
-			if self.score.ONE > self.score.TWO and self.score.ONE == self.score.WIN:
-				self.winner2 = self.player0.name
-			elif self.score.ONE < self.score.TWO and self.score.TWO == self.score.WIN:
-				self.winner2 = self.player1.name
-		elif self.mode == "one":
+		if self.mode == "one" and self.status == "match1":
 			if self.score.ONE > self.score.TWO and self.score.ONE == self.score.WIN:
 				self.winner = self.player0.name
 			elif self.score.ONE < self.score.TWO and self.score.TWO == self.score.WIN:
 				self.winner = self.player1.name
+		elif self.mode == "one" and self.status == "match2":
+			if self.score.ONE > self.score.TWO and self.score.ONE == self.score.WIN:
+				self.winner2 = self.player0.name
+			elif self.score.ONE < self.score.TWO and self.score.TWO == self.score.WIN:
+				self.winner2 = self.player1.name
+		elif self.mode == "one" and self.status == "match3":
+			if self.score.ONE > self.score.TWO and self.score.ONE == self.score.WIN:
+				self.winner3 = self.player0.name
+			elif self.score.ONE < self.score.TWO and self.score.TWO == self.score.WIN:
+				self.winner3 = self.player1.name
 		elif self.mode == "two":
 			if self.score.ONE > self.score.TWO and self.score.ONE == self.score.WIN:
 				self.winner = self.player0.name

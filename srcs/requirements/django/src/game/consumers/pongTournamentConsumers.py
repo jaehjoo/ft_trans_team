@@ -62,7 +62,7 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
                     }
                 )
                 await self.channel_layer.group_discard(self.game_group_name, self.channel_name)
-            class_room = self.get_class_room()
+            class_room = await self.get_class_room()
             if class_room != None:
                 delattr(self.RoomList, self.game_group_name)
         else:
@@ -90,8 +90,7 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
             if num_players == 1 and class_room == None:
                 setattr(self.RoomList, self.game_group_name, Room("one"))
                 class_room = await self.get_class_room()
-                class_room.setPlayersOneByOne({"name": msg_data['player0'], "rating": 0}, {"name": msg_data['player1'], "rating": 0})
-                class_room.status = "match1"
+                class_room.setPlayerOneByOne({"name": msg_data['player0'], "rating": 0}, {"name": msg_data['player1'], "rating": 0})
             if num_players == 4 and class_room != None:
                 await self.channel_layer.group_send(
                     self.game_group_name, {
@@ -105,20 +104,26 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
                         }
                     }
                 )
-        elif msg_type == "next.game" and msg_data['status'] == "match1":
+                asyncio.create_task(self.game_update_task())
+
+        elif msg_type == "next.game" and msg_data['status'] == "match1" and msg_data['name'] == self.user_name:
+            class_room = await self.get_class_room()
+            class_room.winner = msg_data['name']
             class_room.status = "match2"
+            db_room = await self.get_db_room()
             await self.channel_layer.group_send(
                 self.game_group_name, {
                     "type" : "game.message",
                     "data" : {
                         "mode" : "set.game",
                         "status" : "match2",
-                        "player0" : class_room.player2.name,
-                        "player1" : class_room.player3.name,
+                        "player0" : db_room.players[2],
+                        "player1" : db_room.players[3],
                         "group" : self.game_group_name
                     }
                 }
             )
+            class_room.setForNextMatch()
             await self.channel_layer.group_send(
                 self.game_group_name, {
                     "type" : "game.message",
@@ -131,7 +136,11 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
                     }
                 }
             )
-        elif msg_type == "next.game" and msg_data['status'] == "match2":
+            asyncio.create_task(self.game_update_task())
+
+        elif msg_type == "next.game" and msg_data['status'] == "match2" and msg_data['name'] == self.user_name:
+            class_room = await self.get_class_room()
+            class_room.winner2 = msg_data['name']
             class_room.status = "match3"
             await self.channel_layer.group_send(
                 self.game_group_name, {
@@ -145,6 +154,7 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
                     }
                 }
             )
+            class_room.setForNextMatch()
             await self.channel_layer.group_send(
                 self.game_group_name, {
                     "type" : "game.message",
@@ -173,27 +183,13 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
 
     async def game_update_task(self):
         await asyncio.sleep(2.1)
-        class_room = self.get_class_room()
+        class_room = await self.get_class_room()
 
         while True:
             await asyncio.sleep(0.01)
             class_room.update()
-            # match3 경기 종료(즉, 토너먼트의 모든 경기가 종료된 조건)
-            if class_room.winner != "" and class_room.winner2 != "":
-                await self.calculate_rating()
-                await self.channel_layer.group_send(
-                    self.game_group_name, {
-                        "type" : "game.message",
-                        "data" : {
-                            "mode" : "game.complete",
-                            "status" : "match3",
-                            "winner" : class_room.winner,
-                        }
-                    }
-                )
-                break
             # match1이 종료된 조건
-            elif class_room.winner != "" and class_room.winner2 == "":
+            if class_room.status == "match1" and class_room.winner != "":
                 await self.channel_layer.group_send(
                     self.game_group_name, {
                         "type" : "game.message",
@@ -204,10 +200,9 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
                         }
                     }
                 )
-                class_room.winner = ""
                 break
             # match2 종료된 조건
-            elif class_room.winner2 != "" and class_room.winner == "":
+            elif class_room.status == "match2" and class_room.winner2 != "":
                 await self.channel_layer.group_send(
                     self.game_group_name, {
                         "type" : "game.message",
@@ -215,6 +210,18 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
                             "mode" : "match.game.complete",
                             "status" : "match2",
                             "winner" : class_room.winner2,
+                        }
+                    }
+                )
+                break
+            elif class_room.status == "match3" and class_room.winner3 != "":
+                await self.channel_layer.group_send(
+                    self.game_group_name, {
+                        "type" : "game.message",
+                        "data" : {
+                            "mode" : "game.complete",
+                            "status" : "match3",
+                            "winner" : class_room.winner3,
                         }
                     }
                 )
@@ -238,46 +245,46 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
             while flag == False:
                 count = await self.get_db_room_cnt()
                 room_name_in_db = await self.find_room_in_db()
-            # 데이터베이스에 방이 없거나 "대기 중"인 방이 없을 때
-            if count == 0 or room_name_in_db == "not":
-                await self.create_db_room()
-                await self.channel_layer.group_add(self.game_group_name, self.channel_name)
-                await self.channel_layer.group_discard("game_queue_tournament", self.channel_name)
-                flag = True
-            elif room_name_in_db:
-                self.game_group_name = room_name_in_db
-                db_room = await self.get_db_room()
-                await self.set_players(db_room)
-                await self.channel_layer.group_add(db_room.room_name, self.channel_name)
-                await self.channel_layer.group_discard("game_queue_tournament", self.channel_name)
-                if self.is_room_full(db_room) == True:
-                    # 매치 메이킹 시스템으로 적으로 레이팅이 비슷한 플레이어와 매치가 됩니다.
-                    await self.match_players(db_room)
-                    await self.channel_layer.group_send(
-                        self.game_group_name, {
-                            "type" : "game.message",
-                            "data" : {
-                                "mode" : "set.game",
-                                "status" : "match1",
-                                "player0" : db_room.player0,
-                                "player1" : db_room.player1,
-                                "group" : self.game_group_name
+                # 데이터베이스에 방이 없거나 "대기 중"인 방이 없을 때
+                if count == 0 or room_name_in_db == "not":
+                    await self.create_db_room()
+                    await self.channel_layer.group_add(self.game_group_name, self.channel_name)
+                    await self.channel_layer.group_discard("game_queue_tournament", self.channel_name)
+                    flag = True
+                elif room_name_in_db:
+                    self.game_group_name = room_name_in_db
+                    db_room = await self.get_db_room()
+                    await self.set_players(db_room)
+                    await self.channel_layer.group_add(db_room.room_name, self.channel_name)
+                    await self.channel_layer.group_discard("game_queue_tournament", self.channel_name)
+                    if await self.is_room_full(db_room) == True:
+                        # 매치 메이킹 시스템으로 적으로 레이팅이 비슷한 플레이어와 매치가 됩니다.
+                        await self.match_players(db_room)
+                        await self.channel_layer.group_send(
+                            self.game_group_name, {
+                                "type" : "game.message",
+                                "data" : {
+                                    "mode" : "set.game",
+                                    "status" : "match1",
+                                    "player0" : db_room.player0,
+                                    "player1" : db_room.player1,
+                                    "group" : self.game_group_name
+                                }
                             }
-                        }
-                    )
-                flag = True
+                        )
+                    flag = True
 
     async def find_room_in_db(self):
-        with transaction.atomic():
-            # 현재 상태가 "대기중"인 방이 있는지 탐색
-            db_room = self.get_waiting_db_room()
-            if db_room:
+            db_room = await self.get_waiting_db_room()
+            if db_room == None:
+                return "not"
+            else:
                 return db_room.room_name
-            return "not"
         
     @database_sync_to_async
     def get_waiting_db_room(self):
-        return GameRoom.objects.filter(status="waiting").first()
+        with transaction.atomic():
+            return GameRoom.objects.filter(status="waiting").first()
 
     @database_sync_to_async
     def get_db_room(self):
@@ -377,67 +384,67 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
         record = UserRecordPongGame.objects.get(me=is_user)
         return record.rating
     
-    async def calculate_rating(self):
-        class_room = self.get_class_room()
-        if class_room.winner == class_room.player0.name:
-            player0rating = rating_calculator(class_room.player0.rating, class_room.player1.rating, 0)
-            player1rating = rating_calculator(class_room.player1.rating, class_room.player0.rating, 1)
-            player2rating = rating_calculator(class_room.player2.rating, class_room.player0.rating, 1)
-            player3rating = rating_calculator(class_room.player3.rating, class_room.player0.rating, 1)
-        elif class_room.winner == class_room.player1.name:
-            player1rating = rating_calculator(class_room.player1.rating, class_room.player0.rating, 0)
-            player0rating = rating_calculator(class_room.player0.rating, class_room.player1.rating, 1)
-            player2rating = rating_calculator(class_room.player2.rating, class_room.player1.rating, 1)
-            player3rating = rating_calculator(class_room.player3.rating, class_room.player1.rating, 1)
-        elif class_room.winner == class_room.player2.name:
-            player2rating = rating_calculator(class_room.player2.rating, class_room.player3.rating, 0)
-            player0rating = rating_calculator(class_room.player0.rating, class_room.player2.rating, 1)
-            player1rating = rating_calculator(class_room.player1.rating, class_room.player2.rating, 1)
-            player3rating = rating_calculator(class_room.player3.rating, class_room.player2.rating, 1)
-        elif class_room.winner == class_room.player3.name:
-            player3rating = rating_calculator(class_room.player3.rating, class_room.player2.rating, 0)
-            player0rating = rating_calculator(class_room.player0.rating, class_room.player3.rating, 1)
-            player1rating = rating_calculator(class_room.player1.rating, class_room.player3.rating, 1)
-            player2rating = rating_calculator(class_room.player2.rating, class_room.player3.rating, 1)
+    # async def calculate_rating(self):
+    #     class_room = await self.get_class_room()
+    #     if class_room.winner == class_room.player0.name:
+    #         player0rating = rating_calculator(class_room.player0.rating, class_room.player1.rating, 0)
+    #         player1rating = rating_calculator(class_room.player1.rating, class_room.player0.rating, 1)
+    #         player2rating = rating_calculator(class_room.player2.rating, class_room.player0.rating, 1)
+    #         player3rating = rating_calculator(class_room.player3.rating, class_room.player0.rating, 1)
+    #     elif class_room.winner == class_room.player1.name:
+    #         player1rating = rating_calculator(class_room.player1.rating, class_room.player0.rating, 0)
+    #         player0rating = rating_calculator(class_room.player0.rating, class_room.player1.rating, 1)
+    #         player2rating = rating_calculator(class_room.player2.rating, class_room.player1.rating, 1)
+    #         player3rating = rating_calculator(class_room.player3.rating, class_room.player1.rating, 1)
+    #     elif class_room.winner == class_room.player2.name:
+    #         player2rating = rating_calculator(class_room.player2.rating, class_room.player3.rating, 0)
+    #         player0rating = rating_calculator(class_room.player0.rating, class_room.player2.rating, 1)
+    #         player1rating = rating_calculator(class_room.player1.rating, class_room.player2.rating, 1)
+    #         player3rating = rating_calculator(class_room.player3.rating, class_room.player2.rating, 1)
+    #     elif class_room.winner == class_room.player3.name:
+    #         player3rating = rating_calculator(class_room.player3.rating, class_room.player2.rating, 0)
+    #         player0rating = rating_calculator(class_room.player0.rating, class_room.player3.rating, 1)
+    #         player1rating = rating_calculator(class_room.player1.rating, class_room.player3.rating, 1)
+    #         player2rating = rating_calculator(class_room.player2.rating, class_room.player3.rating, 1)
 
-        await self.set_rating([class_room.player0.name, player0rating], [class_room.player1.name, player1rating], [class_room.player2.name, player2rating], [class_room.player3.name, player3rating], class_room.winner)
+    #     await self.set_rating([class_room.player0.name, player0rating], [class_room.player1.name, player1rating], [class_room.player2.name, player2rating], [class_room.player3.name, player3rating], class_room.winner)
     
-    @database_sync_to_async
-    def set_rating(self, player0Info, player1Info, player2Info, player3Info, winner):
-        player0 = User.objects.get(username=player0Info[0])
-        player0record = UserRecordPongGame.objects.get(me=player0)
-        player1 = User.objects.get(username=player1Info[0])
-        player1record = UserRecordPongGame.objects.get(me=player1)
-        player2 = User.objects.get(username=player0Info[0])
-        player2record = UserRecordPongGame.objects.get(me=player2)
-        player3 = User.objects.get(username=player1Info[0])
-        player3record = UserRecordPongGame.objects.get(me=player3)
-        player0record.rating = player0Info[1]
-        player1record.rating = player1Info[1]
-        player2record.rating = player2Info[1]
-        player3record.rating = player3Info[1]
-        if winner == player0.username:
-            player0record.win += 1
-            player1record.lose += 1
-            player2record.lose += 1
-            player3record.lose += 1
-        elif winner == player1.username:
-            player1record.win += 1
-            player0record.lose += 1
-            player2record.lose += 1
-            player3record.lose += 1
-        elif winner == player2.username:
-            player2record.win += 1
-            player0record.lose += 1
-            player1record.lose += 1
-            player3record.lose += 1
-        elif winner == player3.username:
-            player3record.win += 1
-            player0record.lose += 1
-            player1record.lose += 1
-            player2record.lose += 1
+    # @database_sync_to_async
+    # def set_rating(self, player0Info, player1Info, player2Info, player3Info, winner):
+    #     player0 = User.objects.get(username=player0Info[0])
+    #     player0record = UserRecordPongGame.objects.get(me=player0)
+    #     player1 = User.objects.get(username=player1Info[0])
+    #     player1record = UserRecordPongGame.objects.get(me=player1)
+    #     player2 = User.objects.get(username=player0Info[0])
+    #     player2record = UserRecordPongGame.objects.get(me=player2)
+    #     player3 = User.objects.get(username=player1Info[0])
+    #     player3record = UserRecordPongGame.objects.get(me=player3)
+    #     player0record.rating = player0Info[1]
+    #     player1record.rating = player1Info[1]
+    #     player2record.rating = player2Info[1]
+    #     player3record.rating = player3Info[1]
+    #     if winner == player0.username:
+    #         player0record.win += 1
+    #         player1record.lose += 1
+    #         player2record.lose += 1
+    #         player3record.lose += 1
+    #     elif winner == player1.username:
+    #         player1record.win += 1
+    #         player0record.lose += 1
+    #         player2record.lose += 1
+    #         player3record.lose += 1
+    #     elif winner == player2.username:
+    #         player2record.win += 1
+    #         player0record.lose += 1
+    #         player1record.lose += 1
+    #         player3record.lose += 1
+    #     elif winner == player3.username:
+    #         player3record.win += 1
+    #         player0record.lose += 1
+    #         player1record.lose += 1
+    #         player2record.lose += 1
 
-        player0record.save()
-        player1record.save()
-        player2record.save()
-        player3record.save()
+    #     player0record.save()
+    #     player1record.save()
+    #     player2record.save()
+    #     player3record.save()

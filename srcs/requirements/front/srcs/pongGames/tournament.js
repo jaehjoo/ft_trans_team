@@ -76,15 +76,17 @@ export const StartCanvasTournament = () => {
       } else if (textData.data.mode == "set.game") {
         entities[3].name = textData.data.player0;
         entities[4].name = textData.data.player1;
-        ws.send(
-          JSON.stringify({
-            type: "set.game",
-            data: {
-              player0: entities[3].name,
-              player1: entities[4].name,
-            },
-          })
-        );
+        if (textData.data.status == "match1") {
+          ws.send(
+            JSON.stringify({
+              type: "set.game",
+              data: {
+                player0: entities[3].name,
+                player1: entities[4].name,
+              },
+            })
+          );
+        }
       } else if (textData.data.mode == "game.start") {
         flag.START = true;
 		    flag.STOP = false;
