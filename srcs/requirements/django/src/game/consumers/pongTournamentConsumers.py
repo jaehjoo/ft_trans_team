@@ -108,8 +108,9 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
 
         elif msg_type == "next.game" and msg_data['status'] == "match1" and msg_data['name'] == self.user_name:
             class_room = await self.get_class_room()
-            class_room.winner = msg_data['name']
+            # class_room.winner = msg_data['name']
             class_room.status = "match2"
+            class_room.setForNextMatch()
             db_room = await self.get_db_room()
             await self.channel_layer.group_send(
                 self.game_group_name, {
@@ -123,7 +124,6 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
                     }
                 }
             )
-            class_room.setForNextMatch()
             await self.channel_layer.group_send(
                 self.game_group_name, {
                     "type" : "game.message",
@@ -140,8 +140,9 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
 
         elif msg_type == "next.game" and msg_data['status'] == "match2" and msg_data['name'] == self.user_name:
             class_room = await self.get_class_room()
-            class_room.winner2 = msg_data['name']
+            # class_room.winner2 = msg_data['name']
             class_room.status = "match3"
+            class_room.setForNextMatch()
             await self.channel_layer.group_send(
                 self.game_group_name, {
                     "type" : "game.message",
@@ -154,7 +155,6 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
                     }
                 }
             )
-            class_room.setForNextMatch()
             await self.channel_layer.group_send(
                 self.game_group_name, {
                     "type" : "game.message",

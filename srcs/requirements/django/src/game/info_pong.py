@@ -143,8 +143,7 @@ class Room:
 
 	def setForNextMatch(self):
 		self.score = Score()
-		self.window = Window(1024, 768, 1024 / 50, {1024 / 80, 768})
-		self.ball = Ball(1024 / 2, 768 / 2, 3, 3, 1024 / 100)
+		self.ball.init()
 		self.player0bar = Bar(self.window.width / 60, self.window.height / 7, self.window.width / 50, self.window.height / 2 - self.window.height / 14)
 		self.player1bar = Bar(self.window.width / 60, self.window.height / 7, self.window.width / 50 * 48 + 3, self.window.height / 2 - self.window.height / 14)
 
