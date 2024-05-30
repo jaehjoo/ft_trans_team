@@ -32,7 +32,7 @@ export const StartCanvasTournament = () => {
   let flag = {
     START: false,
     STOP: false,
-	FINAL: false,
+	  FINAL: false,
   };
 
   const access_token = localStorage.getItem('access_token')
@@ -49,15 +49,11 @@ export const StartCanvasTournament = () => {
     context.clearRect(0, 0, GameViewport.WIDTH, GameViewport.HEIGHT);
     if (flag.START == false) {
       scene[0].draw(context);
-    } else if (flag.STOP == true)
-    {
+    } else if (flag.STOP == true) {
       scene[1].draw(context);
-	  if (flag.FINAL == true) {
-		ws.close();
-		window.addEventListener("click", function() {
-			window.location.href("/login");
-		}, { once : true });
-	  }
+	    if (flag.FINAL == true) {
+		    ws.close();
+	    }
     }
   }
 
@@ -77,6 +73,7 @@ export const StartCanvasTournament = () => {
         entities[3].name = textData.data.player0;
         entities[4].name = textData.data.player1;
         if (textData.data.status == "match1") {
+          scene[1].setPlayerInfo([textData.data.player0, textData.data.player1, textData.data.player2, textData.data.player3]);
           ws.send(
             JSON.stringify({
               type: "set.game",
@@ -105,7 +102,7 @@ export const StartCanvasTournament = () => {
         document.removeEventListener("keydown", keyDownHandler, false);
         document.removeEventListener("keyup", keyUpHandler, false);
   		  if (textData.data['status'] == "match1") {
-			  scene[1].match1Winner = textData.data['winner'];
+			    scene[1].match1Winner = textData.data['winner'];
         } else if (textData.data['status'] == "match2") {
           scene[1].match2Winner = textData.data['winner'];
         } else if (textData.data['status'] == "match3") {
@@ -128,6 +125,9 @@ export const StartCanvasTournament = () => {
         }
       }	else if (textData.data.mode == "game.complete") {
         flag.FINAL = true;
+		    window.addEventListener("click", function() {
+			    window.location.href = "/main";
+		    }, { once : true });
         scene[1].match3Winner = textData.data['winner'];
       } else if (textData.data.mode == "abnormal.termination") {
         document.removeEventListener("keydown", keyDownHandler, false);
@@ -141,7 +141,7 @@ export const StartCanvasTournament = () => {
           })
         );
         ws.close();
-        window.location.href = "/login";
+        window.location.href = "/main";
       }
     }
   }
