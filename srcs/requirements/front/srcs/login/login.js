@@ -3,7 +3,7 @@ import Modal from "../../components/ui/CreateByModal.js";
 const Login = () => {
   const loginButtonClickHandler = () => {
     window.location.href =
-      "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-3f97e5a7884daa587a8fbdcab6bbc5e1c4ff366e0858e0e46097ed9abd24fef7&redirect_uri=https%3A%2F%2Ftranscendence.kgnj.kr%2Fshallwe&response_type=code";
+      "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-d0d023b144b4e27194209f49d44643e4fc9946d77bb5ea10e49f6eaf752677b1&redirect_uri=https%3A%2F%2F10.14.6.7%2Fshallwe&response_type=code";
   };
 
   window.loginButtonClickHandler = loginButtonClickHandler;

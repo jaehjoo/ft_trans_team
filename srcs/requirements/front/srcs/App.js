@@ -10,7 +10,7 @@ import PingPong from "./pongGames/pingpong.js";
 import Fighting from "./fightingGames/fighting.js";
 import MypageLayout from "./main/MypageLayout.js";
 
-export const URL = "https://transcendence.kgnj.kr";
+export const URL = "https://10.14.6.7";
 
 const refreshHandler = (event) => {
   if (
