@@ -1,6 +1,7 @@
 import { StartCanvasOne } from "./onebyone.js";
 import { StartCanvasTeam } from "./twobytwo.js";
 import { StartCanvasTournament } from "./tournament.js";
+import { StartCanavasOneLocal } from "./onebyone_local.js"; 
 
 const addCanvas = async () => {
   const canvas = document.createElement("canvas");
