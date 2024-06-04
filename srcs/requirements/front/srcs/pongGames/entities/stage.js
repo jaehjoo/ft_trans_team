@@ -34,6 +34,8 @@ export class Stage {
 		context.fillRect(0, 0, this.background.WIDTH, this.background.HEIGHT);
 	}
 
+	update_local() {}
+
 	draw(context) {
 		this.backgroundDraw(context);
 		this.middleLineDraw(context);

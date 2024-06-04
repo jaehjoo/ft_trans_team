@@ -5,14 +5,13 @@ import { PlayerOne } from "./entities/fighters/playerOne.js";
 import { PlayerTwo } from "./entities/fighters/playerTwo.js";
 import { Wait } from "./entities/wait.js";
 import { Result } from "./entities/res.js";
-import { Room } from "./physics/physics.js";
 
 const GameViewport = {
   WIDTH: 1024,
   HEIGHT: 768,
 };
 
-export const StartCanvasOne = () => {
+export const StartCanvasOneLocal = () => {
   const canvasEl = document.querySelector("canvas");
   const context = canvasEl.getContext("2d");
 
@@ -22,7 +21,6 @@ export const StartCanvasOne = () => {
   const entities = [
     new Stage(GameViewport),
     new Board(GameViewport),
-    new Room("one"),
     new Ball(GameViewport),
     new PlayerOne(GameViewport),
     new PlayerTwo(GameViewport),
@@ -42,10 +40,15 @@ export const StartCanvasOne = () => {
     context.clearRect(0, 0, GameViewport.WIDTH, GameViewport.HEIGHT);
     if (flag.START == false) {
       scene[0].draw(context);
+      flag.START = true;
+      setTimeout(function() {}, 1000);
     } else if (flag.STOP == true) {
       scene[1].draw(context);
       document.removeEventListener("keydown", keyDownHandler, false);
       document.removeEventListener("keyup", keyUpHandler, false);
+      window.addEventListener("click", function () {
+        window.location.href = "/main";
+      })
     }
   }
 
@@ -54,6 +57,80 @@ export const StartCanvasOne = () => {
     for (const entity of entities) {
       entity.draw(context);
     }
+  }
+
+  function checkWallCollision() {
+		if ((entities[2].ball.Y + entities[2].velocity.Y > entities[0].background.HEIGHT - entities[0].borderLine.WIDTH - entities[2].ball.RADIUS) || (entities[2].ball.Y + entities[2].velocity.Y < entities[0].borderLine.WIDTH + entities[2].ball.RADIUS))
+		  entities[2].velocity.Y *= -1.2;
+    if (entities[3].bar.Y < entities[0].borderLine.WIDTH)
+		  entities[3].bar.Y = entities[0].borderLine.WIDTH;
+    if (entities[3].bar.Y > entities[0].background.HEIGHT - entities[0].borderLine.WIDTH - entities[3].bar.HEIGHT)
+      entities[3].bar.Y = entities[0].background.HEIGHT - entities[0].borderLine.WIDTH - entities[3].bar.HEIGHT;
+    if (entities[4].bar.Y < entities[0].borderLine.WIDTH)
+      entities[4].bar.Y = entities[0].borderLine.WIDTH;
+    if (entities[4].bar.Y > entities[0].background.HEIGHT - entities[0].borderLine.WIDTH - entities[4].bar.HEIGHT)
+      entities[4].bar.Y = entities[0].background.HEIGHT - entities[0].borderLine.WIDTH - entities[4].bar.HEIGHT;
+  }
+
+  function getHitFactor(barMiddlePoint, barHarfHeight) {
+    return ((barMiddlePoint - entities[2].ball.Y) / barHarfHeight) * 1.2;
+  }
+
+  function checkBarCollision() {
+    let dir;
+
+    if (entities[2].ball.X - entities[2].ball.RADIUS < entities[3].bar.X + 10 && entities[2].ball.Y + entities[2].velocity.Y >= entities[3].bar.Y && entities[2].ball.Y + entities[2].velocity.Y <= entities[3].bar.Y + entities[3].bar.HEIGHT) {
+      dir = getHitFactor(entities[3].bar.Y + entities[3].bar.HEIGHT / 2, entities[3].bar.HEIGHT / 2)
+      entities[2].velocity.X *= -1.2;
+      entities[2].velocity.Y *= dir;
+    }
+    if (entities[2].ball.X + entities[2].ball.RADIUS > entities[4].bar.X + entities[4].bar.WIDTH - 10 && entities[2].ball.Y + entities[2].velocity.Y >= entities[4].bar.X && entities[2].ball.Y + entities[2].velocity.Y <= entities[4].bar.X + entities[4].bar.HEIGHT) {
+      dir = getHitFactor(entities[4].bar.X + entities[4].bar.HEIGHT / 2, entities[4].bar.HEIGHT / 2)
+      entities[2].velocity.X *= -1.2;
+      entities[2].velocity.Y *= dir;
+    }
+  }
+
+  function checkBoundary() {
+    if (entities[2].ball.X < entities[3].bar.X) {
+      entities[2].serve += 1
+      entities[2].init()
+      entities[1].score.TWO += 1
+    }
+    else if (entities[2].ball.X > entities[4].bar.X + entities[4].bar.WIDTH) {
+      entities[2].serve += 1
+      entities[2].init()
+      entities[1].score.ONE += 1
+   }
+  }
+
+  function update_physics() {
+    checkWallCollision();
+    checkBarCollision();
+    checkBoundary();
+  }
+
+  function checkScore() {
+    console.log(entities[1].score.WIN);
+		if (entities[1].score.ONE == entities[1].score.TWO && entities[1].score.ONE > 9) {
+			entities[1].score.WIN = entities[1].ONE + 2
+    }
+    if (entities[1].score.ONE > entities[1].score.TWO && entities[1].score.ONE == entities[1].score.WIN) {
+      entities[1].winner = "player1";
+      flag.STOP = true;
+    }
+    else if (entities[1].score.ONE < entities[1].score.TWO && entities[1].score.TWO == entities[1].score.WIN) {
+      entities[1].winner = "player2";
+      flag.STOP = true;
+    }
+  }
+
+  function update() {
+    for (const entitiy of entities) {
+      entitiy.update_local();
+    }
+    update_physics();
+    checkScore();
   }
 
   function start(time) {
@@ -74,25 +151,25 @@ export const StartCanvasOne = () => {
 
   function keyDownHandler(event) {
     if (event.keyCode == 87)
-      entities[2].setplayer0barState("up", true);
+      entities[3].upPressed = true;
     if (event.keyCode == 38)
-      entities[2].setplayer1barState("up", true);
+      entities[4].upPressed = true;
     if (event.keyCode == 83)
-      entities[2].setplayer0barState("down", true);
+      entities[3].downPressed = true;
     if (event.keyCode == 40)
-      entities[2].setplayer1barState("down", true);
+      entities[4].downPressed = true;
   }
 
   function keyUpHandler(event) {
     if (event.keyCode == 87)
-      entities[2].setplayer0barState("up", false);
+      entities[3].upPressed = false;
     if (event.keyCode == 38)
-      entities[2].setplayer1barState("up", false);
+      entities[4].upPressed = false;
     if (event.keyCode == 83)
-      entities[2].setplayer0barState("down", false);
+      entities[3].downPressed = false;
     if (event.keyCode == 40)
-      entities[2].setplayer1barState("down", false);
+      entities[4].downPressed = false;
   }
 }
 
-export default StartCanvasOne;
+export default StartCanvasOneLocal;

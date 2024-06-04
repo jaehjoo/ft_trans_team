@@ -36,6 +36,11 @@ export class Ball {
     this.ball.Y = y;
   }
 
+  update_local() {
+    this.ball.X += this.velocity.X;
+    this.ball.Y += this.velocity.Y;
+  }
+
   draw(context) {
     context.beginPath();
     context.arc(this.ball.X, this.ball.Y, this.ball.RADIUS, 0, Math.PI * 2);

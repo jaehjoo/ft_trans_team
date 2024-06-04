@@ -12,9 +12,23 @@ export class Fighter {
     this.name = "";
   }
 
+	init(x, y) {
+		this.bar.X = x;
+		this.bar.Y = y;
+	}
+
   update(x, y) {
     this.bar.X = x;
     this.bar.Y = y;
+  }
+
+  update_local() {
+    if (this.upPressed == true) {
+      this.bar.Y -= 7;
+    }
+    if (this.downPressed == true) {
+      this.bar.Y += 7;
+    }
   }
 
   draw(context) {

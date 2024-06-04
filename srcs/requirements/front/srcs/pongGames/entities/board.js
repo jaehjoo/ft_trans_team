@@ -9,11 +9,21 @@ export class Board {
 			TWO : 0,
 			WIN : 11
 		}
+		this.winner = "";
+	}
+
+	init() {
+		this.score.ONE = 0;
+		this.score.TWO = 0;
+		this.score.WIN = 11;
 	}
 
 	update(ONE, TWO) {
 		this.score.ONE = ONE;
 		this.score.TWO = TWO;
+	}
+
+	update_local() {
 	}
 
 	draw(context) {

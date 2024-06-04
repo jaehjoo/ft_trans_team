@@ -10,13 +10,16 @@ import PingPong from "./pongGames/pingpong.js";
 import Fighting from "./fightingGames/fighting.js";
 import MypageLayout from "./main/MypageLayout.js";
 
-export const URL = "https://10.14.6.7";
+export const URL = "https://10.14.6.8";
 
 const refreshHandler = (event) => {
   if (
     window.location.pathname === "/pingpong/onebyone" ||
     window.location.pathname === "/pingpong/twobytwo" ||
     window.location.pathname === "/pingpong/tournament" ||
+    window.location.pathname === "/pingpong/onebyonelocal" ||
+    window.location.pathname === "/pingpong/twobytwolocal" ||
+    window.location.pathname === "/pingpong/tournamentlocal" ||
     window.location.pathname === "/fighting"
   ) {
     event.returnValue =
@@ -33,6 +36,9 @@ window.addEventListener("popstate", function (event) {
     path === "/pingpong/onebyone" ||
     path === "/pingpong/twobytwo" ||
     path === "/pingpong/tournament" ||
+    path === "/pingpong/onebyonelocal" ||
+    path === "/pingpong/twobytwolocal" ||
+    path === "/pingpong/tournamentlocal" ||
     path === "/fighting"
   ) {
     window.history.pushState(null, document.title, location.href);
@@ -94,6 +100,15 @@ export const App = () => {
   } else if (window.location.pathname === "/pingpong/tournament") {
     document.body.innerHTML = "";
     PingPong("tournament");
+  } else if (window.location.pathname === "/pingpong/onebyonelocal") {
+    document.body.innerHTML = "";
+    PingPong("one_local");
+  } else if (window.location.pathname === "/pingpong/twobytwolocal") {
+    document.body.innerHTML = "";
+    PingPong("team_local");
+  } else if (window.location.pathname === "/pingpong/tournamentlocal") {
+    document.body.innerHTML = "";
+    PingPong("tournamnet_local");
   } else if (window.location.pathname === "/fighting") {
     document.body.innerHTML = "";
     Fighting();
