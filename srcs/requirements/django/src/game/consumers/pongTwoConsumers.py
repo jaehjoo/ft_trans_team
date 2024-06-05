@@ -132,7 +132,7 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
         class_room = getattr(self.RoomList, self.game_group_name)
 
         while True:
-            await asyncio.sleep(0.01)
+            await asyncio.sleep(0.0005)
             class_room.update()
             if class_room.winner != "" and class_room.winner2 != "":
                 await self.calculate_rating()

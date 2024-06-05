@@ -26,8 +26,8 @@ export const StartCanvasTeam = () => {
     new Ball(GameViewport),
     new PlayerOne(GameViewport),
     new PlayerTwo(GameViewport),
-	new PlayerThree(GameViewport),
-	new PlayerFour(GameViewport),
+	  new PlayerThree(GameViewport),
+	  new PlayerFour(GameViewport),
   ];
 
   const scene = [new Wait(GameViewport), new Result(GameViewport)];
@@ -73,16 +73,16 @@ export const StartCanvasTeam = () => {
       } else if (textData.data.mode == "set.game") {
         entities[3].name = textData.data.player0;
         entities[4].name = textData.data.player1;
-		entities[5].name = textData.data.player2;
-		entities[6].name = textData.data.player3;
+		    entities[5].name = textData.data.player2;
+		    entities[6].name = textData.data.player3;
         ws.send(
           JSON.stringify({
             type: "set.game",
             data: {
               player0: entities[3].name,
               player1: entities[4].name,
-			  player2: entities[5].name,
-			  player3: entities[6].name,
+			        player2: entities[5].name,
+			        player3: entities[6].name,
             },
           })
         );

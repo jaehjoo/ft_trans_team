@@ -186,7 +186,7 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
         class_room = await self.get_class_room()
 
         while True:
-            await asyncio.sleep(0.01)
+            await asyncio.sleep(0.0005)
             class_room.update()
             # match1이 종료된 조건
             if class_room.status == "match1" and class_room.winner != "":

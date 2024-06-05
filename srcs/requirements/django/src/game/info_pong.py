@@ -296,7 +296,7 @@ class Room:
 				self.score.ONE += 1
 
 	def checkScore(self):
-		if self.score.ONE == self.score.TWO and self.score.ONE > 9:
+		if self.score.ONE == self.score.TWO and self.score.ONE > self.score.WIN - 2:
 			self.score.WIN = self.score.ONE + 2
 		if self.mode == "one" and self.status == "match1":
 			if self.score.ONE > self.score.TWO and self.score.ONE == self.score.WIN:
@@ -317,6 +317,6 @@ class Room:
 			if self.score.ONE > self.score.TWO and self.score.ONE == self.score.WIN:
 				self.winner = self.player0.name
 				self.winner2 = self.player1.name
-			elif self.score.TWO > self.score.TWO and self.score.TWO == self.score.WIN:
+			elif self.score.TWO > self.score.ONE and self.score.TWO == self.score.WIN:
 				self.winner = self.player2.name
 				self.winner2 = self.player3.name
