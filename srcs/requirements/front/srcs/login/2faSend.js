@@ -20,6 +20,8 @@ const Sended = (fa) => {
         if (data.success === "N") {
           localStorage.clear();
           window.location.href = "/login";
+        } else {
+          window.location.href = "/main";
         }
       });
     } catch (e) {

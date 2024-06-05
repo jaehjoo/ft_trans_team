@@ -52,7 +52,7 @@ class Score:
 	def __init__(self):
 		self.ONE = 0
 		self.TWO = 0
-		self.WIN = 1
+		self.WIN = 5
 
 	def setScore(self, ONE, TWO):
 		self.ONE = ONE

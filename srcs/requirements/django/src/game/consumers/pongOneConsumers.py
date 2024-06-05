@@ -46,9 +46,9 @@ class PongOneConsumers(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         try:
-            member_count = await self.get_group_member_count(self.game_group_name)
-            if member_count == 1:
-                await delattr(self.RoomList, self.game_group_name)
+            cnt = await self.db_cnt()
+            if cnt == 2:
+                delattr(self.RoomList, self.game_group_name)
                 await self.db_delete()
         except AttributeError:
             logger.debug("No room")
