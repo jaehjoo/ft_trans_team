@@ -90,14 +90,14 @@ class Ball:
 	
 	def init(self):
 		self.ballX, self.ballY = self.initLoca
-		if self.velocityX < 0 and self.velocityX != -3:
-			self.velocityX = -3
-		elif self.velocityX > 0 and self.velocityX != 3:
-			self.velocityX = 3
-		if self.velocityY < 0 and self.velocityY != -3:
-			self.velocityY = -3
-		elif self.velocityY > 0 and self.velocityY != 3:
-			self.velocityY = 3
+		if self.velocityX < 0 and self.velocityX != -6:
+			self.velocityX = -6
+		elif self.velocityX > 0 and self.velocityX != 6:
+			self.velocityX = 6
+		if self.velocityY < 0 and self.velocityY != -6:
+			self.velocityY = -6
+		elif self.velocityY > 0 and self.velocityY != 6:
+			self.velocityY = 6
 
 		if self.serve == 2:
 			self.velocityX *= -1
@@ -128,7 +128,7 @@ class Room:
 		self.winner2 = ""
 		self.winner3 = ""
 		self.window = Window(1024, 768, 1024 / 50, {1024 / 80, 768})
-		self.ball = Ball(1024 / 2, 768 / 2, 3, 3, 1024 / 100)
+		self.ball = Ball(1024 / 2, 768 / 2, 6, 6, 1024 / 100)
 		self.score = Score()
 		self.mode = mode
 		self.status = "match1"
@@ -144,7 +144,7 @@ class Room:
 	def setForNextMatch(self):
 		self.score = Score()
 		self.window = Window(1024, 768, 1024 / 50, {1024 / 80, 768})
-		self.ball = Ball(1024 / 2, 768 / 2, 3, 3, 1024 / 100)
+		self.ball = Ball(1024 / 2, 768 / 2, 6, 6, 1024 / 100)
 		self.player0bar = Bar(self.window.width / 60, self.window.height / 7, self.window.width / 50, self.window.height / 2 - self.window.height / 14)
 		self.player1bar = Bar(self.window.width / 60, self.window.height / 7, self.window.width / 50 * 48 + 3, self.window.height / 2 - self.window.height / 14)
 

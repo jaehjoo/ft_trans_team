@@ -10,8 +10,8 @@ export class Ball {
       Y: view.HEIGHT / 2,
     };
     this.velocity = {
-      X: 3,
-      Y: 3,
+      X: 6,
+      Y: 6,
     };
     this.serve = 0;
     this.ballColor;
@@ -20,10 +20,10 @@ export class Ball {
   init() {
     this.ball.X = this.window.WIDTH / 2;
     this.ball.Y = this.window.HEIGHT / 2;
-    if (this.velocity.X < 0) this.velocity.X = -3;
-    else this.velocity.X = 3;
-    if (this.velocity.Y < 0) this.velocity.Y = -3;
-    else this.velocity.Y = 3;
+    if (this.velocity.X < 0) this.velocity.X = -6;
+    else this.velocity.X = 6;
+    if (this.velocity.Y < 0) this.velocity.Y = -6;
+    else this.velocity.Y = 6;
     if (this.serve == 2) {
       this.velocity.X *= -1;
       this.velocity.Y *= -1;

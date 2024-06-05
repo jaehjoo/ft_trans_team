@@ -49,10 +49,10 @@ class fightingConsumers(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         try:
             cnt = await self.db_cnt()
-            if cnt == 2:
-                delattr(self.RoomList, self.game_group_name)
+            if cnt == 1:
                 await self.db_delete()
-        except AttributeError:
+                delattr(self.RoomList, self.game_group_name)
+        except:
             logger.debug('No room')
         if close_code == 1000:
             if self.game_group_name:

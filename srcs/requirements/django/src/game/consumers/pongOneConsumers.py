@@ -47,11 +47,12 @@ class PongOneConsumers(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         try:
             cnt = await self.db_cnt()
+            logger.error("cnt : " + str(cnt))
             if cnt == 1:
-                delattr(self.RoomList, self.game_group_name)
                 await self.db_delete()
-        except AttributeError:
-            logger.debug("No room")
+                delattr(self.RoomList, self.game_group_name)
+        except:
+            logger.error("No room")
 
         if close_code == 1000:
             if self.game_group_name:
@@ -193,7 +194,7 @@ class PongOneConsumers(AsyncWebsocketConsumer):
         class_room = getattr(self.RoomList, self.game_group_name)
 
         while True:
-            await asyncio.sleep(0.01)
+            await asyncio.sleep(0.0005)
             class_room.update()
             if class_room.winner != "":
                 await self.calculate_rating()
