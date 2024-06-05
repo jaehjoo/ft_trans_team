@@ -24,6 +24,7 @@ class UserKey(models.Model):
 	access_42 = models.CharField(max_length=80, default="")
 	# 0 : 등록 안 함, 1 : email, 2 : sms, 3 : otp
 	auth2fa = models.IntegerField(default=0)
+	
 	otp_secret = models.CharField(max_length=32, default="")
 	twofactorkey = models.CharField(max_length=32, default="")
 

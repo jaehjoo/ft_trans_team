@@ -75,7 +75,7 @@ def send_otp(request):
     except User.DoesNotExist:
         return False
     key = UserKey.objects.get(me=user)
-    if key.auth2fa == 3:
+    if key.otp_secret != "":
         secret_key = key.otp_secret
     else:
         secret_key = random_key(32)

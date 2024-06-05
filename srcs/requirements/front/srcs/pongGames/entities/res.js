@@ -19,4 +19,8 @@ export class Result {
       context.drawImage(this.screen.LOSE, 0, 0);
     }
   }
+
+  draw_local(context, winner) {
+    context.draw
+  }
 }
