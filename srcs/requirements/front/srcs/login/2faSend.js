@@ -16,12 +16,12 @@ const Sended = (fa) => {
         },
       });
 
-      if (res.success === "N") {
-        localStorage.clear();
-        window.location.href = "/login";
-      } else {
-        window.location.href = "/main";
-      }
+      res.json().then((data) => {
+        if (data.success === "N") {
+          localStorage.clear();
+          window.location.href = "/login";
+        }
+      });
     } catch (e) {
       console.log(e);
     }

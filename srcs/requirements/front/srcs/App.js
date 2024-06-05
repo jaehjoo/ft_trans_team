@@ -108,7 +108,7 @@ export const App = () => {
     PingPong("team_local");
   } else if (window.location.pathname === "/pingpong/tournamentlocal") {
     document.body.innerHTML = "";
-    PingPong("tournamnet_local");
+    PingPong("tournament_local");
   } else if (window.location.pathname === "/fighting") {
     document.body.innerHTML = "";
     Fighting();

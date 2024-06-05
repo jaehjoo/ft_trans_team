@@ -1,7 +1,9 @@
 import { StartCanvasOne } from "./onebyone.js";
 import { StartCanvasTeam } from "./twobytwo.js";
 import { StartCanvasTournament } from "./tournament.js";
-import { StartCanvasOneLocal } from "./onebyone_local.js"; 
+import { StartCanvasOneLocal } from "./onebyone_local.js";
+import { StartCanvasTeamLocal } from "./twobytwo_local.js";
+import { StartCanvasTournamentLocal } from "./tournament_local.js";
 
 const addCanvas = async () => {
   const canvas = document.createElement("canvas");
@@ -23,6 +25,10 @@ const PingPong = (str) => {
       StartCanvasTournament();
     else if (str === "one_local")
       StartCanvasOneLocal();
+    else if (str === "team_local")
+      StartCanvasTeamLocal();
+    else if (str === "tournament_local")
+      StartCanvasTournamentLocal();
   });
 };
 

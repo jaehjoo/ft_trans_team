@@ -103,7 +103,7 @@ def check_code_2fa(request):
                 result = False
             key.twofactorkey = ""
             key.save()
-            if result:
+            if result == True:
                 return jsonMessage("Y", None, None)
         except User.DoesNotExist:
             return jsonMessage("N", "fail.input2fa", None)

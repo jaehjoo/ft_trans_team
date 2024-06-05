@@ -7,7 +7,7 @@ export class Board {
 		this.score = {
 			ONE : 0,
 			TWO : 0,
-			WIN : 11
+			WIN : 5,
 		}
 		this.winner = "";
 	}
@@ -15,7 +15,7 @@ export class Board {
 	init() {
 		this.score.ONE = 0;
 		this.score.TWO = 0;
-		this.score.WIN = 11;
+		this.score.WIN = 5;
 	}
 
 	update(ONE, TWO) {

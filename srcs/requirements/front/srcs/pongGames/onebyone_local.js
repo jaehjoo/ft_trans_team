@@ -46,9 +46,6 @@ export const StartCanvasOneLocal = () => {
       scene[1].draw(context);
       document.removeEventListener("keydown", keyDownHandler, false);
       document.removeEventListener("keyup", keyUpHandler, false);
-      window.addEventListener("click", function () {
-        window.location.href = "/main";
-      })
     }
   }
 
@@ -84,11 +81,13 @@ export const StartCanvasOneLocal = () => {
       entities[2].velocity.X *= -1.2;
       entities[2].velocity.Y *= dir;
     }
-    if (entities[2].ball.X + entities[2].ball.RADIUS > entities[4].bar.X + entities[4].bar.WIDTH - 10 && entities[2].ball.Y + entities[2].velocity.Y >= entities[4].bar.X && entities[2].ball.Y + entities[2].velocity.Y <= entities[4].bar.X + entities[4].bar.HEIGHT) {
-      dir = getHitFactor(entities[4].bar.X + entities[4].bar.HEIGHT / 2, entities[4].bar.HEIGHT / 2)
+    if (entities[2].ball.X + entities[2].ball.RADIUS > entities[4].bar.X + entities[4].bar.WIDTH - 10 && entities[2].ball.Y + entities[2].velocity.Y >= entities[4].bar.Y && entities[2].ball.Y + entities[2].velocity.Y <= entities[4].bar.Y + entities[4].bar.HEIGHT) {
+      dir = getHitFactor(entities[4].bar.Y + entities[4].bar.HEIGHT / 2, entities[4].bar.HEIGHT / 2)
       entities[2].velocity.X *= -1.2;
       entities[2].velocity.Y *= dir;
     }
+    if (!entities[2].velocity.Y)
+      entities[2].velocity.Y = 3;
   }
 
   function checkBoundary() {
@@ -111,17 +110,22 @@ export const StartCanvasOneLocal = () => {
   }
 
   function checkScore() {
-    console.log(entities[1].score.WIN);
 		if (entities[1].score.ONE == entities[1].score.TWO && entities[1].score.ONE > 9) {
 			entities[1].score.WIN = entities[1].ONE + 2
     }
     if (entities[1].score.ONE > entities[1].score.TWO && entities[1].score.ONE == entities[1].score.WIN) {
       entities[1].winner = "player1";
       flag.STOP = true;
+      window.addEventListener("click", function() {
+       window.location.href = "/main"; 
+      }, {once : true});
     }
     else if (entities[1].score.ONE < entities[1].score.TWO && entities[1].score.TWO == entities[1].score.WIN) {
       entities[1].winner = "player2";
       flag.STOP = true;
+      window.addEventListener("click", function() {
+        window.location.href = "/main"; 
+      }, {once : true});
     }
   }
 
@@ -137,10 +141,10 @@ export const StartCanvasOneLocal = () => {
     window.requestAnimationFrame(start);
     secondsPassed = (time - previousTime) / 1000;
     previousTime = time;
-    update();
     if (flag.START == false || flag.STOP == true) {
       sceneDraw();
     } else {
+      update();
       playingDraw();
     }
   }
