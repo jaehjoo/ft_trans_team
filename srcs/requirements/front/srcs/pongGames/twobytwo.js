@@ -51,8 +51,7 @@ export const StartCanvasTeam = () => {
     context.clearRect(0, 0, GameViewport.WIDTH, GameViewport.HEIGHT);
     if (flag.START == false) {
       scene[0].draw(context);
-    } else if (flag.STOP == true)
-    {
+    } else if (flag.STOP == true) {
       scene[1].draw(context);
       ws.close();
     }
@@ -114,7 +113,7 @@ export const StartCanvasTeam = () => {
         	scene[1].win = 2;
         window.addEventListener("click", function() {
           window.location.href = "/main";
-        }, {once : true})
+        }, {once : true});
       } else if (textData.data.mode == "abnormal.termination") {
         document.removeEventListener("keydown", keyDownHandler, false);
         document.removeEventListener("keyup", keyUpHandler, false);

@@ -140,7 +140,7 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
                     self.game_group_name, {
                         "type" : "game.message",
                         "data" : {
-                            "mode" : "game.compelete",
+                            "mode" : "game.complete",
                             "winner" : class_room.winner,
                             "winner2" : class_room.winner2,
                         }
