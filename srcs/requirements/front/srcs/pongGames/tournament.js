@@ -124,6 +124,7 @@ export const StartCanvasTournament = () => {
           }
         }
       }	else if (textData.data.mode == "game.complete") {
+        flag.STOP = true;
         flag.FINAL = true;
 		    window.addEventListener("click", function() {
 			    window.location.href = "/main";

@@ -94,7 +94,8 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
             if num_players == 1 and class_room == None:
                 setattr(self.RoomList, self.game_group_name, Room("one"))
                 class_room = await self.get_class_room()
-                class_room.setPlayerOneByOne({"name": msg_data['player0'], "rating": 0}, {"name": msg_data['player1'], "rating": 0})
+                players = await self.get_players()
+                class_room.setPlayerTournament(players)
             if num_players == 4 and class_room != None:
                 await self.channel_layer.group_send(
                     self.game_group_name, {
@@ -111,6 +112,7 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
                 asyncio.create_task(self.game_update_task())
 
         elif msg_type == "next.game" and msg_data['status'] == "match1" and msg_data['name'] == self.user_name:
+            await asyncio.sleep(2)
             class_room = await self.get_class_room()
             class_room.winner = msg_data['name']
             class_room.status = "match2"
@@ -143,6 +145,7 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
             asyncio.create_task(self.game_update_task())
 
         elif msg_type == "next.game" and msg_data['status'] == "match2" and msg_data['name'] == self.user_name:
+            await asyncio.sleep(2)
             class_room = await self.get_class_room()
             class_room.winner2 = msg_data['name']
             class_room.status = "match3"
@@ -355,6 +358,14 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
                 db_room.players[i] = self.user_name
                 break
         db_room.save()
+    
+    @database_sync_to_async
+    def get_players(self):
+        db_room = GameRoom.objects.get(room_name=self.game_group_name)
+        all_players = []
+        for i in range(4):
+            all_players.append(db_room.players[i])
+        return all_players
 
     async def match_players(self, db_room):
         players = [db_room.players[0], db_room.players[1], db_room.players[2], db_room.players[3]]

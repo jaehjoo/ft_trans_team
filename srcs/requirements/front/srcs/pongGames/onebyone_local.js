@@ -43,7 +43,7 @@ export const StartCanvasOneLocal = () => {
       flag.START = true;
       setTimeout(function() {}, 1000);
     } else if (flag.STOP == true) {
-      scene[1].draw(context);
+      scene[1].draw_local(context, "one");
       document.removeEventListener("keydown", keyDownHandler, false);
       document.removeEventListener("keyup", keyUpHandler, false);
     }
@@ -115,6 +115,7 @@ export const StartCanvasOneLocal = () => {
     }
     if (entities[1].score.ONE > entities[1].score.TWO && entities[1].score.ONE == entities[1].score.WIN) {
       entities[1].winner = "player1";
+      scene[1].win = 1;
       flag.STOP = true;
       window.addEventListener("click", function() {
        window.location.href = "/main"; 
@@ -122,6 +123,7 @@ export const StartCanvasOneLocal = () => {
     }
     else if (entities[1].score.ONE < entities[1].score.TWO && entities[1].score.TWO == entities[1].score.WIN) {
       entities[1].winner = "player2";
+      scene[1].win = 2;
       flag.STOP = true;
       window.addEventListener("click", function() {
         window.location.href = "/main"; 
