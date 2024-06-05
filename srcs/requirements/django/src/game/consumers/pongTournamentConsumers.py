@@ -20,6 +20,7 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
 
     async def connect(self):
         self.game_group_name = ""
+        self.status = 0
         self.create_time = datetime.now()
         query_string = parse_qs(self.scope['query_string'].decode())
         access_token = query_string.get('access', None)[0]
@@ -43,40 +44,43 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
             await self.close()
 
     async def disconnect(self, close_code):
-        try:
-            cnt = await self.db_cnt()
-            if cnt == 1:
-                await self.db_delete()
-                delattr(self.RoomList, self.game_group_name)
-        except:
-            logger.debug("No room")
+        class_room = await self.get_class_room()
 
-        if close_code == 1000:
-            if self.game_group_name:
-                await self.channel_layer.group_send(
-                    self.game_group_name, {
-                        'type' : 'game.message',
-                        'data' : {
-                            'mode' : 'normal.termination',
+        if self.status != 2:
+            try:
+                cnt = await self.db_cnt()
+                if cnt == 1:
+                    await self.db_delete()
+                    delattr(self.RoomList, self.game_group_name)
+            except:
+                logger.debug("No room")
+
+            if close_code == 1000:
+                if self.game_group_name:
+                    await self.channel_layer.group_send(
+                        self.game_group_name, {
+                            'type' : 'game.message',
+                            'data' : {
+                                'mode' : 'normal.termination',
+                            }
                         }
-                    }
-                )
-                await self.channel_layer.group_discard(self.game_group_name, self.channel_name)
-            class_room = await self.get_class_room()
-            if class_room != None:
-                delattr(self.RoomList, self.game_group_name)
-        else:
-            logger.error("websocket " + self.channel_name + ": abnormal termination")
-            if self.game_group_name:
-                await self.channel_layer.group_send(
-                    self.game_group_name, {
-                        'type' : 'game.message',
-                        'data' : {
-                            'mode' : 'abnormal.termination',
+                    )
+                    await self.channel_layer.group_discard(self.game_group_name, self.channel_name)
+                class_room = await self.get_class_room()
+                if class_room != None:
+                    delattr(self.RoomList, self.game_group_name)
+            else:
+                logger.error("websocket " + self.channel_name + ": abnormal termination")
+                if self.game_group_name:
+                    await self.channel_layer.group_send(
+                        self.game_group_name, {
+                            'type' : 'game.message',
+                            'data' : {
+                                'mode' : 'abnormal.termination',
+                            }
                         }
-                    }
-                )
-                await self.channel_layer.group_discard(self.game_group_name, self.channel_name)
+                    )
+                    await self.channel_layer.group_discard(self.game_group_name, self.channel_name)
         await self.close()
 
     async def receive(self, text_data):
@@ -190,6 +194,11 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
             class_room.update()
             # match1이 종료된 조건
             if class_room.status == "match1" and class_room.winner != "":
+                if class_room.player0.name == self.user_name or class_room.player1.name == self.user_name:
+                    if class_room.winner == self.user_name:
+                        self.status = 1
+                    else:
+                        self.status = 2
                 await self.channel_layer.group_send(
                     self.game_group_name, {
                         "type" : "game.message",
@@ -203,6 +212,11 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
                 break
             # match2 종료된 조건
             elif class_room.status == "match2" and class_room.winner2 != "":
+                if class_room.player2.name == self.user_name or class_room.player3.name == self.user_name:
+                    if class_room.winner2 == self.user_name:
+                        self.status = 1
+                    else:
+                        self.status = 2
                 await self.channel_layer.group_send(
                     self.game_group_name, {
                         "type" : "game.message",
