@@ -1,0 +1,31 @@
+#nginx
+NGINX_PORT="443"
+SSL_CRT="\/etc\/nginx\/ssl\/jaehjoo.crt"
+SSL_KEY="\/etc\/nginx\/ssl\/jaehjoo.key"
+SSL_CRT_OSL="/etc/nginx/ssl/jaehjoo.crt"
+SSL_KEY_OSL="/etc/nginx/ssl/jaehjoo.key"
+#django
+DJANGO_SECRET_KEY="django-insecure-o6t1oz+tk^e6!8y*ij*4j#n=sus^ap)m@-!=72f1=q4)v-1f0@"
+SERVER_PORT="8000"
+DJANGO_SUPERUSER_PASSWORD="1234"
+DJANGO_SUPERUSER_USERNAME="philo"
+DJANGO_SUPERUSER_EMAIL="jaehjoo@student.42seoul.kr"
+ACCESS_SECRET="lwkn wefwef"
+REFRESH_SECRET="wlkslns wlwlss"
+SERVER_ADDRESS = "transcendence.kgnj.kr"
+#2fa
+EMAIL_SECRET="zkfmrh3645!"
+COOLSMS_API_KEY="NCSFE7Q84WRCSTKS"
+COOLSMS_API_SECRET="M5JDEN9JR1OVOBXUNWN5WSQGOIWWVJRQ"
+COOLSMS_NUMBER="01048103778"
+#auth42, 기한 : 4.19
+42_CLIENT_SECRET="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"
+42_BASE_URL = "https://api.intra.42.fr/oauth/token"
+42_CLIENT_ID="u-s4t2ud-d0d023b144b4e27194209f49d44643e4fc9946d77bb5ea10e49f6eaf752677b1"
+#db
+HOST_NAME="db"
+DB_PORT="5432"
+DB_PASS="1234"
+DB_NAME="transcendence"
+DB_USER="postgres"
+#front

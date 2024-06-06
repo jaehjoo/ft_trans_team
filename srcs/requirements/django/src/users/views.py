@@ -1,5 +1,6 @@
 import json, logging
 from django.http import JsonResponse
+from django.middleware.csrf import get_token
 from datetime import datetime
 from users.models import User, UserAvatar, UserKey, UserRecordFriends, UserRecordPongGame, UserRecordFightingGame
 from users import jwt, enroll42, enroll2fa
@@ -52,6 +53,7 @@ def login(request):
 			return jsonMessage("Y", "success.login.already", {'name' : name})
 	user = auth_42(request)
 	if user:
+		csrf_token = get_token(request)
 		return jsonMessage("Y", None, {"access" : jwt.generate_access(user), "refresh" : jwt.generate_refresh(user)})
 	return jsonMessage("N", "fail.auth.42", None)
 
