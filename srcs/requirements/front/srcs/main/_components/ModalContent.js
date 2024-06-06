@@ -1,5 +1,3 @@
-import { useState } from "../../../MyReact.js";
-
 const ModalContent = () => {
   const handleClick = (text) => {
     switch (text) {
@@ -14,6 +12,15 @@ const ModalContent = () => {
         break;
       case "fighting":
         window.location.href = "/fighting";
+        break;
+      case "L1v1":
+        window.location.href = "/pingpong/onebyonelocal";
+        break;
+      case "L2v2":
+        window.location.href = "/pingpong/twobytwolocal";
+        break;
+      case "Ltournament":
+        window.location.href = "/pingpong/tournamentlocal";
         break;
       default:
         break;
@@ -35,6 +42,11 @@ const ModalContent = () => {
         <button type="button" class="btn btn-primary w-100" onclick="modalHandleClick('2v2')">2 VS 2</button>
         <button type="button" class="btn btn-primary w-100" onclick="modalHandleClick('tournament')">Tournament</button>
         <button type="button" class="btn btn-primary w-100" onclick="modalHandleClick('fighting')">Fighting Game</button>
+        <hr>
+        <p>Local Play</p>
+        <button type="button" class="btn btn-primary w-100" onclick="modalHandleClick('L1v1')">1 VS 1</button>
+        <button type="button" class="btn btn-primary w-100" onclick="modalHandleClick('L2v2')">2 VS 2</button>
+        <button type="button" class="btn btn-primary w-100" onclick="modalHandleClick('Ltournament')">Tournament</button>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
