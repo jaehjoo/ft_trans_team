@@ -29,22 +29,6 @@ const refreshHandler = (event) => {
 
 window.onbeforeunload = refreshHandler;
 
-window.history.pushState(null, document.title, location.href);
-window.addEventListener("popstate", function (event) {
-  const path = window.location.pathname;
-  if (
-    path === "/pingpong/onebyone" ||
-    path === "/pingpong/twobytwo" ||
-    path === "/pingpong/tournament" ||
-    path === "/pingpong/onebyonelocal" ||
-    path === "/pingpong/twobytwolocal" ||
-    path === "/pingpong/tournamentlocal" ||
-    path === "/fighting"
-  ) {
-    window.history.pushState(null, document.title, location.href);
-  }
-});
-
 export const App = () => {
   if (window.location.pathname === "/") {
     if (localStorage.getItem("access_token") === null) {
