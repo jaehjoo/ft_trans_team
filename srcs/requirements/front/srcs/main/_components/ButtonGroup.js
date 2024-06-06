@@ -10,7 +10,7 @@ const ButtonGroup = () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-CSRFToken": localStorage.getItem("csrf_token"),
+        // "X-CSRFToken": localStorage.getItem("csrf_token"),
       },
       body: JSON.stringify({
         access: localStorage.getItem("access_token"),

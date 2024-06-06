@@ -17,7 +17,7 @@ const avatarChange = async (data) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-CSRFToken": localStorage.getItem("csrf_token"),
+        // "X-CSRFToken": localStorage.getItem("csrf_token"),
       },
       body: JSON.stringify(data),
     });
@@ -108,7 +108,7 @@ const MyPage = () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-CSRFToken": localStorage.getItem("csrf_token"),
+        // "X-CSRFToken": localStorage.getItem("csrf_token"),
       },
       body: JSON.stringify(data),
     });

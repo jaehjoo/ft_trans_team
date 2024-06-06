@@ -66,7 +66,7 @@ export const App = () => {
             if (data.success === "Y") {
               localStorage.setItem("access_token", data.content.access);
               localStorage.setItem("refresh_token", data.content.refresh);
-              localStorage.setItem("csrf_token", data.content.csrftoken);
+              // localStorage.setItem("csrf_token", data.content.csrftoken);
               window.location.href = `/2fa`;
             } else {
               window.location.href = URL;

@@ -23,7 +23,7 @@ const FaImgGroup = (fa, setFa, setFaSent) => {
         access: localStorage.getItem("access_token"),
       }),
       headers: {
-        "X-CSRFToken": localStorage.getItem("csrf_token"),
+        // "X-CSRFToken": localStorage.getItem("csrf_token"),
         "Content-Type": "application/json",
       },
     })
@@ -98,7 +98,7 @@ const faPage = () => {
         access: localStorage.getItem("access_token"),
       }),
       headers: {
-        "X-CSRFToken": localStorage.getItem("csrf_token"),
+        // "X-CSRFToken": localStorage.getItem("csrf_token"),
         "Content-Type": "application/json",
       },
     })

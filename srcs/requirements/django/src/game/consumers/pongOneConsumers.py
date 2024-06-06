@@ -47,7 +47,6 @@ class PongOneConsumers(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         try:
             cnt = await self.db_cnt()
-            logger.error("cnt : " + str(cnt))
             if cnt == 1:
                 await self.db_delete()
                 delattr(self.RoomList, self.game_group_name)

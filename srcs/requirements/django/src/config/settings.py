@@ -142,8 +142,6 @@ CORS_ALLOW_HEADERS = (
     'host',
     'origin',
     'user-agent',
-    'X-CsrfToken',
-    'csrftoken',
     'x-requested-with',
 )
 

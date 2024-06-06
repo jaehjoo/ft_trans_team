@@ -47,7 +47,6 @@ def access_get_name(request):
 	if request.method == 'GET':
 		access = request.GET.get('access')
 	elif request.method == 'POST':
-		logger.error(request.body)
 		access = json.loads(request.body).get('access', None)
 	else:
 		access = None

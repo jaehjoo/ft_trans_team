@@ -9,7 +9,7 @@ const fetchAddUser = async (name) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-CSRFToken": localStorage.getItem("csrf_token"),
+      // "X-CSRFToken": localStorage.getItem("csrf_token"),
     },
     body: JSON.stringify(data),
   });
@@ -46,7 +46,7 @@ const fetchDeleteUser = async (name) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-CSRFToken": localStorage.getItem("csrf_token"),
+      // "X-CSRFToken": localStorage.getItem("csrf_token"),
     },
     body: JSON.stringify(data),
   });
