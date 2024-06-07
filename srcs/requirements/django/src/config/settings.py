@@ -110,6 +110,10 @@ LOGGING = {
 }
 
 # CORS, CSRF
+SESSION_COOKIE_HTTPONLY = True
+
+CSRF_COOKIE_HTTPONLY = True
+
 CSRF_TRUSTED_ORIGINS = [
     ADDRESS,
 ]
@@ -119,10 +123,6 @@ CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
-    ADDRESS,
-]
-
-CORS_ORIGIN_WHITELIST = [
     ADDRESS,
 ]
 
@@ -195,11 +195,17 @@ USE_TZ = False
 # EMAIL
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
 EMAIL_HOST = 'smtp.naver.com'
+
 EMAIL_USE_TLS = True
+
 EMAIL_PORT = 587
+
 EMAIL_HOST_USER = 'wnwoduq@naver.com'
+
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_SECRET')
+
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Static files (CSS, JavaScript, Images)

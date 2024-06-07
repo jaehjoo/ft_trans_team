@@ -43,7 +43,7 @@ export const StartCanvasTournamentLocal = () => {
         entities[4].name = "player2";
     } else if (status === 1) {
         entities[3].name = "player3";
-        entities[4].name = "player4"
+        entities[4].name = "player4";
     } else if (status === 2) {
         entities[3].name = scene[1].match1Winner;
         entities[4].name = scene[1].match2Winner;
@@ -55,11 +55,14 @@ export const StartCanvasTournamentLocal = () => {
     if (flag.START == false) {
       setPlayer();
       scene[1].draw(context);
+      setTimeout(function() {flag.START = true}, 3000);
     } else if (flag.STOP == true) {
       scene[1].draw(context);
       if (status === 3) {
         document.removeEventListener("keydown", keyDownHandler, false);
         document.removeEventListener("keyup", keyUpHandler, false);
+        setTimeout(function() { window.location.href = "/main" }, 1500);
+        status++;
       } else {
         flag.STOP = false;
         flag.START = false;
@@ -140,15 +143,6 @@ export const StartCanvasTournamentLocal = () => {
             scene[1].match3Winner = entities[3].name;
         status++;
         flag.STOP = true;
-        if (status < 2) {
-            window.addEventListener("click", function () {
-                flag.START = true;
-              }, {once : true})
-        } else {
-            window.addEventListener("click", function () {
-                window.location.href = "/main";
-              }, {once : true});
-        }
         entities[1].init();
     } else if (entities[1].score.ONE < entities[1].score.TWO && entities[1].score.TWO == entities[1].score.WIN) {
         if (status === 0)
@@ -159,15 +153,6 @@ export const StartCanvasTournamentLocal = () => {
             scene[1].match3Winner = entities[4].name;
         status++;
         flag.STOP = true;
-        if (status < 2) {
-            window.addEventListener("click", function () {
-                flag.START = true;
-              }, {once : true})
-        } else {
-            window.addEventListener("click", function () {
-                window.location.href = "/main";
-              }, {once : true});
-        }
         entities[1].init();
     }
   }

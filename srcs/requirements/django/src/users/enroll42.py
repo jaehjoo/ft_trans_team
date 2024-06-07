@@ -45,50 +45,50 @@ def generate_42(request):
 			is_record_fightinggame.save()
 
 			# debug용
-			try:
-				User.objects.get(username="jjh")
-			except User.DoesNotExist:
-				one = User(
-					username="jjh", display_name="jjh",
-					email="jjh@ac.kr", phone_number="01048103778",
-					connect=False
-				)
-				one.save()
-				is_key = UserKey(me=one, auth42=True, access_42=access_token)
-				is_key.save()
-				is_avatar = UserAvatar(me=one)
-				is_avatar.save()
-				is_record_ponggame = UserRecordPongGame(me=one)
-				is_record_ponggame.save()
-				is_record_fightinggame = UserRecordFightingGame(me=one)
-				is_record_fightinggame.save()
-				two = User(
-					username="knk", display_name="knk",
-					email="knk@ac.kr", phone_number="01029797512",
-					connect=False
-				)
-				two.save()
-				is_key = UserKey(me=two, auth42=True, access_42=access_token)
-				is_key.save()
-				is_avatar = UserAvatar(me=two)
-				is_avatar.save()
-				is_record_ponggame = UserRecordPongGame(me=two)
-				is_record_ponggame.save()
-				is_record_fightinggame = UserRecordFightingGame(me=two)
-				is_record_fightinggame.save()
-				three = User(
-					username="ccw", display_name="ccw",
-					email="ccw@ac.kr", phone_number="",
-					connect=False
-				)
-				three.save()
-				is_key = UserKey(me=three, auth42=True, access_42=access_token)
-				is_key.save()
-				is_avatar = UserAvatar(me=three)
-				is_avatar.save()
-				is_record_ponggame = UserRecordPongGame(me=three)
-				is_record_ponggame.save()
-				is_record_fightinggame = UserRecordFightingGame(me=three)
-				is_record_fightinggame.save()
+			# try:
+			# 	User.objects.get(username="jjh")
+			# except User.DoesNotExist:
+			# 	one = User(
+			# 		username="jjh", display_name="jjh",
+			# 		email="jjh@ac.kr", phone_number="01048103778",
+			# 		connect=False
+			# 	)
+			# 	one.save()
+			# 	is_key = UserKey(me=one, auth42=True, access_42=access_token)
+			# 	is_key.save()
+			# 	is_avatar = UserAvatar(me=one)
+			# 	is_avatar.save()
+			# 	is_record_ponggame = UserRecordPongGame(me=one)
+			# 	is_record_ponggame.save()
+			# 	is_record_fightinggame = UserRecordFightingGame(me=one)
+			# 	is_record_fightinggame.save()
+			# 	two = User(
+			# 		username="knk", display_name="knk",
+			# 		email="knk@ac.kr", phone_number="01029797512",
+			# 		connect=False
+			# 	)
+			# 	two.save()
+			# 	is_key = UserKey(me=two, auth42=True, access_42=access_token)
+			# 	is_key.save()
+			# 	is_avatar = UserAvatar(me=two)
+			# 	is_avatar.save()
+			# 	is_record_ponggame = UserRecordPongGame(me=two)
+			# 	is_record_ponggame.save()
+			# 	is_record_fightinggame = UserRecordFightingGame(me=two)
+			# 	is_record_fightinggame.save()
+			# 	three = User(
+			# 		username="ccw", display_name="ccw",
+			# 		email="ccw@ac.kr", phone_number="",
+			# 		connect=False
+			# 	)
+			# 	three.save()
+			# 	is_key = UserKey(me=three, auth42=True, access_42=access_token)
+			# 	is_key.save()
+			# 	is_avatar = UserAvatar(me=three)
+			# 	is_avatar.save()
+			# 	is_record_ponggame = UserRecordPongGame(me=three)
+			# 	is_record_ponggame.save()
+			# 	is_record_fightinggame = UserRecordFightingGame(me=three)
+			# 	is_record_fightinggame.save()
 			return is_user
 	return None
