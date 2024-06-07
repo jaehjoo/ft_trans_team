@@ -86,9 +86,9 @@ export class StatusBar {
 		else
 			this.drawText(context, 100, 50, PlayerInfo[0].display.toLowerCase());
 			if (PlayerInfo[1].name.length > 10)
-			this.drawText(context, 1000, 50, PlayerInfo[1].display);
+			this.drawText(context, 900, 50, PlayerInfo[1].display);
 		else
-			this.drawText(context, 1000, 50, PlayerInfo[1].display.toLowerCase());
+			this.drawText(context, 900, 50, PlayerInfo[1].display.toLowerCase());
 	}
 
 	draw(time, context) {

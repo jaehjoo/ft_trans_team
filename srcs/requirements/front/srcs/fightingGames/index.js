@@ -10,7 +10,9 @@ export const StartCanvas = () => {
 	const context = canvas.getContext('2d');
 
 	start.src = startBackground;
-	context.drawImage(start, 0, 0, 1024, 768, 0, 0, GameViewport.WIDTH, GameViewport.HEIGHT);
+	start.onload = function() {
+		context.drawImage(start, 0, 0, 1024, 768, 0, 0, GameViewport.WIDTH, GameViewport.HEIGHT);
+	};
 
 	window.addEventListener("click", function() {
 		let ws;
