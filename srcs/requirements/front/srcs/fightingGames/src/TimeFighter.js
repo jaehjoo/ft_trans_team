@@ -53,6 +53,7 @@ export class TimeFighter {
 			}
 			else if (textData.data.mode == "game.start") {
 				this.flag.connected = true;
+				registerKeyboardEvents();
 			}
 		}
 	}
@@ -73,7 +74,6 @@ export class TimeFighter {
 		if (!this.flag.connected)
 			this.connectWebsocket();
 		if (this.flag.connected && !this.flag.set) {
-			registerKeyboardEvents();
 			this.registerScenes();
 			this.sceneManager.setCurrentScene("select");
 			this.flag.set = true;

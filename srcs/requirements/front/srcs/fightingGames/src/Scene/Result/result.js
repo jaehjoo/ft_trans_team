@@ -1,6 +1,7 @@
 import { GameViewport } from "../../constants/window.js";
 import { PlayerInfo } from "../../constants/fighter.js";
 import { result } from "../../constants/image.js";
+import { removeKeyboardEvents } from "../../handlers/keyEventHandler.js";
 
 export class ResultScene {
 	context = this.getContext();
@@ -57,6 +58,7 @@ export class ResultScene {
 					}
 				})
 			)
+			removeKeyboardEvents();
 			this.complete = true;
 		}
 	}
