@@ -234,6 +234,14 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
     async def game_message(self, event):
         await self.send(text_data=json.dumps(event))
 
+    @database_sync_to_async
+    def get_rating_all(player):
+        rating = []
+        for name in player:
+            pl = UserRecordPongGame(me=name)
+            rating.append(pl.rating)
+        return rating
+
     # database를 이용하여 사람 수를 세거나 할 때 사용
     @database_sync_to_async
     def db_cnt(self):
@@ -287,6 +295,16 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
         # 비동기 함수로 생성된 save_room()를 호출
         await save_room()
 
+    @database_sync_to_async
+    def get_rating_all(self, player):
+        ratings = []
+
+        for user in player:
+            is_user = User.objects.get(username=user)
+            rating = UserRecordPongGame.objects.get(me=is_user)
+            ratings.append(rating.rating)
+        return ratings
+
     # 게임방이 얼마나 있는 지 확인할 때 사용
     @database_sync_to_async
     def get_db_room_cnt(self):
@@ -313,19 +331,20 @@ class PongTwoConsumers(AsyncWebsocketConsumer):
   
     async def calculate_rating(self):
         class_room = getattr(self.RoomList, self.game_group_name, None)
+        ratingInfo = await self.get_rating_all([class_room.player0.name, class_room.player1.name, class_room.player2.name, class_room.player3.name])
         if class_room.winner == class_room.player0.name and class_room.winner2 == class_room.player1.name:
-            player0rating = rating_calculator(class_room.player0.rating, class_room.player2.rating, 0)
-            player1rating = rating_calculator(class_room.player1.rating, class_room.player3.rating, 0)
+            player0rating = rating_calculator(ratingInfo[0], ratingInfo[2], 0)
+            player1rating = rating_calculator(ratingInfo[1], ratingInfo[3], 0)
 
-            player2rating = rating_calculator(class_room.player2.rating, class_room.player0.rating, 1)
-            player3rating = rating_calculator(class_room.player3.rating, class_room.player1.rating, 1)
+            player2rating = rating_calculator(ratingInfo[2], ratingInfo[0], 1)
+            player3rating = rating_calculator(ratingInfo[3], ratingInfo[1], 1)
 
         elif class_room.winner == class_room.player2.name and class_room.winner2 == class_room.player3.name:
-            player2rating = rating_calculator(class_room.player2.rating, class_room.player0.rating, 0)
-            player3rating = rating_calculator(class_room.player3.rating, class_room.player1.rating, 0)
+            player2rating = rating_calculator(ratingInfo[2], ratingInfo[0], 0)
+            player3rating = rating_calculator(ratingInfo[3], ratingInfo[1], 0)
 
-            player0rating = rating_calculator(class_room.player0.rating, class_room.player2.rating, 1)
-            player1rating = rating_calculator(class_room.player1.rating, class_room.player3.rating, 1)
+            player0rating = rating_calculator(ratingInfo[0], ratingInfo[2], 1)
+            player1rating = rating_calculator(ratingInfo[1], ratingInfo[3], 1)
 
         await self.set_rating([class_room.player0.name, player0rating], [class_room.player1.name, player1rating], [class_room.player2.name, player2rating], [class_room.player3.name, player3rating], class_room.winner, class_room.winner2)
 

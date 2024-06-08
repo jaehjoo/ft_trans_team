@@ -180,12 +180,13 @@ class PongOneConsumers(AsyncWebsocketConsumer):
 
     async def calculate_rating(self):
         class_room = getattr(self.RoomList, self.game_group_name, None)
+        ratingInfo = await self.get_rating_all([class_room.player0.name, class_room.player1.name])
         if class_room.winner == class_room.player0.name:
-            player0rating = rating_calculator(class_room.player0.rating, class_room.player1.rating, 0)
-            player1rating = rating_calculator(class_room.player1.rating, class_room.player0.rating, 1)
+            player0rating = rating_calculator(ratingInfo[0], ratingInfo[1], 0)
+            player1rating = rating_calculator(ratingInfo[1], ratingInfo[0], 1)
         else:
-            player0rating = rating_calculator(class_room.player0.rating, class_room.player1.rating, 1)
-            player1rating = rating_calculator(class_room.player1.rating, class_room.player0.rating, 0)
+            player0rating = rating_calculator(ratingInfo[0], ratingInfo[1], 1)
+            player1rating = rating_calculator(ratingInfo[1], ratingInfo[0], 0)
         await self.set_rating([class_room.player0.name, player0rating], [class_room.player1.name, player1rating], class_room.winner)
 
     async def game_update_task(self):
@@ -221,7 +222,16 @@ class PongOneConsumers(AsyncWebsocketConsumer):
                     }
                 )
 
-
+    @database_sync_to_async
+    def get_rating_all(self, player):
+        logger.error(player)
+        ratings = []
+        for user in player:
+            is_user = User.objects.get(username=user)
+            rating = UserRecordPongGame.objects.get(me=is_user).rating
+            logger.error(rating)
+            ratings.append(rating)
+        return ratings
 
     # database를 이용하여 사람 수를 세거나 할 때 사용
     @database_sync_to_async

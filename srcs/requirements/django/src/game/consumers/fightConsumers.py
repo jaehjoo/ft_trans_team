@@ -236,13 +236,25 @@ class fightingConsumers(AsyncWebsocketConsumer):
     
     async def calculate_rating(self):
         is_room = getattr(self.RoomList, self.game_group_name, None)
+        ratingInfo = await self.get_rating_all([is_room.player0.name, is_room.player1.name])
         if is_room.winner == is_room.player0.name:
-            player0rating = rating_calculator(is_room.player0.rating, is_room.player1.rating, 0)
-            player1rating = rating_calculator(is_room.player1.rating, is_room.player0.rating, 1)
+            player0rating = rating_calculator(ratingInfo[0], ratingInfo[1], 0)
+            player1rating = rating_calculator(ratingInfo[1], ratingInfo[0], 1)
         else:
-            player0rating = rating_calculator(is_room.player0.rating, is_room.player1.rating, 1)
-            player1rating = rating_calculator(is_room.player1.rating, is_room.player0.rating, 0)
+            player0rating = rating_calculator(ratingInfo[0], ratingInfo[1], 1)
+            player1rating = rating_calculator(ratingInfo[1], ratingInfo[0], 0)
         await self.set_rating([is_room.player0.name, player0rating], [is_room.player1.name, player1rating], is_room.winner)
+
+
+    @database_sync_to_async
+    def get_rating_all(self, player):
+        ratings = []
+
+        for user in player:
+            is_user = User.objects.get(username=user)
+            rating = UserRecordFightingGame.objects.get(me=is_user)
+            ratings.append(rating.rating)
+        return ratings
 
     @database_sync_to_async
     def db_cnt(self):

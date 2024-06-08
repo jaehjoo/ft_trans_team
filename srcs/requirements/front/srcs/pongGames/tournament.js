@@ -67,11 +67,13 @@ export const StartCanvasTournament = () => {
   function checkWebSocketMessage() {
     ws.onmessage = (msg) => {
       let textData = JSON.parse(msg.data);
+      console.log(textData.data.mode);
       if (textData.data.mode == "connect") {
         yourName = textData.data.name;
       } else if (textData.data.mode == "set.game") {
         entities[3].name = textData.data.player0;
         entities[4].name = textData.data.player1;
+        console.log(entities[3].name + ", " + entities[4].name);
         if (textData.data.status == "match1") {
           scene[1].setPlayerInfo([textData.data.player0, textData.data.player1, textData.data.player2, textData.data.player3]);
           ws.send(
@@ -108,10 +110,8 @@ export const StartCanvasTournament = () => {
         } else if (textData.data['status'] == "match3") {
           scene[1].match3Winner = textData.data['winner'];
         }
-        if (entities[3].name == yourName || entities[4].name == yourName) {
-          if (textData.data['winner'] != yourName)
-            flag.FINAL = true;
-          else if (textData.data['status'] == "match1" || textData.data['status'] == "match2") {
+        if (textData.data['winner'] == yourName) {
+          if (textData.data['status'] == "match1" || textData.data['status'] == "match2") {
             ws.send(
               JSON.stringify({
                 type: "next.game",
@@ -162,17 +162,21 @@ export const StartCanvasTournament = () => {
   window.requestAnimationFrame(start);
 
   function keyDownHandler(event) {
-    let player;
-    if (yourName == entities[3].name) player = entities[3];
-    else player = entities[4];
-    if (event.keyCode == 87)
-      player.upPressed = true;
-    else if (event.keyCode == 38)
-      player.upPressed = true;
-    else if (event.keyCode == 83)
-      player.downPressed = true;
-    else if (event.keyCode == 40)
-      player.downPressed = true;
+    let player = null;
+    if (yourName == entities[3].name)
+      player = entities[3];
+    else if (yourName == entities[4].name)
+      player = entities[4];
+    if (player) {
+      console.log(player.name);
+      if (event.keyCode == 87)
+        player.upPressed = true;
+      else if (event.keyCode == 38)
+        player.upPressed = true;
+      else if (event.keyCode == 83)
+        player.downPressed = true;
+      else if (event.keyCode == 40)
+        player.downPressed = true;
       ws.send(
         JSON.stringify({
           'type' : 'bar.info',
@@ -183,30 +187,35 @@ export const StartCanvasTournament = () => {
           }
         })
       )
+    }
   }
 
   function keyUpHandler(event) {
-    let player;
-    if (yourName == entities[3].name) player = entities[3];
-    else player = entities[4];
-    if (event.keyCode == 87) 
-      player.upPressed = false;
-    else if (event.keyCode == 38)
-      player.upPressed = false;
-    else if (event.keyCode == 83)
-      player.downPressed = false;
-    else if (event.keyCode == 40)
-      player.downPressed = false;
-    ws.send(
-      JSON.stringify({
-        'type' : 'bar.info',
-        'data' : {
-          'name' : yourName,
-          'up' : player.upPressed,
-          'down' : player.downPressed,
-        }
-      })
-    )
+    let player = null;
+    if (yourName == entities[3].name)
+      player = entities[3];
+    else if (yourName == entities[4].name)
+      player = entities[4];
+    if (player) {
+      if (event.keyCode == 87) 
+        player.upPressed = false;
+      else if (event.keyCode == 38)
+        player.upPressed = false;
+      else if (event.keyCode == 83)
+        player.downPressed = false;
+      else if (event.keyCode == 40)
+        player.downPressed = false;
+      ws.send(
+        JSON.stringify({
+          'type' : 'bar.info',
+          'data' : {
+            'name' : yourName,
+            'up' : player.upPressed,
+            'down' : player.downPressed,
+          }
+        })
+      )
+    }
   }
 }
 

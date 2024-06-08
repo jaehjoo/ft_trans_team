@@ -132,23 +132,26 @@ export const StartCanvasTeamLocal = () => {
   }
 
   function checkScore() {
+		if (entities[1].score.ONE == entities[1].score.TWO && entities[1].score.ONE > 9) {
+		  entities[1].score.WIN = entities[1].ONE + 2
+    }
     if (entities[1].score.ONE > entities[1].score.TWO && entities[1].score.ONE == entities[1].score.WIN) {
-        entities[2].winner = entities[3].name;
-        entities[2].winner2 = entities[4].name;
-        scene[1].win = 1;
-        flag.STOP = true;
-        window.addEventListener("click", function () {
-          window.location.href = "/main";
-        }, {once : true});
+      entities[2].winner = entities[3].name;
+      entities[2].winner2 = entities[4].name;
+      scene[1].win = 1;
+      flag.STOP = true;
+      window.addEventListener("click", function () {
+        window.location.href = "/main";
+      }, {once : true});
     }
     else if (entities[1].score.TWO > entities[1].score.TWO && entities[1].score.TWO == entities[1].score.WIN) {
-        entities[2].winner = entities[5].name;
-        entities[2].winner2 = entities[6].name;
-        scene[1].win = 2;
-        flag.STOP = true;
-        window.addEventListener("click", function () {
-          window.location.href = "/main";
-        }, {once : true});
+      entities[2].winner = entities[5].name;
+      entities[2].winner2 = entities[6].name;
+      scene[1].win = 2;
+      flag.STOP = true;
+      window.addEventListener("click", function () {
+        window.location.href = "/main";
+      }, {once : true});
     }
   }
 

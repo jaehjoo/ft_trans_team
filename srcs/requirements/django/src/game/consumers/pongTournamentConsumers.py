@@ -117,6 +117,7 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
             class_room.winner = msg_data['name']
             class_room.status = "match2"
             db_room = await self.get_db_room()
+            class_room.setPlayerOneByOne({"name" : db_room.players[2], "rating" : 0}, {"name" : db_room.players[3], "rating" : 0})
             await self.channel_layer.group_send(
                 self.game_group_name, {
                     "type" : "game.message",
@@ -149,6 +150,7 @@ class PongTournamentConsumers(AsyncWebsocketConsumer):
             class_room = await self.get_class_room()
             class_room.winner2 = msg_data['name']
             class_room.status = "match3"
+            class_room.setPlayerOneByOne({"name" : class_room.winner, "rating" : 0}, {"name" : class_room.winner2, "rating" : 0})
             await self.channel_layer.group_send(
                 self.game_group_name, {
                     "type" : "game.message",

@@ -316,9 +316,9 @@ class Room:
 				self.winner2 = self.player3.name
 		elif self.mode == "one" and self.status == "match3":
 			if self.score.ONE > self.score.TWO and self.score.ONE == self.score.WIN:
-				self.winner3 = self.player0.name
+				self.winner3 = self.winner
 			elif self.score.ONE < self.score.TWO and self.score.TWO == self.score.WIN:
-				self.winner3 = self.player1.name
+				self.winner3 = self.winner2
 		elif self.mode == "two":
 			if self.score.ONE > self.score.TWO and self.score.ONE == self.score.WIN:
 				self.winner = self.player0.name

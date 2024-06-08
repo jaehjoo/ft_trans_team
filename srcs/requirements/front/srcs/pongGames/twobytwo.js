@@ -146,17 +146,24 @@ export const StartCanvasTeam = () => {
   window.requestAnimationFrame(start);
 
   function keyDownHandler(event) {
-    let player;
-    if (yourName == entities[3].name) player = entities[3];
-    else player = entities[4];
-    if (event.keyCode == 87)
-      player.upPressed = true;
-    else if (event.keyCode == 38)
-      player.upPressed = true;
-    else if (event.keyCode == 83)
-      player.downPressed = true;
-    else if (event.keyCode == 40)
-      player.downPressed = true;
+    let player = null;
+    if (yourName == entities[3].name)
+      player = entities[3];
+    else if (yourName == entities[4].name) 
+      player = entities[4];
+    else if (yourName == entities[5].name)
+      player = entities[5];
+    else if (yourName == entities[6].name)
+      player = entities[6];
+    if (player) {
+      if (event.keyCode == 87)
+        player.upPressed = true;
+      else if (event.keyCode == 38)
+        player.upPressed = true;
+      else if (event.keyCode == 83)
+        player.downPressed = true;
+      else if (event.keyCode == 40)
+        player.downPressed = true;
       ws.send(
         JSON.stringify({
           'type' : 'bar.info',
@@ -168,29 +175,38 @@ export const StartCanvasTeam = () => {
         })
       )
     }
+    }
 
   function keyUpHandler(event) {
-    let player;
-    if (yourName == entities[3].name) player = entities[3];
-    else player = entities[4];
-    if (event.keyCode == 87) 
-      player.upPressed = false;
-    else if (event.keyCode == 38)
-      player.upPressed = false;
-    else if (event.keyCode == 83)
-      player.downPressed = false;
-    else if (event.keyCode == 40)
-      player.downPressed = false;
-    ws.send(
-      JSON.stringify({
-        'type' : 'bar.info',
-        'data' : {
-          'name' : yourName,
-          'up' : player.upPressed,
-          'down' : player.downPressed,
-        }
-      })
-    )
+    let player = null;
+    if (yourName == entities[3].name)
+      player = entities[3];
+    else if (yourName == entities[4].name)
+      player = entities[4];
+    else if (yourName == entities[5].name)
+      player = entities[5];
+    else if (yourName == entities[6].name)
+      player = entities[6];
+    if (player) {
+       if (event.keyCode == 87) 
+        player.upPressed = false;
+      else if (event.keyCode == 38)
+        player.upPressed = false;
+      else if (event.keyCode == 83)
+        player.downPressed = false;
+      else if (event.keyCode == 40)
+        player.downPressed = false;
+      ws.send(
+        JSON.stringify({
+          'type' : 'bar.info',
+          'data' : {
+            'name' : yourName,
+            'up' : player.upPressed,
+            'down' : player.downPressed,
+          }
+        })
+      )
+    }
   }
 }
 export default StartCanvasTeam;
